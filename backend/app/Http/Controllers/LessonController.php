@@ -11,18 +11,28 @@ class LessonController extends Controller
 {
     /**
      * Danh sách bài học
+     * 
+     * Query params:
+     * - course_id: Lọc theo khóa học
+     * - search: Tìm kiếm theo title hoặc description
+     * - duration_min: Lọc thời lượng tối thiểu (giây)
+     * - duration_max: Lọc thời lượng tối đa (giây)
+     * - sort_by: Sắp xếp theo (id, title, duration, display_order, created_at) - mặc định: display_order
+     * - order_by: Thứ tự (asc, desc) - mặc định: asc
+     * - per_page: Số lượng mỗi trang - mặc định: 15
+     * - page: Số trang
      */
     public function index(Request $request)
     {
         $query = Lesson::with('course');
 
         // Lọc theo khóa học
-        if ($request->has('course_id')) {
+        if ($request->has('course_id') && $request->course_id) {
             $query->where('course_id', $request->course_id);
         }
 
         // Tìm kiếm
-        if ($request->has('search')) {
+        if ($request->has('search') && $request->search) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
@@ -30,9 +40,37 @@ class LessonController extends Controller
             });
         }
 
-        $query->orderBy('display_order');
+        // Lọc theo duration_min
+        if ($request->has('duration_min') && $request->duration_min) {
+            $query->where('duration', '>=', (int)$request->duration_min);
+        }
+
+        // Lọc theo duration_max
+        if ($request->has('duration_max') && $request->duration_max) {
+            $query->where('duration', '<=', (int)$request->duration_max);
+        }
+
+        // Sắp xếp
+        $sortBy = $request->get('sort_by', 'display_order');
+        $orderBy = $request->get('order_by', 'asc');
+        
+        // Validate sort_by
+        $allowedSortBy = ['id', 'title', 'duration', 'display_order', 'created_at', 'updated_at'];
+        if (!in_array($sortBy, $allowedSortBy)) {
+            $sortBy = 'display_order';
+        }
+        
+        // Validate order_by
+        $orderBy = strtolower($orderBy);
+        if (!in_array($orderBy, ['asc', 'desc'])) {
+            $orderBy = 'asc';
+        }
+        
+        $query->orderBy($sortBy, $orderBy);
 
         $perPage = $request->get('per_page', 15);
+        $perPage = min(max(1, (int)$perPage), 100); // Giới hạn từ 1-100
+        
         $lessons = $query->paginate($perPage);
 
         return response()->json([

@@ -11,13 +11,24 @@ class UserController extends Controller
 {
     /**
      * Danh sách người dùng
+     * 
+     * Query params:
+     * - search: Tìm kiếm theo email hoặc fullname
+     * - role_id: Lọc theo role ID
+     * - role_name: Lọc theo tên role (ROOT, ADMIN, TEACHER, STUDENT)
+     * - created_at_from: Lọc từ ngày tạo (format: Y-m-d)
+     * - created_at_to: Lọc đến ngày tạo (format: Y-m-d)
+     * - sort_by: Sắp xếp theo (id, email, fullname, created_at) - mặc định: id
+     * - order_by: Thứ tự (asc, desc) - mặc định: desc
+     * - per_page: Số lượng mỗi trang - mặc định: 15
+     * - page: Số trang
      */
     public function index(Request $request)
     {
         $query = User::with('roles');
 
         // Tìm kiếm
-        if ($request->has('search')) {
+        if ($request->has('search') && $request->search) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('email', 'like', "%{$search}%")
@@ -25,14 +36,51 @@ class UserController extends Controller
             });
         }
 
-        // Lọc theo role
-        // if ($request->has('role_id')) {
-        //     $query->whereHas('roles', function ($q) use ($request) {
-        //         $q->where('roles.id', $request->role_id);
-        //     });
-        // }
+        // Lọc theo role_id
+        if ($request->has('role_id') && $request->role_id) {
+            $query->whereHas('roles', function ($q) use ($request) {
+                $q->where('roles.id', $request->role_id);
+            });
+        }
+
+        // Lọc theo role_name
+        if ($request->has('role_name') && $request->role_name) {
+            $query->whereHas('roles', function ($q) use ($request) {
+                $q->where('roles.name', $request->role_name);
+            });
+        }
+
+        // Lọc theo ngày tạo (từ)
+        if ($request->has('created_at_from') && $request->created_at_from) {
+            $query->whereDate('created_at', '>=', $request->created_at_from);
+        }
+
+        // Lọc theo ngày tạo (đến)
+        if ($request->has('created_at_to') && $request->created_at_to) {
+            $query->whereDate('created_at', '<=', $request->created_at_to);
+        }
+
+        // Sắp xếp
+        $sortBy = $request->get('sort_by', 'id');
+        $orderBy = $request->get('order_by', 'desc');
+        
+        // Validate sort_by
+        $allowedSortBy = ['id', 'email', 'fullname', 'created_at', 'updated_at'];
+        if (!in_array($sortBy, $allowedSortBy)) {
+            $sortBy = 'id';
+        }
+        
+        // Validate order_by
+        $orderBy = strtolower($orderBy);
+        if (!in_array($orderBy, ['asc', 'desc'])) {
+            $orderBy = 'desc';
+        }
+        
+        $query->orderBy($sortBy, $orderBy);
 
         $perPage = $request->get('per_page', 15);
+        $perPage = min(max(1, (int)$perPage), 100); // Giới hạn từ 1-100
+        
         $users = $query->paginate($perPage);
 
         return response()->json([

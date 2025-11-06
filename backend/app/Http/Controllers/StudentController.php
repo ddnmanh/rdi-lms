@@ -12,16 +12,49 @@ class StudentController extends Controller
 {
     /**
      * Danh sách khóa học của sinh viên
+     * 
+     * Query params:
+     * - search: Tìm kiếm theo title hoặc description
+     * - sort_by: Sắp xếp theo (id, title, start_date, end_date, created_at) - mặc định: id
+     * - order_by: Thứ tự (asc, desc) - mặc định: desc
      */
     public function courses(Request $request)
     {
         $user = $request->user();
 
-        $courses = $user->courses()
+        $query = $user->courses()
             ->with(['lessons' => function ($query) {
                 $query->orderBy('display_order');
-            }])
-            ->get();
+            }]);
+
+        // Tìm kiếm
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        // Sắp xếp
+        $sortBy = $request->get('sort_by', 'id');
+        $orderBy = $request->get('order_by', 'desc');
+        
+        // Validate sort_by
+        $allowedSortBy = ['id', 'title', 'start_date', 'end_date', 'created_at', 'updated_at'];
+        if (!in_array($sortBy, $allowedSortBy)) {
+            $sortBy = 'id';
+        }
+        
+        // Validate order_by
+        $orderBy = strtolower($orderBy);
+        if (!in_array($orderBy, ['asc', 'desc'])) {
+            $orderBy = 'desc';
+        }
+        
+        $query->orderBy($sortBy, $orderBy);
+
+        $courses = $query->get();
 
         return response()->json([
             'success' => true,

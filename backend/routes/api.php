@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -29,14 +30,14 @@ Route::prefix('auth')->group(function () {
 
 // Protected routes - require authentication
 Route::middleware('auth:api')->group(function () {
-    // Authentication
+    // Authentication (không cần kiểm tra permission vì là thông tin cá nhân)
     Route::prefix('auth')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
     });
 
-    // User Management (Admin)
-    Route::prefix('users')->group(function () {
+    // User Management (Admin) - yêu cầu permission
+    Route::middleware('check.permission')->prefix('users')->group(function () {
         Route::get('/', [UserController::class, 'index']);
         Route::post('/', [UserController::class, 'store']);
         Route::get('/{id}', [UserController::class, 'show']);
@@ -45,8 +46,18 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/{id}/roles', [UserController::class, 'assignRoles']);
     });
 
-    // Course Management (Admin)
-    Route::prefix('courses')->group(function () {
+    // Role Management (Admin) - yêu cầu permission
+    Route::middleware('check.permission')->prefix('roles')->group(function () {
+        Route::get('/', [RoleController::class, 'index']);
+        Route::post('/', [RoleController::class, 'store']);
+        Route::get('/{id}', [RoleController::class, 'show']);
+        Route::put('/{id}', [RoleController::class, 'update']);
+        Route::delete('/{id}', [RoleController::class, 'destroy']);
+        Route::post('/{id}/permissions', [RoleController::class, 'assignPermissions']);
+    });
+
+    // Course Management (Admin) - yêu cầu permission
+    Route::middleware('check.permission')->prefix('courses')->group(function () {
         Route::get('/', [CourseController::class, 'index']);
         Route::post('/', [CourseController::class, 'store']);
         Route::get('/{id}', [CourseController::class, 'show']);
@@ -57,8 +68,8 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/{id}/users/remove', [CourseController::class, 'removeUser']);
     });
 
-    // Lesson Management (Admin)
-    Route::prefix('lessons')->group(function () {
+    // Lesson Management (Admin) - yêu cầu permission
+    Route::middleware('check.permission')->prefix('lessons')->group(function () {
         Route::get('/', [LessonController::class, 'index']);
         Route::post('/', [LessonController::class, 'store']);
         Route::get('/{id}', [LessonController::class, 'show']);
@@ -66,8 +77,8 @@ Route::middleware('auth:api')->group(function () {
         Route::delete('/{id}', [LessonController::class, 'destroy']);
     });
 
-    // Student routes
-    Route::prefix('student')->group(function () {
+    // Student routes - yêu cầu permission
+    Route::middleware('check.permission')->prefix('student')->group(function () {
         Route::get('/courses', [StudentController::class, 'courses']);
         Route::get('/courses/{courseId}', [StudentController::class, 'courseDetail']);
         Route::get('/lessons/{lessonId}', [StudentController::class, 'lessonDetail']);
@@ -75,8 +86,8 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/courses/{courseId}/progress', [StudentController::class, 'courseProgress']);
     });
 
-    // Report routes (Admin)
-    Route::prefix('reports')->group(function () {
+    // Report routes (Admin) - yêu cầu permission
+    Route::middleware('check.permission')->prefix('reports')->group(function () {
         Route::get('/overview', [ReportController::class, 'overview']);
         Route::get('/courses/{courseId}/statistics', [ReportController::class, 'courseStatistics']);
         Route::get('/courses/{courseId}/students', [ReportController::class, 'courseStudents']);

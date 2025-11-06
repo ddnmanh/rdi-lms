@@ -396,6 +396,238 @@
 			]
 		},
 		{
+			"name": "Role Management",
+			"item": [
+				{
+					"name": "Get All Roles",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/roles?search=&level_from=&level_to=&user_id=&permission_id=&sort_by=level&order_by=asc&per_page=15&page=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "roles"],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Tìm kiếm theo name hoặc description"
+								},
+								{
+									"key": "level_from",
+									"value": "",
+									"description": "Lọc từ level (1-255)"
+								},
+								{
+									"key": "level_to",
+									"value": "",
+									"description": "Lọc đến level (1-255)"
+								},
+								{
+									"key": "user_id",
+									"value": "",
+									"description": "Lọc các roles có user này"
+								},
+								{
+									"key": "permission_id",
+									"value": "",
+									"description": "Lọc các roles có permission này"
+								},
+								{
+									"key": "sort_by",
+									"value": "level",
+									"description": "Sắp xếp theo (id, name, level, created_at, updated_at)"
+								},
+								{
+									"key": "order_by",
+									"value": "asc",
+									"description": "Thứ tự (asc, desc)"
+								},
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Số lượng mỗi trang (1-100)"
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Số trang"
+								}
+							]
+						},
+						"description": "Danh sách roles với pagination và filters"
+					}
+				},
+				{
+					"name": "Create Role",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"MODERATOR\",\n  \"description\": \"Người điều hành\",\n  \"level\": 50,\n  \"permission_ids\": [1, 2, 3]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/roles",
+							"host": ["{{base_url}}"],
+							"path": ["api", "roles"]
+						},
+						"description": "Tạo role mới"
+					}
+				},
+				{
+					"name": "Get Role by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/roles/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "roles", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Chi tiết role"
+					}
+				},
+				{
+					"name": "Update Role",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"MODERATOR\",\n  \"description\": \"Người điều hành (Updated)\",\n  \"level\": 50,\n  \"permission_ids\": [1, 2, 3, 4]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/roles/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "roles", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Cập nhật role"
+					}
+				},
+				{
+					"name": "Delete Role",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/roles/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "roles", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Xóa role (soft delete)"
+					}
+				},
+				{
+					"name": "Assign Permissions to Role",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"permission_ids\": [1, 2, 3, 4, 5]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/roles/:id/permissions",
+							"host": ["{{base_url}}"],
+							"path": ["api", "roles", ":id", "permissions"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Gán permissions cho role"
+					}
+				}
+			]
+		},
+		{
 			"name": "Course Management",
 			"item": [
 				{

@@ -181,7 +181,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/users?search=&role_id=&per_page=15&page=1",
+							"raw": "{{base_url}}/api/users?search=&role_id=&role_name=&created_at_from=&created_at_to=&sort_by=id&order_by=desc&per_page=15&page=1",
 							"host": ["{{base_url}}"],
 							"path": ["api", "users"],
 							"query": [
@@ -193,12 +193,37 @@
 								{
 									"key": "role_id",
 									"value": "",
-									"description": "Lọc theo role"
+									"description": "Lọc theo role ID"
+								},
+								{
+									"key": "role_name",
+									"value": "",
+									"description": "Lọc theo tên role (ROOT, ADMIN, TEACHER, STUDENT)"
+								},
+								{
+									"key": "created_at_from",
+									"value": "",
+									"description": "Lọc từ ngày tạo (format: Y-m-d)"
+								},
+								{
+									"key": "created_at_to",
+									"value": "",
+									"description": "Lọc đến ngày tạo (format: Y-m-d)"
+								},
+								{
+									"key": "sort_by",
+									"value": "id",
+									"description": "Sắp xếp theo (id, email, fullname, created_at, updated_at)"
+								},
+								{
+									"key": "order_by",
+									"value": "desc",
+									"description": "Thứ tự (asc, desc)"
 								},
 								{
 									"key": "per_page",
 									"value": "15",
-									"description": "Số lượng mỗi trang"
+									"description": "Số lượng mỗi trang (1-100)"
 								},
 								{
 									"key": "page",
@@ -207,7 +232,7 @@
 								}
 							]
 						},
-						"description": "Danh sách người dùng với pagination"
+						"description": "Danh sách người dùng với pagination và filters"
 					}
 				},
 				{
@@ -388,7 +413,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/courses?search=&per_page=15&page=1",
+							"raw": "{{base_url}}/api/courses?search=&user_id=&start_date_from=&start_date_to=&end_date_from=&end_date_to=&date_range=all&sort_by=id&order_by=desc&per_page=15&page=1",
 							"host": ["{{base_url}}"],
 							"path": ["api", "courses"],
 							"query": [
@@ -398,9 +423,49 @@
 									"description": "Tìm kiếm theo title hoặc description"
 								},
 								{
+									"key": "user_id",
+									"value": "",
+									"description": "Lọc các khóa học có user này tham gia"
+								},
+								{
+									"key": "start_date_from",
+									"value": "",
+									"description": "Lọc từ ngày bắt đầu (format: Y-m-d)"
+								},
+								{
+									"key": "start_date_to",
+									"value": "",
+									"description": "Lọc đến ngày bắt đầu (format: Y-m-d)"
+								},
+								{
+									"key": "end_date_from",
+									"value": "",
+									"description": "Lọc từ ngày kết thúc (format: Y-m-d)"
+								},
+								{
+									"key": "end_date_to",
+									"value": "",
+									"description": "Lọc đến ngày kết thúc (format: Y-m-d)"
+								},
+								{
+									"key": "date_range",
+									"value": "all",
+									"description": "Lọc theo trạng thái (active, upcoming, past, all)"
+								},
+								{
+									"key": "sort_by",
+									"value": "id",
+									"description": "Sắp xếp theo (id, title, start_date, end_date, created_at, updated_at)"
+								},
+								{
+									"key": "order_by",
+									"value": "desc",
+									"description": "Thứ tự (asc, desc)"
+								},
+								{
 									"key": "per_page",
 									"value": "15",
-									"description": "Số lượng mỗi trang"
+									"description": "Số lượng mỗi trang (1-100)"
 								},
 								{
 									"key": "page",
@@ -409,7 +474,7 @@
 								}
 							]
 						},
-						"description": "Danh sách khóa học với pagination"
+						"description": "Danh sách khóa học với pagination và filters"
 					}
 				},
 				{
@@ -662,7 +727,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/lessons?course_id=&search=&per_page=15&page=1",
+							"raw": "{{base_url}}/api/lessons?course_id=&search=&duration_min=&duration_max=&sort_by=display_order&order_by=asc&per_page=15&page=1",
 							"host": ["{{base_url}}"],
 							"path": ["api", "lessons"],
 							"query": [
@@ -674,12 +739,32 @@
 								{
 									"key": "search",
 									"value": "",
-									"description": "Tìm kiếm"
+									"description": "Tìm kiếm theo title hoặc description"
+								},
+								{
+									"key": "duration_min",
+									"value": "",
+									"description": "Lọc thời lượng tối thiểu (giây)"
+								},
+								{
+									"key": "duration_max",
+									"value": "",
+									"description": "Lọc thời lượng tối đa (giây)"
+								},
+								{
+									"key": "sort_by",
+									"value": "display_order",
+									"description": "Sắp xếp theo (id, title, duration, display_order, created_at, updated_at)"
+								},
+								{
+									"key": "order_by",
+									"value": "asc",
+									"description": "Thứ tự (asc, desc)"
 								},
 								{
 									"key": "per_page",
 									"value": "15",
-									"description": "Số lượng mỗi trang"
+									"description": "Số lượng mỗi trang (1-100)"
 								},
 								{
 									"key": "page",
@@ -688,7 +773,7 @@
 								}
 							]
 						},
-						"description": "Danh sách bài học với pagination"
+						"description": "Danh sách bài học với pagination và filters"
 					}
 				},
 				{
@@ -833,11 +918,28 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/student/courses",
+							"raw": "{{base_url}}/api/student/courses?search=&sort_by=id&order_by=desc",
 							"host": ["{{base_url}}"],
-							"path": ["api", "student", "courses"]
+							"path": ["api", "student", "courses"],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Tìm kiếm theo title hoặc description"
+								},
+								{
+									"key": "sort_by",
+									"value": "id",
+									"description": "Sắp xếp theo (id, title, start_date, end_date, created_at, updated_at)"
+								},
+								{
+									"key": "order_by",
+									"value": "desc",
+									"description": "Thứ tự (asc, desc)"
+								}
+							]
 						},
-						"description": "Danh sách khóa học của sinh viên"
+						"description": "Danh sách khóa học của sinh viên với filters"
 					}
 				},
 				{
@@ -1024,14 +1126,44 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/reports/courses/:courseId/students?per_page=15&page=1",
+							"raw": "{{base_url}}/api/reports/courses/:courseId/students?search=&progress_min=&progress_max=&is_completed=&sort_by=user_id&order_by=asc&per_page=15&page=1",
 							"host": ["{{base_url}}"],
 							"path": ["api", "reports", "courses", ":courseId", "students"],
 							"query": [
 								{
+									"key": "search",
+									"value": "",
+									"description": "Tìm kiếm theo email hoặc fullname"
+								},
+								{
+									"key": "progress_min",
+									"value": "",
+									"description": "Lọc tiến độ tối thiểu (%)"
+								},
+								{
+									"key": "progress_max",
+									"value": "",
+									"description": "Lọc tiến độ tối đa (%)"
+								},
+								{
+									"key": "is_completed",
+									"value": "",
+									"description": "Lọc theo trạng thái hoàn thành (true/false)"
+								},
+								{
+									"key": "sort_by",
+									"value": "user_id",
+									"description": "Sắp xếp theo (user_id, email, fullname, overall_percentage, total_watched_duration)"
+								},
+								{
+									"key": "order_by",
+									"value": "asc",
+									"description": "Thứ tự (asc, desc)"
+								},
+								{
 									"key": "per_page",
 									"value": "15",
-									"description": "Số lượng mỗi trang"
+									"description": "Số lượng mỗi trang (1-100)"
 								},
 								{
 									"key": "page",
@@ -1046,7 +1178,7 @@
 								}
 							]
 						},
-						"description": "Danh sách sinh viên trong khóa học với tiến độ học"
+						"description": "Danh sách sinh viên trong khóa học với tiến độ học và filters"
 					}
 				},
 				{
@@ -1079,34 +1211,6 @@
 							]
 						},
 						"description": "Chi tiết tiến độ học của một sinh viên trong khóa học"
-					}
-				},
-				{
-					"name": "Get Student Login History",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{access_token}}"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/api/reports/students/:userId/login-history",
-							"host": ["{{base_url}}"],
-							"path": ["api", "reports", "students", ":userId", "login-history"],
-							"variable": [
-								{
-									"key": "userId",
-									"value": "1"
-								}
-							]
-						},
-						"description": "Lịch sử đăng nhập của sinh viên"
 					}
 				}
 			]

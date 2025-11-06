@@ -45,6 +45,16 @@ class ReportController extends Controller
 
     /**
      * Danh sách sinh viên trong khóa học với tiến độ học
+     * 
+     * Query params:
+     * - search: Tìm kiếm theo email hoặc fullname
+     * - progress_min: Lọc tiến độ tối thiểu (%)
+     * - progress_max: Lọc tiến độ tối đa (%)
+     * - is_completed: Lọc theo trạng thái hoàn thành (true/false)
+     * - sort_by: Sắp xếp theo (user_id, email, fullname, overall_percentage, total_watched_duration) - mặc định: user_id
+     * - order_by: Thứ tự (asc, desc) - mặc định: asc
+     * - per_page: Số lượng mỗi trang - mặc định: 15
+     * - page: Số trang
      */
     public function courseStudents(Request $request, $courseId)
     {
@@ -57,12 +67,22 @@ class ReportController extends Controller
             ], 404);
         }
 
-        $students = $course->users()->get();
+        $students = $course->users();
+
+        // Tìm kiếm
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $students->where(function ($q) use ($search) {
+                $q->where('email', 'like', "%{$search}%")
+                    ->orWhere('fullname', 'like', "%{$search}%");
+            });
+        }
+
+        $students = $students->get();
 
         $totalDuration = $course->lessons->sum('duration');
 
-        $studentsWithProgress = $students->map(function ($student) use ($courseId, $totalDuration) {
-            $course = Course::with('lessons')->find($courseId);
+        $studentsWithProgress = $students->map(function ($student) use ($course, $totalDuration) {
             $totalWatchedDuration = 0;
 
             foreach ($course->lessons as $lesson) {
@@ -89,16 +109,63 @@ class ReportController extends Controller
             ];
         });
 
+        // Lọc theo progress_min
+        if ($request->has('progress_min') && $request->progress_min !== null) {
+            $progressMin = (float)$request->progress_min;
+            $studentsWithProgress = $studentsWithProgress->filter(function ($student) use ($progressMin) {
+                return $student['overall_percentage'] >= $progressMin;
+            });
+        }
+
+        // Lọc theo progress_max
+        if ($request->has('progress_max') && $request->progress_max !== null) {
+            $progressMax = (float)$request->progress_max;
+            $studentsWithProgress = $studentsWithProgress->filter(function ($student) use ($progressMax) {
+                return $student['overall_percentage'] <= $progressMax;
+            });
+        }
+
+        // Lọc theo is_completed
+        if ($request->has('is_completed') && $request->is_completed !== null) {
+            $isCompleted = filter_var($request->is_completed, FILTER_VALIDATE_BOOLEAN);
+            $studentsWithProgress = $studentsWithProgress->filter(function ($student) use ($isCompleted) {
+                return $student['is_completed'] === $isCompleted;
+            });
+        }
+
+        // Sắp xếp
+        $sortBy = $request->get('sort_by', 'user_id');
+        $orderBy = $request->get('order_by', 'asc');
+        
+        // Validate sort_by
+        $allowedSortBy = ['user_id', 'email', 'fullname', 'overall_percentage', 'total_watched_duration'];
+        if (!in_array($sortBy, $allowedSortBy)) {
+            $sortBy = 'user_id';
+        }
+        
+        // Validate order_by
+        $orderBy = strtolower($orderBy);
+        if (!in_array($orderBy, ['asc', 'desc'])) {
+            $orderBy = 'asc';
+        }
+        
+        // Sắp xếp collection
+        $studentsWithProgress = $studentsWithProgress->sortBy(function ($student) use ($sortBy) {
+            return $student[$sortBy];
+        }, SORT_REGULAR, $orderBy === 'desc');
+
         $perPage = $request->get('per_page', 15);
+        $perPage = min(max(1, (int)$perPage), 100); // Giới hạn từ 1-100
         $currentPage = $request->get('page', 1);
         $items = $studentsWithProgress->forPage($currentPage, $perPage)->values();
 
         return response()->json([
             'success' => true,
             'data' => [
-                'current_page' => $currentPage,
+                'current_page' => (int)$currentPage,
                 'per_page' => $perPage,
                 'total' => $studentsWithProgress->count(),
+                'last_page' => ceil($studentsWithProgress->count() / $perPage),
                 'items' => $items,
             ]
         ]);

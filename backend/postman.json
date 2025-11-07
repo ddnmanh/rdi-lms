@@ -181,7 +181,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/users?search=&role_id=&role_name=&created_at_from=&created_at_to=&sort_by=id&order_by=desc&per_page=15&page=1",
+							"raw": "{{base_url}}/api/users?search=&search_email=&search_fullname=&role_id=&role_name=&created_at_from=&created_at_to=&sort_by=id&order_by=desc&per_page=15&page=1",
 							"host": ["{{base_url}}"],
 							"path": ["api", "users"],
 							"query": [
@@ -189,6 +189,16 @@
 									"key": "search",
 									"value": "",
 									"description": "Tìm kiếm theo email hoặc fullname"
+								},
+								{
+									"key": "search_email",
+									"value": "",
+									"description": "Tìm kiếm theo email"
+								},
+								{
+									"key": "search_fullname",
+									"value": "",
+									"description": "Tìm kiết theo fullname"
 								},
 								{
 									"key": "role_id",

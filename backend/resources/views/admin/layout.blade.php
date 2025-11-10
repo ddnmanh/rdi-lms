@@ -48,7 +48,7 @@
                 sidebar.classList.remove('collapsed');
                 main.classList.remove('sidebar-collapsed');
                 if (nav && window.innerWidth >= 1024) {
-                    nav.style.left = '256px';
+                    nav.style.left = '16rem';
                 }
                 toggleBtn && (toggleBtn.innerHTML = '<i class="fas fa-chevron-left text-xl"></i>');
             }
@@ -71,7 +71,7 @@
             sidebar.classList.toggle('collapsed');
             main.classList.toggle('sidebar-collapsed');
             if (nav && window.innerWidth >= 1024) {
-                nav.style.left = sidebarCollapsed ? '80px' : '256px';
+                nav.style.left = sidebarCollapsed ? '80px' : '16rem';
             }
             if (toggleBtn) {
                 toggleBtn.innerHTML = sidebarCollapsed ?
@@ -262,6 +262,28 @@
         main {
             overflow-x: hidden;
             max-width: 100%;
+            font-size: 12px;
+            @media (min-width: 1536px) {
+                font-size: 14px;
+            }
+            @media (min-width: 1920px) {
+                font-size: 16px;
+            }
+            @media (min-width: 2560px) {
+                font-size: 18px;
+            }
+            @media (min-width: 3840px) {
+                font-size: 20px;
+            }
+            @media (min-width: 4096px) {
+                font-size: 22px;
+            }
+            @media (min-width: 4352px) {
+                font-size: 24px;
+            }
+            @media (min-width: 4608px) {
+                font-size: 26px;
+            }
         }
     </style>
 
@@ -392,8 +414,7 @@
 
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
     <!-- Top Nav -->
-    <nav
-        class="fixed top-0 left-64 right-0 lg:left-64 z-50 min-h-16 py-3 bg-white dark:bg-gray-900 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700/60 transition-all duration-300">
+    <nav class="fixed top-0 left-64 right-0 z-50 min-h-16 py-3 bg-white dark:bg-gray-900 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700/60 transition-all duration-300">
         <div class="h-full w-full flex items-center justify-between px-4 sm:px-6">
             <!-- Title Section -->
             <div class="flex flex-col gap-0 min-w-0 flex-1">
@@ -461,8 +482,7 @@
     </nav>
 
     <!-- Sidebar -->
-    <aside id="sidebar"
-        class="fixed top-0 left-0 w-64 h-screen bg-white dark:bg-gray-900 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700/60 overflow-hidden transition-all duration-300 z-40 lg:translate-x-0 -translate-x-full flex flex-col">
+    <aside id="sidebar" class="fixed top-0 left-0 w-64 h-screen bg-white dark:bg-gray-900 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700/60 overflow-hidden transition-all duration-300 z-40 lg:translate-x-0 -translate-x-full flex flex-col">
         <!-- Sidebar Header -->
         <div class="h-16 sidebar-item flex items-center px-4 flex-shrink-0">
             <a href="{{ route('admin.dashboard') }}"
@@ -491,7 +511,7 @@
                         class="fas fa-tachometer-alt sidebar-icon {{ request()->routeIs('admin.dashboard') ? 'text-white' : 'text-gray-600 dark:text-gray-400' }} text-sm"></i>
                 </div>
                 <span class="sidebar-text">Dashboard</span>
-                <span class="sidebar-tooltip">Dashboard</span>
+                {{-- <span class="sidebar-tooltip z-50">Dashboard</span> --}}
             </a>
 
             {{-- Group: Quản lý --}}
@@ -506,9 +526,9 @@
                         class="fas fa-users sidebar-icon {{ request()->routeIs('admin.users.*') ? 'text-white' : 'text-gray-600 dark:text-gray-400' }} text-sm"></i>
                 </div>
                 <span class="sidebar-text">Người dùng</span>
-                <span class="sidebar-tooltip">Người dùng</span>
+                {{-- <span class="sidebar-tooltip z-50">Người dùng</span> --}}
             </a>
-            <a href="{{ route('admin.roles') }}"
+            <a href="{{ route('admin.roles.list') }}"
                 class="sidebar-item group flex items-center gap-3 px-2 py-2 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.roles.*') ? 'active bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20' }}">
                 <div
                     class="h-7 w-7 rounded-lg {{ request()->routeIs('admin.roles.*') ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-900/30' }} flex items-center justify-center transition-all duration-300">
@@ -516,9 +536,9 @@
                         class="fas fa-user-shield sidebar-icon {{ request()->routeIs('admin.roles.*') ? 'text-white' : 'text-gray-600 dark:text-gray-400' }} text-sm"></i>
                 </div>
                 <span class="sidebar-text">Vai trò</span>
-                <span class="sidebar-tooltip">Vai trò</span>
+                {{-- <span class="sidebar-tooltip z-50">Vai trò</span> --}}
             </a>
-            <a href="{{ route('admin.courses') }}"
+            <a href="{{ route('admin.courses.list') }}"
                 class="sidebar-item group flex items-center gap-3 px-2 py-2 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.courses.*') ? 'active bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20' }}">
                 <div
                     class="h-7 w-7 rounded-lg {{ request()->routeIs('admin.courses.*') ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-900/30' }} flex items-center justify-center transition-all duration-300">
@@ -526,9 +546,9 @@
                         class="fas fa-book sidebar-icon {{ request()->routeIs('admin.courses.*') ? 'text-white' : 'text-gray-600 dark:text-gray-400' }} text-sm"></i>
                 </div>
                 <span class="sidebar-text">Khóa học</span>
-                <span class="sidebar-tooltip">Khóa học</span>
+                {{-- <span class="sidebar-tooltip z-50">Khóa học</span> --}}
             </a>
-            <a href="{{ route('admin.lessons') }}"
+            <a href="{{ route('admin.lessons.list') }}"
                 class="sidebar-item group flex items-center gap-3 px-2 py-2 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.lessons.*') ? 'active bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20' }}">
                 <div
                     class="h-7 w-7 rounded-lg {{ request()->routeIs('admin.lessons.*') ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-900/30' }} flex items-center justify-center transition-all duration-300">
@@ -536,7 +556,7 @@
                         class="fas fa-play-circle sidebar-icon {{ request()->routeIs('admin.lessons.*') ? 'text-white' : 'text-gray-600 dark:text-gray-400' }} text-sm"></i>
                 </div>
                 <span class="sidebar-text">Bài học</span>
-                <span class="sidebar-tooltip">Bài học</span>
+                {{-- <span class="sidebar-tooltip z-50">Bài học</span> --}}
             </a>
 
             <a href="{{ route('admin.reports') }}"
@@ -545,7 +565,7 @@
                     <i class="fas fa-chart-line sidebar-icon {{ request()->routeIs('admin.reports.*') ? 'text-white' : 'text-gray-600 dark:text-gray-400' }} text-sm"></i>
                 </div>
                 <span class="sidebar-text">Báo cáo</span>
-                <span class="sidebar-tooltip">Báo cáo</span>
+                {{-- <span class="sidebar-tooltip z-50">Báo cáo</span> --}}
             </a>
         </nav>
 
@@ -572,14 +592,7 @@
     </div>
 
     <!-- Main -->
-    <main class="h-[calc(100dvh-73px)] mt-[73px] p-2 md:p-6 transition-all duration-300 lg:ml-64 bg-gray-100 dark:bg-gray-900 overflow-y-auto">
-        {{-- Optional page header slot --}}
-        {{-- @hasSection('page-header')
-            <div class="mb-6">
-                @yield('page-header')
-            </div>
-        @endif --}}
-        {{-- Content --}}
+    <main class="h-[calc(100dvh-55px)] mt-[55px] p-2 md:p-6 transition-all duration-300 lg:ml-64 bg-gray-100 dark:bg-gray-900 overflow-y-auto">
         @yield('content')
     </main>
 
@@ -690,17 +703,74 @@
             }, 3000);
         }
 
-        // Format date
+        // ===== Timezone Utilities =====
+        // Tự động nhận biết timezone của client
+        function getClientTimezone() {
+            try {
+                return Intl.DateTimeFormat().resolvedOptions().timeZone;
+            } catch (e) {
+                // Fallback: tính toán offset
+                const offset = -new Date().getTimezoneOffset();
+                const hours = Math.floor(Math.abs(offset) / 60);
+                const minutes = Math.abs(offset) % 60;
+                const sign = offset >= 0 ? '+' : '-';
+                return `UTC${sign}${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+            }
+        }
+
+        // Chuyển đổi UTC datetime từ Laravel sang local time format cho datetime-local input
+        // Tự động sử dụng timezone của client
+        function formatDateTimeLocal(utcDateTimeString) {
+            if (!utcDateTimeString) return '';
+
+            // Parse UTC datetime từ Laravel (ISO 8601 với Z hoặc +00:00)
+            const date = new Date(utcDateTimeString);
+            if (isNaN(date.getTime())) return '';
+
+            // JavaScript Date tự động chuyển UTC sang local time của client
+            // Format: YYYY-MM-DDTHH:mm (local time, không có timezone)
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+
+        // [DEPRECATED] Chuyển đổi local time từ datetime-local input sang UTC format
+        // Lưu ý: Function này đã không còn được sử dụng.
+        // Thay vào đó, client nên gửi local time + timezone, server sẽ chuyển đổi sang UTC.
+        // Giữ lại function này để tương thích ngược nếu có code cũ đang sử dụng.
+        // function convertLocalToUTC(localDateTimeString) {
+        //     if (!localDateTimeString) return null;
+
+        //     // datetime-local input trả về "YYYY-MM-DDTHH:mm" (local time, không có timezone)
+        //     // Tạo Date object - JavaScript sẽ coi như local time của client
+        //     const localDate = new Date(localDateTimeString);
+        //     if (isNaN(localDate.getTime())) return null;
+
+        //     // Chuyển sang UTC format (ISO 8601 với Z) để Laravel xử lý đúng
+        //     return localDate.toISOString();
+        // }
+
+        // Format date - hiển thị theo timezone của client
+        // Laravel lưu và trả về datetime ở UTC, JavaScript tự động chuyển sang local time
         function formatDate(dateString) {
             if (!dateString) return '-';
             const date = new Date(dateString);
-            return date.toLocaleDateString('vi-VN', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+            if (isNaN(date.getTime())) return '-';
+
+            // Laravel trả về datetime ở UTC (có timezone Z hoặc +00:00)
+            // JavaScript Date tự động parse và chuyển đổi sang local time của client
+            // Sử dụng local time methods để hiển thị đúng theo timezone của client
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+
+            return `${day}/${month}/${year} ${hours}:${minutes}`;
         }
     </script>
     @stack('scripts')

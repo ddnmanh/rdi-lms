@@ -83,6 +83,13 @@ class ScanRoutesCommand extends Command
             $normalizedPath = preg_replace('/\{[^}]+\}/', '{id}', $path);
 
             foreach ($methods as $method) {
+                // Lấy permission metadata từ route action (nếu có)
+                $permissionMeta = $route->action['permission'] ?? null;
+
+                // Nếu có metadata trong route, sử dụng nó; nếu không thì tự động generate
+                $name = $permissionMeta['name'] ?? $this->generatePermissionName($method, $normalizedPath);
+                $description = $permissionMeta['description'] ?? $this->generatePermissionDescription($method, $normalizedPath);
+
                 // Kiểm tra permission đã tồn tại chưa
                 $existingPermission = Permission::where('method', $method)
                     ->where('path', $normalizedPath)
@@ -92,17 +99,38 @@ class ScanRoutesCommand extends Command
                     // Nếu đã tồn tại và bị soft delete, restore nó
                     if ($existingPermission->trashed()) {
                         $existingPermission->restore();
+                        // Nếu route có permission metadata, luôn cập nhật; nếu không thì chỉ cập nhật khi chưa có
+                        $shouldUpdate = $permissionMeta !== null || !$existingPermission->name || !$existingPermission->description;
+                        if ($shouldUpdate) {
+                            $existingPermission->update([
+                                'name' => $name,
+                                'description' => $description,
+                            ]);
+                        }
                         $updated++;
                         $this->line("  ✓ Restored: {$method} {$normalizedPath}");
                     } else {
-                        $skipped++;
-                        if ($this->option('verbose')) {
-                            $this->line("  - Skipped: {$method} {$normalizedPath} (đã tồn tại)");
+                        // Nếu route có permission metadata, luôn cập nhật; nếu không thì chỉ cập nhật khi chưa có
+                        $shouldUpdate = $permissionMeta !== null || !$existingPermission->name || !$existingPermission->description;
+                        if ($shouldUpdate) {
+                            $existingPermission->update([
+                                'name' => $name,
+                                'description' => $description,
+                            ]);
+                            $updated++;
+                            $this->line("  ✓ Updated: {$method} {$normalizedPath}" . ($permissionMeta ? ' (từ route metadata)' : ''));
+                        } else {
+                            $skipped++;
+                            if ($this->option('verbose')) {
+                                $this->line("  - Skipped: {$method} {$normalizedPath} (đã tồn tại)");
+                            }
                         }
                     }
                 } else {
                     // Tạo permission mới
                     Permission::create([
+                        'name' => $name,
+                        'description' => $description,
                         'method' => $method,
                         'path' => $normalizedPath,
                     ]);
@@ -138,6 +166,141 @@ class ScanRoutesCommand extends Command
         }
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * Tạo tên permission từ method và path
+     */
+    private function generatePermissionName($method, $path)
+    {
+        // Loại bỏ prefix /api nếu có
+        $pathWithoutPrefix = preg_replace('/^\/api\//', '/', $path);
+        $pathWithoutPrefix = ltrim($pathWithoutPrefix, '/');
+
+        // Chuyển đổi path thành tên dễ đọc
+        $segments = explode('/', $pathWithoutPrefix);
+        $resource = '';
+        $action = '';
+
+        // Xác định resource và action dựa trên path và method
+        if (count($segments) > 0) {
+            $resource = $segments[0];
+
+            // Loại bỏ {id} nếu có
+            $resource = str_replace('{id}', '', $resource);
+            $resource = trim($resource, '/');
+        }
+
+        // Xác định action dựa trên method và path
+        switch (strtoupper($method)) {
+            case 'GET':
+                if (strpos($path, '{id}') !== false) {
+                    $action = 'Xem chi tiết';
+                } else {
+                    $action = 'Xem danh sách';
+                }
+                break;
+            case 'POST':
+                $action = 'Tạo mới';
+                break;
+            case 'PUT':
+            case 'PATCH':
+                $action = 'Cập nhật';
+                break;
+            case 'DELETE':
+                $action = 'Xóa';
+                break;
+            default:
+                $action = 'Thao tác';
+        }
+
+        // Tạo tên từ resource và action
+        $resourceName = $this->formatResourceName($resource);
+        return $action . ' ' . $resourceName;
+    }
+
+    /**
+     * Tạo mô tả permission từ method và path
+     */
+    private function generatePermissionDescription($method, $path)
+    {
+        // Loại bỏ prefix /api nếu có
+        $pathWithoutPrefix = preg_replace('/^\/api\//', '/', $path);
+        $pathWithoutPrefix = ltrim($pathWithoutPrefix, '/');
+
+        $segments = explode('/', $pathWithoutPrefix);
+        $resource = '';
+
+        if (count($segments) > 0) {
+            $resource = $segments[0];
+            $resource = str_replace('{id}', '', $resource);
+            $resource = trim($resource, '/');
+        }
+
+        $resourceName = $this->formatResourceName($resource);
+        $methodName = strtoupper($method);
+
+        // Tạo mô tả chi tiết
+        $description = "Cho phép thực hiện {$methodName} trên route {$path}";
+
+        switch (strtoupper($method)) {
+            case 'GET':
+                if (strpos($path, '{id}') !== false) {
+                    $description = "Cho phép xem chi tiết {$resourceName}";
+                } else {
+                    $description = "Cho phép xem danh sách {$resourceName}";
+                }
+                break;
+            case 'POST':
+                $description = "Cho phép tạo mới {$resourceName}";
+                break;
+            case 'PUT':
+            case 'PATCH':
+                $description = "Cho phép cập nhật {$resourceName}";
+                break;
+            case 'DELETE':
+                $description = "Cho phép xóa {$resourceName}";
+                break;
+        }
+
+        return $description;
+    }
+
+    /**
+     * Format resource name để dễ đọc hơn
+     */
+    private function formatResourceName($resource)
+    {
+        // Chuyển đổi từ snake_case hoặc kebab-case sang tên dễ đọc
+        $resource = str_replace(['-', '_'], ' ', $resource);
+        $resource = ucwords($resource);
+
+        // Mapping một số resource phổ biến
+        $mapping = [
+            'Users' => 'Người dùng',
+            'User' => 'Người dùng',
+            'Roles' => 'Vai trò',
+            'Role' => 'Vai trò',
+            'Permissions' => 'Phân quyền',
+            'Permission' => 'Phân quyền',
+            'Courses' => 'Khóa học',
+            'Course' => 'Khóa học',
+            'Lessons' => 'Bài học',
+            'Lesson' => 'Bài học',
+            'Auth' => 'Xác thực',
+            'Login' => 'Đăng nhập',
+            'Logout' => 'Đăng xuất',
+            'Register' => 'Đăng ký',
+            'Refresh' => 'Làm mới',
+        ];
+
+        foreach ($mapping as $key => $value) {
+            if (stripos($resource, $key) !== false) {
+                $resource = str_ireplace($key, $value, $resource);
+            }
+        }
+
+        return $resource;
     }
 }
 

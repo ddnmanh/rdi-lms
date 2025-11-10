@@ -119,7 +119,7 @@
                 renderRolesCheckboxes();
             }
         } catch (error) {
-            showAlert('Không thể tải danh sách vai trò: ' + error.message, 'error');
+            // showAlert('Không thể tải danh sách vai trò: ' + error.message, 'error');
         }
     }
 
@@ -162,7 +162,7 @@
                 renderRolesCheckboxes(userRoleIds);
             }
         } catch (error) {
-            showAlert('Không thể tải thông tin người dùng: ' + error.message, 'error');
+            // showAlert('Không thể tải thông tin người dùng: ' + error.message, 'error');
             setTimeout(() => {
                 window.location.href = '{{ route('admin.users.list') }}';
             }, 2000);
@@ -188,7 +188,7 @@
         console.log(roleCheckboxes);
 
         if (roleCheckboxes.length === 0) {
-            showAlert('Vui lòng chọn ít nhất một vai trò', 'error');
+            // showAlert('Vui lòng chọn ít nhất một vai trò', 'error');
             return;
         }
         formData.role_ids = Array.from(roleCheckboxes).map(cb => parseInt(cb.value));
@@ -204,7 +204,7 @@
             } else {
                 // Create mode
                 if (!password) {
-                    showAlert('Password là bắt buộc khi tạo mới', 'error');
+                    // showAlert('Password là bắt buộc khi tạo mới', 'error');
                     return;
                 }
                 data = await apiRequest('/users', {
@@ -214,13 +214,13 @@
             }
 
             if (data.success) {
-                showAlert(data.message || 'Lưu thành công', 'success');
+                // showAlert(data.message || 'Lưu thành công', 'success');
                 setTimeout(() => {
                     window.location.href = '{{ route('admin.users.list') }}';
                 }, 1000);
             }
         } catch (error) {
-            showAlert(error.message, 'error');
+            // showAlert(error.message, 'error');
         }
     }
 </script>

@@ -1,8 +1,8 @@
 @extends('admin.layout')
 
-@section('title', 'Quản lý Người dùng')
+@section('title', 'Quản lý Khóa học')
 
-@section('description', 'Quản lý tất cả người dùng trong hệ thống')
+@section('description', 'Quản lý tất cả khóa học trong hệ thống')
 
 @section('content')
 <style>
@@ -51,10 +51,10 @@
         {{-- Actions Bar --}}
         <div class="flex items-center justify-start gap-3">
             <div class="flex items-center gap-3">
-                <a href="{{ route('admin.users.create') }}"
+                <a href="{{ route('admin.courses.create') }}"
                     class="group px-4 py-2.5 bg-blue-600 text-white rounded-xl transition-all duration-300 font-medium flex items-center justify-center gap-2 hover:bg-blue-700">
                     <i class="fas fa-plus"></i>
-                    <span>Thêm người dùng</span>
+                    <span>Thêm khóa học</span>
                 </a>
             </div>
             <button
@@ -63,54 +63,45 @@
                 disabled
                 class="group px-4 py-2.5 bg-red-600 text-white rounded-xl transition-all duration-300 font-medium flex items-center justify-center gap-2 hover:bg-red-700 opacity-50 cursor-not-allowed">
                 <i class="fas fa-trash"></i>
-                <span>Xóa <span id="selectedCount"></span> người dùng</span>
+                <span>Xóa <span id="selectedCount"></span> khóa học</span>
             </button>
         </div>
 
         {{-- Filter Section --}}
         <form onsubmit="return handleSubmitFilter(event)" class="max-w-1/2 p-3 2xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col lg:flex-row justify-start gap-4">
             <div class="flex flex-col lg:flex-row justify-start flex-wrap gap-4 flex-1">
-                {{-- Role Filter --}}
-                <div class="min-w-32 flex flex-col items-stretch justify-start gap-0.5">
-                    <label for="roleFilter" class="block text-sm font-medium text-gray-300 dark:text-gray-300 ml-2">
-                        Vai trò
+                {{-- Title Filter --}}
+                <div class="flex-1 min-w-40 max-w-80 flex flex-col items-stretch justify-start gap-0.5">
+                    <label for="titleFilter" class="block text-sm font-medium text-gray-300 dark:text-gray-300">
+                        Tiêu đề
                     </label>
-                    <select id="roleFilter"
+                    <input type="text" id="titleFilter" placeholder="Tìm theo tiêu đề..."
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                </div>
+
+                {{-- Date Range Filter --}}
+                <div class="flex flex-col items-stretch justify-start gap-0.5">
+                    <label for="dateRangeFilter" class="block text-sm font-medium text-gray-300 dark:text-gray-300 ml-2">
+                        Trạng thái
+                    </label>
+                    <select id="dateRangeFilter" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
                         <option value="">Tất cả</option>
+                        <option value="active">Đang diễn ra</option>
+                        <option value="upcoming">Sắp diễn ra</option>
+                        <option value="past">Đã kết thúc</option>
                     </select>
                 </div>
 
-                {{-- Name Filter --}}
-                <div class="flex-1 min-w-40 max-w-80 flex flex-col items-stretch justify-start gap-0.5">
-                    <label for="nameFilter" class="block text-sm font-medium text-gray-300 dark:text-gray-300">
-                        Tên
-                    </label>
-                    <input type="text" id="nameFilter" placeholder="Tìm theo tên..."
-                        {{-- onkeyup="debounceLoadUsers()" --}}
-                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                </div>
-
-                {{-- Email Filter --}}
-                <div class="flex-1 min-w-40 max-w-80 flex flex-col items-stretch justify-start gap-0.5">
-                    <label for="emailFilter" class="block text-sm font-medium text-gray-300 dark:text-gray-300">
-                        Email
-                    </label>
-                    <input type="text" id="emailFilter" placeholder="Tìm theo email..."
-                        {{-- onkeyup="debounceLoadUsers()" --}}
-                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                </div>
-
-                {{-- Created From Date --}}
+                {{-- Date From Filter --}}
                 <div class="flex flex-col items-stretch justify-start gap-0.5">
-                    <label for="createdFrom" class="block text-sm font-medium text-gray-300 dark:text-gray-300">
-                        Ngày tạo
+                    <label for="startDateFrom" class="block text-sm font-medium text-gray-300 dark:text-gray-300">
+                        Ngày bắt đầu
                     </label>
                     <div class="flex items-center gap-1">
-                        <input type="date" id="createdFrom"
+                        <input type="date" id="startDateFrom"
                             class="w-full px-4 py-1.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
                         <i class="fa-solid fa-minus text-gray-300 dark:text-gray-500"></i>
-                        <input type="date" id="createdTo"
+                        <input type="date" id="startDateTo"
                             class="w-full px-4 py-1.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
                     </div>
                 </div>
@@ -118,12 +109,12 @@
 
             <div class="flex items-end gap-3">
                 <button onclick="resetFilters()"
-                    class="px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300">
+                    class="px-4 py-2.5 font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300">
                     <i class="fas fa-redo"></i>
                 </button>
                 <button
                     type="submit"
-                    class="px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all duration-300 flex items-center gap-2">
+                    class="px-4 py-2.5 font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all duration-300 flex items-center gap-2">
                     <i class="fas fa-filter"></i>
                     <span>Lọc</span>
                 </button>
@@ -135,8 +126,22 @@
     <div class="flex-1 flex flex-col items-stretch justify-start bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
 
         <div class="table-scroll-container w-full overflow-x-hidden h-full overflow-y-auto">
-            <div id="usersTable">
-
+            <div id="coursesTable">
+                <div class="pt-40 flex flex-col items-center justify-center gap-2">
+                    <div id="SPINNER_LOADING">
+                        <div id="SPINNER_LOADING_LDS_ROLLER">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                    </div>
+                    <div class=" text-[#9ca3af80] dark:text-[#9ca3af80]">Đang tải dữ liệu...</div>
+                </div>
             </div>
         </div>
 
@@ -144,13 +149,13 @@
         <div class="px-3.5 py-2 border-t border-gray-200 dark:border-gray-700">
             <div class="grid grid-cols-1 sm:grid-cols-3 justify-between items-center gap-4">
                 {{-- Info --}}
-                <span id="paginationInfo" class="text-sm text-gray-600 dark:text-gray-400 text-left"></span>
+                <span id="paginationInfo" class=" text-gray-600 dark:text-gray-400 text-left"></span>
 
                 {{-- Items per page selector --}}
                 <div class="flex items-center justify-center gap-2">
-                    <label for="itemPerPage" class="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">Số mục mỗi trang</label>
-                    <select id="itemPerPage" onchange="loadUsers(1)"
-                        class="px-2 py-0.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label for="itemPerPage" class=" text-gray-600 dark:text-gray-400 whitespace-nowrap">Số mục mỗi trang</label>
+                    <select id="itemPerPage" onchange="loadCourses(1)"
+                        class="px-2 py-0.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100  focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="10">10</option>
                         <option value="15" selected>15</option>
                         <option value="25">25</option>
@@ -160,7 +165,7 @@
                 </div>
 
                 {{-- Custom Pagination --}}
-                <div id="pagination" class="flex items-center justify-end gap-1 text-sm 2xl:text-base"></div>
+                <div id="pagination" class="flex items-center justify-end gap-1"></div>
             </div>
         </div>
     </div>
@@ -179,17 +184,17 @@
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-red-100 dark:bg-red-900/20">
-                        <i class="fas fa-exclamation-triangle text-xl text-red-600 dark:text-red-400"></i>
+                        <i class="fas fa-exclamation-triangle text-red-600 dark:text-red-400"></i>
                     </div>
                     <div>
-                        <h3 id="deleteModalTitle" class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                            Xác nhận xóa người dùng
+                        <h3 id="deleteModalTitle" class=" font-semibold text-gray-900 dark:text-gray-100">
+                            Xác nhận xóa khóa học
                         </h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                        <p class=" text-gray-500 dark:text-gray-400">
                             Hành động này không thể hoàn tác
                         </p>
                     </div>
-                </div>
+        </div>
             </div>
 
             <hr class="border-gray-200 dark:border-gray-700">
@@ -197,25 +202,25 @@
             {{-- Modal Body --}}
             <div class="">
                 <p id="deleteModalMessage" class="text-gray-700 dark:text-gray-300 mb-4">
-                    Bạn có chắc chắn muốn xóa người dùng này không?
+                    Bạn có chắc chắn muốn xóa khóa học này không?
                 </p>
                 {{-- Single delete info --}}
                 <div id="singleDeleteInfo" class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 space-y-2">
                     <div class="flex items-center gap-2">
-                        <span class="text-sm font-medium text-gray-600 dark:text-gray-400 w-20">Tên:</span>
-                        <span class="text-sm text-gray-900 dark:text-gray-100" id="deleteUserName"></span>
+                        <span class=" font-medium text-gray-600 dark:text-gray-400 w-20">Tiêu đề:</span>
+                        <span class=" text-gray-900 dark:text-gray-100" id="deleteCourseTitle"></span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="text-sm font-medium text-gray-600 dark:text-gray-400 w-20">Email:</span>
-                        <span class="text-sm text-gray-900 dark:text-gray-100 break-all" id="deleteUserEmail"></span>
+                        <span class=" font-medium text-gray-600 dark:text-gray-400 w-20">ID:</span>
+                        <span class=" text-gray-900 dark:text-gray-100" id="deleteCourseId"></span>
                     </div>
                 </div>
                 {{-- Bulk delete info --}}
                 <div id="bulkDeleteInfo" class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4" style="display: none;">
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                        Tất cả dữ liệu liên quan đến <span id="bulkDeleteCount" class="font-semibold text-red-600 dark:text-red-400">0</span> người dùng đã chọn sẽ bị xóa vĩnh viễn và không thể khôi phục.
+                    <p class=" text-gray-600 dark:text-gray-400">
+                        Tất cả dữ liệu liên quan đến <span id="bulkDeleteCount" class="font-semibold text-red-600 dark:text-red-400">0</span> khóa học đã chọn sẽ bị xóa vĩnh viễn và không thể khôi phục.
                     </p>
-                </div>
+            </div>
             </div>
 
             <hr class="border-gray-200 dark:border-gray-700">
@@ -223,35 +228,32 @@
             {{-- Modal Footer --}}
             <div class="flex items-center justify-end gap-3">
                 <button type="button" onclick="closeDeleteModal()"
-                    class="px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300">
+                    class="px-4 py-2.5  font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300">
                     Hủy
                 </button>
                 <button type="button" onclick="confirmDelete()"
-                    class="px-4 py-2.5 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-all duration-300 flex items-center gap-2">
+                    class="px-4 py-2.5  font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-all duration-300 flex items-center gap-2">
                     <i class="fas fa-trash"></i>
                     <span>Xác nhận xóa</span>
                 </button>
             </div>
-        </div>
+            </div>
     </div>
 </div>
 
 <script>
-    let currentPage = 1;
-    let rolesList = [];
-    let deleteUserId = null;
+let currentPage = 1;
+    let deleteCourseId = null;
     let isBulkDelete = false;
-    let debounceTimer = null;
     let sortBy = 'created_at';
     let sortOrder = 'desc';
-    let selectedUserIds = new Set();
+    let selectedCourseIds = new Set();
 
     document.addEventListener('DOMContentLoaded', async function() {
-        await loadRoles();
-        await loadUsers();
+        await loadCourses();
 
         // Ngăn chặn hành động mặc định của form khi nhấn enter ở các input
-        const filterInputs = ['nameFilter', 'emailFilter', 'createdFrom', 'createdTo', 'roleFilter'];
+        const filterInputs = ['titleFilter', 'dateRangeFilter', 'startDateFrom', 'startDateTo'];
         filterInputs.forEach(inputId => {
             const input = document.getElementById(inputId);
             if (input) {
@@ -268,46 +270,20 @@
         });
     });
 
-    function debounceLoadUsers() {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-            loadUsers(1);
-        }, 500);
-    }
-
     function resetFilters() {
-        document.getElementById('roleFilter').value = '';
-        document.getElementById('nameFilter').value = '';
-        document.getElementById('emailFilter').value = '';
-        document.getElementById('createdFrom').value = '';
-        document.getElementById('createdTo').value = '';
-        loadUsers(1);
+        document.getElementById('titleFilter').value = '';
+        document.getElementById('dateRangeFilter').value = '';
+        document.getElementById('startDateFrom').value = '';
+        document.getElementById('startDateTo').value = '';
+        loadCourses(1);
     }
 
     function handleSubmitFilter(event) {
         if (event && event.preventDefault) {
             event.preventDefault();
         }
-        loadUsers(1);
+        loadCourses(1);
         return false;
-    }
-
-    async function loadRoles() {
-        try {
-            const data = await apiRequest('/roles?per_page=100');
-            if (data.success) {
-                rolesList = data.data.data || [];
-                const roleFilter = document.getElementById('roleFilter');
-                rolesList.forEach(role => {
-                    const option = document.createElement('option');
-                    option.value = role.id;
-                    option.textContent = role.name;
-                    roleFilter.appendChild(option);
-                });
-            }
-        } catch (error) {
-            console.error('Error loading roles:', error);
-        }
     }
 
     function handleSort(column) {
@@ -319,19 +295,19 @@
             sortBy = column;
             sortOrder = 'desc';
         }
-        loadUsers(1);
+        loadCourses(1);
     }
 
     function getSortIcon(column) {
         if (sortBy !== column) {
             // Not sorted by this column - show neutral icon
-            return '<i class="fas fa-sort text-gray-300 dark:text-gray-500 text-sm ml-1"></i>';
+            return '<i class="fas fa-sort text-gray-300 dark:text-gray-500 ml-1"></i>';
         } else if (sortOrder === 'asc') {
             // Sorted ascending
-            return '<i class="fas fa-sort-up text-white text-sm ml-1"></i>';
+            return '<i class="fas fa-sort-up text-white ml-1"></i>';
         } else {
             // Sorted descending
-            return '<i class="fas fa-sort-down text-white text-sm ml-1"></i>';
+            return '<i class="fas fa-sort-down text-white ml-1"></i>';
         }
     }
 
@@ -347,7 +323,7 @@
     }
 
     function getCellClass(column) {
-        const baseClass = 'px-4 py-3 whitespace-normal break-words';
+        const baseClass = 'px-3.5 py-2.5 whitespace-normal break-words';
         if (sortBy === column) {
             // Column is being sorted - highlight with light background
             return baseClass + ' bg-blue-50 dark:bg-gray-700/40';
@@ -358,7 +334,7 @@
     }
 
     function renderTableLoading() {
-        const tableContainer = document.getElementById('usersTable');
+        const tableContainer = document.getElementById('coursesTable');
         tableContainer.innerHTML = `
             <div class="pt-40 flex flex-col items-center justify-center gap-2">
                 <div id="SPINNER_LOADING">
@@ -373,44 +349,41 @@
                         <div></div>
                     </div>
                 </div>
-                <div class="text-sm text-[#9ca3af80] dark:text-[#9ca3af80]">Đang tải dữ liệu...</div>
+                <div class=" text-[#9ca3af80] dark:text-[#9ca3af80]">Đang tải dữ liệu...</div>
             </div>
         `;
     }
 
-    async function loadUsers(page = 1) {
-
+async function loadCourses(page = 1) {
         renderTableLoading();
 
-        currentPage = page;
-        // Clear selected users when changing page or filters
-        selectedUserIds.clear();
-        const roleId = document.getElementById('roleFilter').value;
-        const name = document.getElementById('nameFilter').value;
-        const email = document.getElementById('emailFilter').value;
-        const createdFrom = document.getElementById('createdFrom').value;
-        const createdTo = document.getElementById('createdTo').value;
+    currentPage = page;
+        // Clear selected courses when changing page or filters
+        selectedCourseIds.clear();
+        const title = document.getElementById('titleFilter').value;
+    const dateRange = document.getElementById('dateRangeFilter').value;
+        const startDateFrom = document.getElementById('startDateFrom').value;
+        const startDateTo = document.getElementById('startDateTo').value;
         const itemPerPage = document.getElementById('itemPerPage').value || 15;
 
-        try {
-            let url = `/users?page=${page}&per_page=${itemPerPage}`;
-            if (roleId) url += `&role_id=${roleId}`;
-            if (name) url += `&search_fullname=${encodeURIComponent(name)}`;
-            if (email) url += `&search_email=${encodeURIComponent(email)}`;
-            if (createdFrom) url += `&created_at_from=${createdFrom}`;
-            if (createdTo) url += `&created_at_to=${createdTo}`;
+    try {
+            let url = `/courses?page=${page}&per_page=${itemPerPage}`;
+            if (title) url += `&search=${encodeURIComponent(title)}`;
+        if (dateRange) url += `&date_range=${dateRange}`;
+            if (startDateFrom) url += `&start_date_from=${startDateFrom}`;
+            if (startDateTo) url += `&start_date_to=${startDateTo}`;
             if (sortBy) url += `&sort_by=${sortBy}`;
             if (sortOrder) url += `&order_by=${sortOrder}`;
 
             const res = await apiRequest(url);
 
             if (res.success) {
-                renderUsersTable(res?.data?.data || []);
+                renderCoursesTable(res?.data?.data || []);
                 renderPagination(res?.data || {});
                 renderPaginationInfo(res?.data || {});
             }
         } catch (error) {
-            document.getElementById('usersTable').innerHTML = `
+            document.getElementById('coursesTable').innerHTML = `
                 <div class="flex items-center justify-center pt-40">
                     <div class="text-center">
                         <p class="text-red-600 dark:text-red-400">${error.message}</p>
@@ -420,51 +393,61 @@
         }
     }
 
-    function renderUsersTable(users = []) {
-        const tableContainer = document.getElementById('usersTable');
+    function renderCoursesTable(courses = []) {
+        const tableContainer = document.getElementById('coursesTable');
 
-        if (users.length === 0) {
+        if (courses.length === 0) {
             tableContainer.innerHTML = `
-                <table class="w-full table-fixed border-separate border-spacing-0 text-sm">
+                <table class="w-full table-fixed border-separate border-spacing-0 ">
                     <colgroup>
+                        <col class="w-[3%]">
                         <col class="w-[4%]">
-                        <col class="w-[7%]">
-                        <col class="w-[18%]">
                         <col class="w-[20%]">
-                        <col class="w-[13%]">
-                        <col class="w-[13%]">
-                        <col class="w-[25%]">
+                        <col class="w-[18%]">
+                        <col class="w-[9%]">
+                        <col class="w-[9%]">
+                        <col class="w-[8%]">
+                        <col class="w-[9%]">
+                        <col class="w-[8%]">
+                        <col class="w-[8%]">
                     </colgroup>
                     <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
                         <tr>
-                            <th class="px-4 py-3 text-center sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm">
+                            <th class="px-3.5 py-2.5 text-center sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm">
                                 <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                             </th>
                             <th onclick="handleSort('id')" class="${getHeaderClass('id')}">
                                 ID${getSortIcon('id')}
                             </th>
-                            <th onclick="handleSort('fullname')" class="${getHeaderClass('fullname')}">
-                                Tên${getSortIcon('fullname')}
+                            <th onclick="handleSort('title')" class="${getHeaderClass('title')}">
+                                Tiêu đề${getSortIcon('title')}
                             </th>
-                            <th onclick="handleSort('email')" class="${getHeaderClass('email')}">
-                                Email${getSortIcon('email')}
+                            <th class="px-3.5 py-2.5 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Mô tả</th>
+                            <th onclick="handleSort('start_date')" class="${getHeaderClass('start_date')}">
+                                Ngày bắt đầu${getSortIcon('start_date')}
                             </th>
-                            <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Vai trò</th>
-                            <th onclick="handleSort('created_at')" class="${getHeaderClass('created_at')}">
-                                Ngày tạo${getSortIcon('created_at')}
+                            <th onclick="handleSort('end_date')" class="${getHeaderClass('end_date')}">
+                                Ngày kết thúc${getSortIcon('end_date')}
                             </th>
-                            <th class="px-4 py-3 text-right sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Thao tác</th>
+                            <th class="px-3.5 py-2.5 text-center sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Trạng Thái</th>
+                            <th onclick="handleSort('users_count')" class="${getHeaderClass('users_count')}">
+                                Số sinh viên${getSortIcon('users_count')}
+                            </th>
+                            <th onclick="handleSort('lessons_count')" class="${getHeaderClass('lessons_count')}">
+                                Số bài học${getSortIcon('lessons_count')}
+                            </th>
+                            <th class="px-3.5 py-2.5 text-right sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody class="[&>tr:not(:first-child)>td]:border-t [&>tr:not(:first-child)>td]:border-gray-200 dark:[&>tr:not(:first-child)>td]:border-gray-700">
                         <tr>
-                            <td colspan="7" class="pt-40 text-center">
+                            <td colspan="10" class="pt-40 text-center">
                                 <div class="flex flex-col items-center justify-center">
                                     <div class="h-20 w-20 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center mb-4 shadow-lg">
-                                        <i class="fas fa-inbox text-3xl text-gray-400 dark:text-gray-500"></i>
+                                        <i class="fas fa-inbox text-gray-400 dark:text-gray-500"></i>
                                     </div>
-                                    <p class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-1">Không tìm thấy người dùng</p>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Hãy thử lại với các điều kiện lọc khác</p>
+                                    <p class=" font-semibold text-gray-700 dark:text-gray-300 mb-1">Không tìm thấy khóa học</p>
+                                    <p class=" text-gray-500 dark:text-gray-400">Hãy thử lại với các điều kiện lọc khác</p>
                                 </div>
                             </td>
                         </tr>
@@ -475,96 +458,137 @@
         }
 
         let html = `
-            <table class="w-full table-fixed border-separate border-spacing-0 text-sm">
+            <table class="w-full table-fixed border-separate border-spacing-0">
                 <colgroup>
+                    <col class="w-[3%]">
                     <col class="w-[4%]">
-                    <col class="w-[7%]">
-                    <col class="w-[18%]">
                     <col class="w-[20%]">
-                    <col class="w-[13%]">
-                    <col class="w-[13%]">
-                    <col class="w-[25%]">
+                    <col class="w-[18%]">
+                    <col class="w-[9%]">
+                    <col class="w-[9%]">
+                    <col class="w-[8%]">
+                    <col class="w-[9%]">
+                    <col class="w-[8%]">
+                    <col class="w-[8%]">
                 </colgroup>
                 <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
                     <tr>
-                        <th class="px-4 py-3 text-center sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm">
+                        <th class="px-3.5 py-2.5 text-center sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm">
                             <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                         </th>
                         <th onclick="handleSort('id')" class="${getHeaderClass('id')}">
                             ID${getSortIcon('id')}
                         </th>
-                        <th onclick="handleSort('fullname')" class="${getHeaderClass('fullname')}">
-                            Tên${getSortIcon('fullname')}
+                        <th onclick="handleSort('title')" class="${getHeaderClass('title')}">
+                            Tiêu đề${getSortIcon('title')}
                         </th>
-                        <th onclick="handleSort('email')" class="${getHeaderClass('email')}">
-                            Email${getSortIcon('email')}
+                        <th class="px-3.5 py-2.5 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Mô tả</th>
+                        <th onclick="handleSort('start_date')" class="${getHeaderClass('start_date')}">
+                            Ngày bắt đầu${getSortIcon('start_date')}
                         </th>
-                        <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Vai trò</th>
-                        <th onclick="handleSort('created_at')" class="${getHeaderClass('created_at')}">
-                            Ngày tạo${getSortIcon('created_at')}
+                        <th onclick="handleSort('end_date')" class="${getHeaderClass('end_date')}">
+                            Ngày kết thúc${getSortIcon('end_date')}
                         </th>
-                        <th class="px-4 py-3 text-right sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Thao tác</th>
+                        <th class="px-3.5 py-2.5 text-center sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Trạng Thái</th>
+                        <th onclick="handleSort('users_count')" class="${getHeaderClass('users_count')}">
+                            Số sinh viên${getSortIcon('users_count')}
+                        </th>
+                        <th onclick="handleSort('lessons_count')" class="${getHeaderClass('lessons_count')}">
+                            Số bài học${getSortIcon('lessons_count')}
+                        </th>
+                        <th class="px-3.5 py-2.5 text-right sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody class="[&>tr:not(:first-child)>td]:border-t [&>tr:not(:first-child)>td]:border-gray-200 dark:[&>tr:not(:first-child)>td]:border-gray-700">
         `;
 
-        users.forEach(user => {
-            const roleBadge = user?.roles?.map(r => {
-                if (r.name === 'ROOT') {
-                    return `<span class="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-bold rounded-xl bg-gradient-to-r from-red-500 to-red-500 text-white">${r.name}</span>`;
-                } else if (r.name === 'ADMIN') {
-                    return `<span class="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-bold rounded-xl bg-gradient-to-r from-amber-500 to-amber-500 text-white">${r.name}</span>`;
-                } else if (r.name === 'TEACHER') {
-                    return `<span class="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-bold rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-500 text-white">${r.name}</span>`;
-                } else if (r.name === 'STUDENT') {
-                    return `<span class="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-bold rounded-xl bg-gradient-to-r from-blue-500 to-blue-500 text-white">${r.name}</span>`;
-                } else {
-                    return `<span class="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-bold rounded-xl bg-gradient-to-r from-gray-500 to-gray-500 text-white">${r.name}</span>`;
-                }
-            }).join(' ');
+        courses.forEach(course => {
+            const lessonsCount = (course.lessons || []).length;
+            const usersCount = course.users_count !== undefined ? course.users_count : (course.users || []).length;
+            const isChecked = selectedCourseIds.has(course.id);
 
-            const isChecked = selectedUserIds.has(user.id);
+            // Xác định trạng thái dựa trên start_date và end_date
+            let status = 'upcoming';
+            let statusText = 'Sắp diễn ra';
+            let statusClass = 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400';
+            const now = new Date();
+            const startDate = course.start_date ? new Date(course.start_date) : null;
+            const endDate = course.end_date ? new Date(course.end_date) : null;
+
+            console.log(now, startDate, endDate);
+            console.log(now < startDate);
+            console.log(now >= startDate && now <= endDate);
+            console.log(now > endDate);
+
+            console.log(status, statusText, statusClass);
+
+            if (startDate && endDate) {
+                if (now < startDate) {
+                    status = 'upcoming';
+                    statusText = 'Sắp diễn ra';
+                    statusClass = 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400 truncate';
+                } else if (now >= startDate && now <= endDate) {
+                    status = 'active';
+                    statusText = 'Đang diễn ra';
+                    statusClass = 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400 truncate';
+                } else {
+                    status = 'past';
+                    statusText = 'Đã kết thúc';
+                    statusClass = 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 truncate';
+                }
+            }
+
             html += `
                 <tr class="border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td class="px-4 py-3 text-center">
+                    <td class="px-3.5 py-2.5 text-center">
                         <input type="checkbox"
-                            class="user-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                            value="${user.id}"
+                            class="course-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                            value="${course.id}"
                             ${isChecked ? 'checked' : ''}
-                            onchange="toggleUserSelection(${user.id}, this.checked)">
+                            onchange="toggleCourseSelection(${course.id}, this.checked)">
                     </td>
                     <td class="${getCellClass('id')} text-center">
-                        <span class="text-gray-600 dark:text-gray-300">${user.id}</span>
+                        <span class="text-gray-600 dark:text-gray-300">${course.id}</span>
                     </td>
-                    <td class="${getCellClass('fullname')} text-gray-600 dark:text-gray-300">
-                        ${user.fullname || '-'}
+                    <td class="${getCellClass('title')} text-gray-600 dark:text-gray-300">
+                        ${course.title || '-'}
                     </td>
-                    <td class="${getCellClass('email')} text-gray-600 dark:text-gray-300 break-all [overflow-wrap:anywhere]">
-                        ${user.email}
+                    <td class="px-3.5 py-2.5 text-gray-600 dark:text-gray-300 break-all [overflow-wrap:anywhere]">
+                        ${course.description ? (course.description.substring(0, 50) + (course.description.length > 50 ? '...' : '')) : '-'}
                     </td>
-                    <td class="px-4 py-3 align-center whitespace-normal break-words">
-                        ${roleBadge}
+                    <td class="${getCellClass('start_date')} text-gray-600 dark:text-gray-300">
+                        ${formatDate(course.start_date)}
                     </td>
-                    <td class="${getCellClass('created_at')} text-gray-600 dark:text-gray-300">
-                        ${formatDate(user.created_at)}
+                    <td class="${getCellClass('end_date')} text-gray-600 dark:text-gray-300">
+                        ${formatDate(course.end_date)}
                     </td>
-                    <td class="px-4 py-3 align-top">
-                        <div class="flex flex-wrap items-center justify-end gap-2">
-                            <a href="/admin/users/${user.id}"
-                                class="group/action inline-flex items-center justify-center w-7 2xl:w-8 aspect-square rounded-md border border-blue-500 hover:border-blue-600 text-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300"
+                    <td class="${getCellClass('status')} text-center">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full font-medium ${statusClass}">
+                            ${statusText}
+                        </span>
+                    </td>
+                    <td class="${getCellClass('users_count')} text-center text-gray-600 dark:text-gray-300">
+                        ${usersCount}
+                    </td>
+                    <td class="px-3.5 py-2.5 text-center text-gray-600 dark:text-gray-300">
+                        ${lessonsCount}
+                    </td>
+                    <td class="px-3.5 py-2.5 align-top">
+                        <div class="flex flex-nowrap items-center justify-end gap-2">
+                            <a href="/admin/courses/${course.id}"
+                                class="group/action text-sm inline-flex items-center justify-center w-7 2xl:w-8 aspect-square rounded-md border border-blue-500 hover:border-blue-600 text-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300"
                                 title="Xem chi tiết">
-                                <i class="fas fa-eye text-sm 2xl:text-sm"></i>
+                                <i class="fas fa-eye 2xl:"></i>
                             </a>
-                            <a href="/admin/users/${user.id}/edit"
-                                class="group/action inline-flex items-center justify-center w-7 2xl:w-8 aspect-square rounded-md border border-amber-500 hover:border-amber-600 text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-300"
+                            <a href="/admin/courses/${course.id}/edit"
+                                class="group/action text-sm inline-flex items-center justify-center w-7 2xl:w-8 aspect-square rounded-md border border-amber-500 hover:border-amber-600 text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-300"
                                 title="Chỉnh sửa">
-                                <i class="fa-solid fa-pen text-sm 2xl:text-sm"></i>
+                                <i class="fa-solid fa-pen 2xl:"></i>
                             </a>
-                            <button onclick="openDeleteModal(${user.id}, '${(user.fullname || '').replace(/'/g, "\\'")}', '${user.email.replace(/'/g, "\\'")}')"
-                                class="group/action inline-flex items-center justify-center w-7 2xl:w-8 aspect-square rounded-md border border-red-500 hover:border-red-600 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300"
+                            <button onclick="openDeleteModal(${course.id}, '${(course.title || '').replace(/'/g, "\\'")}')"
+                                class="group/action text-sm inline-flex items-center justify-center w-7 2xl:w-8 aspect-square rounded-md border border-red-500 hover:border-red-600 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300"
                                 title="Xóa">
-                                <i class="fas fa-trash text-sm 2xl:text-sm"></i>
+                                <i class="fas fa-trash 2xl:"></i>
                             </button>
                         </div>
                     </td>
@@ -588,23 +612,23 @@
             – <span class="font-semibold text-gray-900 dark:text-gray-100">${lastItem}</span>
             trong <span class="font-semibold text-gray-900 dark:text-gray-100">${total}</span>
         `;
+}
+
+function renderPagination(paginationData) {
+    const pagination = document.getElementById('pagination');
+    const current = paginationData.current_page;
+    const last = paginationData.last_page;
+
+    if (last <= 1) {
+        pagination.innerHTML = '';
+        return;
     }
 
-    function renderPagination(paginationData) {
-        const pagination = document.getElementById('pagination');
-        const current = paginationData.current_page;
-        const last = paginationData.last_page;
-
-        if (last <= 1) {
-            pagination.innerHTML = '';
-            return;
-        }
-
-        let html = '';
+    let html = '';
 
         // Previous Button
         if (current > 1) {
-            html += `<button onclick="loadUsers(${current - 1})" class="px-2.5 py-0.5 bg-white dark:bg-gray-600 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">Trước</button>`;
+            html += `<button onclick="loadCourses(${current - 1})" class="px-2.5 py-0.5 bg-white dark:bg-gray-600 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">Trước</button>`;
         } else {
             html += `<button type="button" disabled class="px-2.5 py-0.5 bg-white dark:bg-gray-600 rounded-md border border-gray-200 dark:border-gray-700 opacity-50 cursor-not-allowed">Trước</button>`;
         }
@@ -616,7 +640,7 @@
                 if (i === current) {
                     html += `<button type="button" class="px-2.5 py-0.5 rounded-md border bg-blue-600 text-white border-blue-600">${i}</button>`;
                 } else {
-                    html += `<button onclick="loadUsers(${i})" class="px-2.5 py-0.5 bg-white dark:bg-gray-600 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">${i}</button>`;
+                    html += `<button onclick="loadCourses(${i})" class="px-2.5 py-0.5 bg-white dark:bg-gray-600 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">${i}</button>`;
                 }
             }
         } else {
@@ -627,59 +651,58 @@
                     if (i === current) {
                         html += `<button type="button" class="px-2.5 py-0.5 rounded-md border bg-blue-600 text-white border-blue-600">${i}</button>`;
                     } else {
-                        html += `<button onclick="loadUsers(${i})" class="px-2.5 py-0.5 bg-white dark:bg-gray-600 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">${i}</button>`;
+                        html += `<button onclick="loadCourses(${i})" class="px-2.5 py-0.5 bg-white dark:bg-gray-600 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">${i}</button>`;
                     }
                 }
                 html += `<span class="inline-flex items-center justify-center px-3 py-1 text-gray-400">...</span>`;
-                html += `<button onclick="loadUsers(${last})" class="px-2.5 py-0.5 bg-white dark:bg-gray-600 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">${last}</button>`;
+                html += `<button onclick="loadCourses(${last})" class="px-2.5 py-0.5 bg-white dark:bg-gray-600 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">${last}</button>`;
             } else if (current >= last - 2) {
                 // Show first, ellipsis, last 3
-                html += `<button onclick="loadUsers(1)" class="px-2.5 py-0.5 bg-white dark:bg-gray-600 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">1</button>`;
+                html += `<button onclick="loadCourses(1)" class="px-2.5 py-0.5 bg-white dark:bg-gray-600 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">1</button>`;
                 html += `<span class="inline-flex items-center justify-center px-3 py-1 text-gray-400">...</span>`;
                 for (let i = last - 2; i <= last; i++) {
                     if (i === current) {
                         html += `<button type="button" class="px-2.5 py-0.5 rounded-md border bg-blue-600 text-white border-blue-600">${i}</button>`;
                     } else {
-                        html += `<button onclick="loadUsers(${i})" class="px-2.5 py-0.5 bg-white dark:bg-gray-600 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">${i}</button>`;
+                        html += `<button onclick="loadCourses(${i})" class="px-2.5 py-0.5 bg-white dark:bg-gray-600 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">${i}</button>`;
                     }
                 }
             } else {
                 // Show first, ellipsis, current-1, current, current+1, ellipsis, last
-                html += `<button onclick="loadUsers(1)" class="px-2.5 py-0.5 bg-white dark:bg-gray-600 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">1</button>`;
+                html += `<button onclick="loadCourses(1)" class="px-2.5 py-0.5 bg-white dark:bg-gray-600 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">1</button>`;
                 html += `<span class="inline-flex items-center justify-center px-3 py-1 text-gray-400">...</span>`;
                 for (let i = current - 1; i <= current + 1; i++) {
                     if (i === current) {
                         html += `<button type="button" class="px-2.5 py-0.5 rounded-md border bg-blue-600 text-white border-blue-600">${i}</button>`;
                     } else {
-                        html += `<button onclick="loadUsers(${i})" class="px-2.5 py-0.5 bg-white dark:bg-gray-600 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">${i}</button>`;
+                        html += `<button onclick="loadCourses(${i})" class="px-2.5 py-0.5 bg-white dark:bg-gray-600 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">${i}</button>`;
                     }
                 }
                 html += `<span class="inline-flex items-center justify-center px-3 py-1 text-gray-400">...</span>`;
-                html += `<button onclick="loadUsers(${last})" class="px-2.5 py-0.5 bg-white dark:bg-gray-600 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">${last}</button>`;
+                html += `<button onclick="loadCourses(${last})" class="px-2.5 py-0.5 bg-white dark:bg-gray-600 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">${last}</button>`;
             }
         }
 
         // Next Button
         if (current < last) {
-            html += `<button onclick="loadUsers(${current + 1})" class="px-2.5 py-0.5 bg-white dark:bg-gray-600 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">Sau</button>`;
+            html += `<button onclick="loadCourses(${current + 1})" class="px-2.5 py-0.5 bg-white dark:bg-gray-600 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">Sau</button>`;
         } else {
             html += `<button type="button" disabled class="px-2.5 py-0.5 bg-white dark:bg-gray-600 rounded-md border border-gray-200 dark:border-gray-700 opacity-50 cursor-not-allowed">Sau</button>`;
         }
         pagination.innerHTML = html;
     }
 
-
-    function openDeleteModal(id, userName, userEmail) {
+    function openDeleteModal(id, courseTitle) {
         isBulkDelete = false;
-        deleteUserId = id;
+        deleteCourseId = id;
 
         // Update modal for single delete
-        document.getElementById('deleteModalTitle').textContent = 'Xác nhận xóa người dùng';
-        document.getElementById('deleteModalMessage').textContent = 'Bạn có chắc chắn muốn xóa người dùng này không?';
+        document.getElementById('deleteModalTitle').textContent = 'Xác nhận xóa khóa học';
+        document.getElementById('deleteModalMessage').textContent = 'Bạn có chắc chắn muốn xóa khóa học này không?';
         document.getElementById('singleDeleteInfo').style.display = 'block';
         document.getElementById('bulkDeleteInfo').style.display = 'none';
-        document.getElementById('deleteUserName').textContent = userName || '-';
-        document.getElementById('deleteUserEmail').textContent = userEmail;
+        document.getElementById('deleteCourseTitle').textContent = courseTitle || '-';
+        document.getElementById('deleteCourseId').textContent = id;
 
         document.getElementById('deleteModal').style.display = 'block';
         document.body.style.overflow = 'hidden';
@@ -688,64 +711,64 @@
     function closeDeleteModal() {
         document.getElementById('deleteModal').style.display = 'none';
         document.body.style.overflow = '';
-        deleteUserId = null;
+        deleteCourseId = null;
         isBulkDelete = false;
     }
 
     async function confirmDelete() {
         if (isBulkDelete) {
             // Bulk delete
-            if (selectedUserIds.size === 0) return;
+            if (selectedCourseIds.size === 0) return;
 
-            const userIds = Array.from(selectedUserIds);
+            const courseIds = Array.from(selectedCourseIds);
 
             try {
                 let successCount = 0;
                 let failCount = 0;
 
-                for (const userId of userIds) {
+                for (const courseId of courseIds) {
                     try {
-                        const data = await apiRequest(`/users/${userId}`, {
+                        const data = await apiRequest(`/courses/${courseId}`, {
                             method: 'DELETE'
                         });
                         if (data.success) {
                             successCount++;
-                        } else {
+        } else {
                             failCount++;
-                        }
-                    } catch (error) {
+        }
+    } catch (error) {
                         failCount++;
-                        console.error(`Error deleting user ${userId}:`, error);
+                        console.error(`Error deleting course ${courseId}:`, error);
                     }
                 }
 
                 if (successCount > 0) {
-                    showNotificationModel(`Đã xóa thành công ${successCount} người dùng${failCount > 0 ? `, ${failCount} người dùng xóa thất bại` : ''}`);
-                    selectedUserIds.clear();
+                    showNotificationModel(`Đã xóa thành công ${successCount} khóa học${failCount > 0 ? `, ${failCount} khóa học xóa thất bại` : ''}`);
+                    selectedCourseIds.clear();
                     closeDeleteModal();
-                    loadUsers(currentPage);
+                    loadCourses(currentPage);
                 } else {
-                    showNotificationModel('Không thể xóa người dùng đã chọn', 'error');
+                    showNotificationModel('Không thể xóa khóa học đã chọn', 'error');
                 }
             } catch (error) {
                 showNotificationModel(error.message, 'error');
             }
         } else {
             // Single delete
-            if (!deleteUserId) return;
+            if (!deleteCourseId) return;
 
             try {
-                const data = await apiRequest(`/users/${deleteUserId}`, {
-                    method: 'DELETE'
-                });
+                const data = await apiRequest(`/courses/${deleteCourseId}`, {
+            method: 'DELETE'
+        });
 
-                if (data.success) {
+        if (data.success) {
                     closeDeleteModal();
                     showNotificationModel(data.message || 'Xóa thành công');
-                    selectedUserIds.delete(deleteUserId);
-                    loadUsers(currentPage);
-                }
-            } catch (error) {
+                    selectedCourseIds.delete(deleteCourseId);
+            loadCourses(currentPage);
+        }
+    } catch (error) {
                 showNotificationModel(error.message, 'error');
             }
         }
@@ -767,33 +790,33 @@
         switch (type) {
             case 'success':
                 alertIcon.className = 'flex h-12 w-12 items-center justify-center rounded-xl bg-green-100 dark:bg-green-900/20';
-                alertIconClass.className = 'fas fa-check-circle text-xl text-green-600 dark:text-green-400';
+                alertIconClass.className = 'fas fa-check-circle text-green-600 dark:text-green-400';
                 alertTitle.textContent = 'Thành công';
-                alertButton.className = 'px-4 py-2.5 text-sm font-semibold text-white bg-green-600 rounded-xl hover:bg-green-700 transition-all duration-300 flex items-center gap-2';
+                alertButton.className = 'px-4 py-2.5  font-semibold text-white bg-green-600 rounded-xl hover:bg-green-700 transition-all duration-300 flex items-center gap-2';
                 break;
             case 'error':
                 alertIcon.className = 'flex h-12 w-12 items-center justify-center rounded-xl bg-red-100 dark:bg-red-900/20';
-                alertIconClass.className = 'fas fa-exclamation-circle text-xl text-red-600 dark:text-red-400';
+                alertIconClass.className = 'fas fa-exclamation-circle text-red-600 dark:text-red-400';
                 alertTitle.textContent = 'Lỗi';
-                alertButton.className = 'px-4 py-2.5 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-all duration-300 flex items-center gap-2';
+                alertButton.className = 'px-4 py-2.5  font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-all duration-300 flex items-center gap-2';
                 break;
             case 'warning':
                 alertIcon.className = 'flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/20';
-                alertIconClass.className = 'fas fa-exclamation-triangle text-xl text-amber-600 dark:text-amber-400';
+                alertIconClass.className = 'fas fa-exclamation-triangle text-amber-600 dark:text-amber-400';
                 alertTitle.textContent = 'Cảnh báo';
-                alertButton.className = 'px-4 py-2.5 text-sm font-semibold text-white bg-amber-600 rounded-xl hover:bg-amber-700 transition-all duration-300 flex items-center gap-2';
+                alertButton.className = 'px-4 py-2.5  font-semibold text-white bg-amber-600 rounded-xl hover:bg-amber-700 transition-all duration-300 flex items-center gap-2';
                 break;
             case 'info':
                 alertIcon.className = 'flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/20';
-                alertIconClass.className = 'fas fa-info-circle text-xl text-blue-600 dark:text-blue-400';
+                alertIconClass.className = 'fas fa-info-circle text-blue-600 dark:text-blue-400';
                 alertTitle.textContent = 'Thông tin';
-                alertButton.className = 'px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all duration-300 flex items-center gap-2';
+                alertButton.className = 'px-4 py-2.5  font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all duration-300 flex items-center gap-2';
                 break;
             default:
                 alertIcon.className = 'flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-700';
-                alertIconClass.className = 'fas fa-bell text-xl text-gray-600 dark:text-gray-400';
+                alertIconClass.className = 'fas fa-bell text-gray-600 dark:text-gray-400';
                 alertTitle.textContent = 'Thông báo';
-                alertButton.className = 'px-4 py-2.5 text-sm font-semibold text-white bg-gray-600 rounded-xl hover:bg-gray-700 transition-all duration-300 flex items-center gap-2';
+                alertButton.className = 'px-4 py-2.5  font-semibold text-white bg-gray-600 rounded-xl hover:bg-gray-700 transition-all duration-300 flex items-center gap-2';
         }
 
         // Show modal
@@ -822,25 +845,25 @@
         }
     });
 
-    function toggleUserSelection(userId, checked) {
+    function toggleCourseSelection(courseId, checked) {
         if (checked) {
-            selectedUserIds.add(userId);
+            selectedCourseIds.add(courseId);
         } else {
-            selectedUserIds.delete(userId);
+            selectedCourseIds.delete(courseId);
         }
         updateSelectAllCheckbox();
         updateBulkDeleteActions();
     }
 
     function toggleSelectAll(checked) {
-        const checkboxes = document.querySelectorAll('.user-checkbox');
+        const checkboxes = document.querySelectorAll('.course-checkbox');
         checkboxes.forEach(checkbox => {
             checkbox.checked = checked;
-            const userId = parseInt(checkbox.value);
+            const courseId = parseInt(checkbox.value);
             if (checked) {
-                selectedUserIds.add(userId);
+                selectedCourseIds.add(courseId);
             } else {
-                selectedUserIds.delete(userId);
+                selectedCourseIds.delete(courseId);
             }
         });
         updateBulkDeleteActions();
@@ -850,7 +873,7 @@
         const selectAllCheckbox = document.getElementById('selectAll');
         if (!selectAllCheckbox) return;
 
-        const checkboxes = document.querySelectorAll('.user-checkbox');
+        const checkboxes = document.querySelectorAll('.course-checkbox');
         const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
 
         if (checkboxes.length === 0) {
@@ -872,39 +895,39 @@
         const bulkDeleteActions = document.getElementById('bulkDeleteActions');
         const selectedCount = document.getElementById('selectedCount');
 
-        if (selectedUserIds.size > 0) {
+        if (selectedCourseIds.size > 0) {
             bulkDeleteActions.disabled = false;
             bulkDeleteActions.style.opacity = '1';
             bulkDeleteActions.style.cursor = 'pointer';
-            // selectedCount.textContent = `${selectedUserIds.size}`;
+            selectedCount.textContent = selectedCourseIds.size;
         } else {
             bulkDeleteActions.disabled = true;
             bulkDeleteActions.style.opacity = '0.5';
             bulkDeleteActions.style.cursor = 'not-allowed';
+            selectedCount.textContent = '0';
         }
     }
 
     function openBulkDeleteModal() {
-        if (selectedUserIds.size === 0) {
-            showNotificationModel('Vui lòng chọn ít nhất một người dùng để xóa', 'error');
+        if (selectedCourseIds.size === 0) {
+            showNotificationModel('Vui lòng chọn ít nhất một khóa học để xóa', 'error');
             return;
         }
 
         isBulkDelete = true;
-        deleteUserId = null;
+        deleteCourseId = null;
 
         // Update modal for bulk delete
-        document.getElementById('deleteModalTitle').textContent = 'Xác nhận xóa nhiều người dùng';
-        document.getElementById('deleteModalMessage').textContent = `Bạn có chắc chắn muốn xóa ${selectedUserIds.size} người dùng đã chọn không?`;
+        document.getElementById('deleteModalTitle').textContent = 'Xác nhận xóa nhiều khóa học';
+        document.getElementById('deleteModalMessage').textContent = `Bạn có chắc chắn muốn xóa ${selectedCourseIds.size} khóa học đã chọn không?`;
         document.getElementById('singleDeleteInfo').style.display = 'none';
         document.getElementById('bulkDeleteInfo').style.display = 'block';
-        document.getElementById('bulkDeleteCount').textContent = selectedUserIds.size;
+        document.getElementById('bulkDeleteCount').textContent = selectedCourseIds.size;
 
         document.getElementById('deleteModal').style.display = 'block';
         document.body.style.overflow = 'hidden';
-    }
+}
 </script>
-
 
 {{-- Alert Notification Modal --}}
 <div id="alertModal" class="fixed inset-0 z-[100] overflow-y-auto overflow-x-hidden" style="display: none;">
@@ -919,18 +942,14 @@
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <div id="alertIcon" class="flex h-12 w-12 items-center justify-center rounded-xl">
-                        <i id="alertIconClass" class="text-xl"></i>
+                        <i id="alertIconClass" class="></i>
                     </div>
                     <div>
-                        <h3 id="alertTitle" class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        <h3 id="alertTitle" class=" font-semibold text-gray-900 dark:text-gray-100">
                             Thông báo
                         </h3>
                     </div>
                 </div>
-                {{-- <button type="button" onclick="closeAlertModal()"
-                    class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-                    <i class="fas fa-times text-xl"></i>
-                </button> --}}
             </div>
 
             <hr class="border-gray-200 dark:border-gray-700">
@@ -947,7 +966,7 @@
             <div class="flex items-center justify-end gap-3">
                 <button type="button" onclick="closeAlertModal()"
                     id="alertButton"
-                    class="px-4 py-2.5 text-sm font-semibold text-white rounded-xl transition-all duration-300 flex items-center gap-2">
+                    class="px-4 py-2.5  font-semibold text-white rounded-xl transition-all duration-300 flex items-center gap-2">
                     <span>Đóng</span>
                 </button>
             </div>

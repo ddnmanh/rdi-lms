@@ -5,10 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\RefreshToken;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 
@@ -87,7 +85,11 @@ class AuthController extends Controller
         // Tạo access token và refresh token
         $tokens = $this->generateTokens($user, $request);
 
-        return response()->json([
+        // Lưu token vào cookie
+        $accessTokenExpires = config('jwt.ttl') * 60; // seconds
+        $refreshTokenExpires = config('jwt.refresh_ttl') * 60; // seconds
+
+        $response = response()->json([
             'success' => true,
             'message' => 'Đăng nhập thành công',
             'data' => [
@@ -95,9 +97,18 @@ class AuthController extends Controller
                 'access_token' => $tokens['access_token'],
                 'refresh_token' => $tokens['refresh_token'],
                 'token_type' => 'Bearer',
-                'expires_in' => config('jwt.ttl') * 60, // seconds
+                'expires_in' => $accessTokenExpires,
             ]
         ]);
+
+        // Set access token cookie (HttpOnly, Secure chỉ khi HTTPS, SameSite)
+        $secure = $request->secure() || config('session.secure', false);
+        $response->cookie('access_token', $tokens['access_token'], $accessTokenExpires / 60, '/', null, $secure, true);
+
+        // Set refresh token cookie (HttpOnly, Secure chỉ khi HTTPS, SameSite)
+        $response->cookie('refresh_token', $tokens['refresh_token'], $refreshTokenExpires / 60, '/', null, $secure, true);
+
+        return $response;
     }
 
     /**
@@ -108,9 +119,9 @@ class AuthController extends Controller
         try {
             $token = JWTAuth::getToken();
 
-            // Revoke refresh token nếu có
-            $refreshToken = $request->input('refresh_token');
-            if ($refreshToken) {
+            // Revoke refresh token từ cookie hoặc request
+            $refreshToken = $request->cookie('refresh_token') ?? $request->input('refresh_token');
+            if ($refreshToken && $request->user()) {
                 $refreshTokenModel = RefreshToken::where('token', $refreshToken)
                     ->where('user_id', $request->user()->id)
                     ->where('is_revoked', false)
@@ -122,17 +133,33 @@ class AuthController extends Controller
             }
 
             // Invalidate access token
-            JWTAuth::invalidate($token);
+            if ($token) {
+                JWTAuth::invalidate($token);
+            }
 
-            return response()->json([
+            $response = response()->json([
                 'success' => true,
                 'message' => 'Đăng xuất thành công'
             ]);
+
+            // Xóa cookies
+            $secure = $request->secure() || config('session.secure', false);
+            $response->cookie('access_token', '', -1, '/', null, $secure, true);
+            $response->cookie('refresh_token', '', -1, '/', null, $secure, true);
+
+            return $response;
         } catch (JWTException $e) {
-            return response()->json([
+            $response = response()->json([
                 'success' => false,
                 'message' => 'Không thể đăng xuất'
             ], 500);
+
+            // Vẫn xóa cookies dù có lỗi
+            $secure = $request->secure() || config('session.secure', false);
+            $response->cookie('access_token', '', -1, '/', null, $secure, true);
+            $response->cookie('refresh_token', '', -1, '/', null, $secure, true);
+
+            return $response;
         }
     }
 
@@ -154,19 +181,16 @@ class AuthController extends Controller
      */
     public function refresh(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'refresh_token' => 'required|string',
-        ]);
+        // Lấy refresh token từ cookie hoặc request body
+        $refreshToken = $request->cookie('refresh_token') ?? $request->input('refresh_token');
 
-        if ($validator->fails()) {
+        if (!$refreshToken) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
+                'message' => 'Refresh token không được cung cấp'
             ], 422);
         }
 
-        $refreshToken = $request->input('refresh_token');
         $refreshTokenModel = RefreshToken::where('token', $refreshToken)
             ->where('is_revoked', false)
             ->first();
@@ -183,16 +207,22 @@ class AuthController extends Controller
         // Tạo access token mới
         try {
             $accessToken = JWTAuth::fromUser($user);
+            $accessTokenExpires = config('jwt.ttl') * 60; // seconds
 
-            return response()->json([
+            $response = response()->json([
                 'success' => true,
                 'message' => 'Refresh token thành công',
                 'data' => [
-                    'access_token' => $accessToken,
                     'token_type' => 'Bearer',
-                    'expires_in' => config('jwt.ttl') * 60, // seconds
+                    'expires_in' => $accessTokenExpires,
                 ]
             ]);
+
+            // Cập nhật access token cookie
+            $secure = $request->secure() || config('session.secure', false);
+            $response->cookie('access_token', $accessToken, $accessTokenExpires / 60, '/', null, $secure, true);
+
+            return $response;
         } catch (JWTException $e) {
             return response()->json([
                 'success' => false,

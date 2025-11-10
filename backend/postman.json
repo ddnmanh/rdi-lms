@@ -181,7 +181,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/users?search=&role_id=&role_name=&created_at_from=&created_at_to=&sort_by=id&order_by=desc&per_page=15&page=1",
+							"raw": "{{base_url}}/api/users?search=&search_email=&search_fullname=&role_id=&role_name=&created_at_from=&created_at_to=&sort_by=id&order_by=desc&per_page=15&page=1",
 							"host": ["{{base_url}}"],
 							"path": ["api", "users"],
 							"query": [
@@ -189,6 +189,16 @@
 									"key": "search",
 									"value": "",
 									"description": "Tìm kiếm theo email hoặc fullname"
+								},
+								{
+									"key": "search_email",
+									"value": "",
+									"description": "Tìm kiếm theo email"
+								},
+								{
+									"key": "search_fullname",
+									"value": "",
+									"description": "Tìm kiết theo fullname"
 								},
 								{
 									"key": "role_id",
@@ -645,7 +655,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/courses?search=&user_id=&start_date_from=&start_date_to=&end_date_from=&end_date_to=&date_range=all&sort_by=id&order_by=desc&per_page=15&page=1",
+							"raw": "{{base_url}}/api/courses?search=&user_id=&start_date_from=&start_date_to=&end_date_from=&end_date_to=&date_range=all&min_users=&max_users=&min_lessons=&max_lessons=&sort_by=id&order_by=desc&per_page=15&page=1",
 							"host": ["{{base_url}}"],
 							"path": ["api", "courses"],
 							"query": [
@@ -685,9 +695,29 @@
 									"description": "Lọc theo trạng thái (active, upcoming, past, all)"
 								},
 								{
+									"key": "min_users",
+									"value": "",
+									"description": "Lọc khóa học có số lượng users >= giá trị này"
+								},
+								{
+									"key": "max_users",
+									"value": "",
+									"description": "Lọc khóa học có số lượng users <= giá trị này"
+								},
+								{
+									"key": "min_lessons",
+									"value": "",
+									"description": "Lọc khóa học có số lượng lessons >= giá trị này"
+								},
+								{
+									"key": "max_lessons",
+									"value": "",
+									"description": "Lọc khóa học có số lượng lessons <= giá trị này"
+								},
+								{
 									"key": "sort_by",
 									"value": "id",
-									"description": "Sắp xếp theo (id, title, start_date, end_date, created_at, updated_at)"
+									"description": "Sắp xếp theo (id, title, start_date, end_date, created_at, updated_at, users_count, lessons_count)"
 								},
 								{
 									"key": "order_by",
@@ -937,6 +967,186 @@
 							]
 						},
 						"description": "Xóa sinh viên khỏi khóa học"
+					}
+				},
+				{
+					"name": "Remove Multiple Users from Course",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_ids\": [1, 2, 3]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/courses/:id/users/remove-multiple",
+							"host": ["{{base_url}}"],
+							"path": ["api", "courses", ":id", "users", "remove-multiple"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Xóa nhiều sinh viên khỏi khóa học"
+					}
+				},
+				{
+					"name": "Add Lesson to Course",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"lesson_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/courses/:id/lessons/add",
+							"host": ["{{base_url}}"],
+							"path": ["api", "courses", ":id", "lessons", "add"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Thêm một bài học vào khóa học"
+					}
+				},
+				{
+					"name": "Add Lessons to Course",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"lesson_ids\": [1, 2, 3]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/courses/:id/lessons",
+							"host": ["{{base_url}}"],
+							"path": ["api", "courses", ":id", "lessons"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Thêm nhiều bài học vào khóa học"
+					}
+				},
+				{
+					"name": "Remove Lesson from Course",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"lesson_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/courses/:id/lessons/remove",
+							"host": ["{{base_url}}"],
+							"path": ["api", "courses", ":id", "lessons", "remove"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Xóa một bài học khỏi khóa học"
+					}
+				},
+				{
+					"name": "Remove Multiple Lessons from Course",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"lesson_ids\": [1, 2, 3]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/courses/:id/lessons/remove-multiple",
+							"host": ["{{base_url}}"],
+							"path": ["api", "courses", ":id", "lessons", "remove-multiple"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Xóa nhiều bài học khỏi khóa học"
 					}
 				}
 			]
@@ -1443,6 +1653,34 @@
 							]
 						},
 						"description": "Chi tiết tiến độ học của một sinh viên trong khóa học"
+					}
+				},
+				{
+					"name": "Get Student Login History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/students/:userId/login-history",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reports", "students", ":userId", "login-history"],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Xem lịch sử đăng nhập của một sinh viên"
 					}
 				}
 			]

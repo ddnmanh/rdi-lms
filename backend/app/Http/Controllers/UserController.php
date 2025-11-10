@@ -11,9 +11,11 @@ class UserController extends Controller
 {
     /**
      * Danh sách người dùng
-     * 
+     *
      * Query params:
      * - search: Tìm kiếm theo email hoặc fullname
+     * - search_email: Tìm kiếm theo email
+     * - search_fullname: Tìm kiết theo fullname
      * - role_id: Lọc theo role ID
      * - role_name: Lọc theo tên role (ROOT, ADMIN, TEACHER, STUDENT)
      * - created_at_from: Lọc từ ngày tạo (format: Y-m-d)
@@ -27,13 +29,23 @@ class UserController extends Controller
     {
         $query = User::with('roles');
 
-        // Tìm kiếm
+        // Tìm kiếm chung theo email hoặc fullname
         if ($request->has('search') && $request->search) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('email', 'like', "%{$search}%")
                     ->orWhere('fullname', 'like', "%{$search}%");
             });
+        }
+
+        // Tìm kiếm theo email
+        if ($request->has('search_email') && $request->search_email) {
+            $query->where('email', 'like', "%{$request->search_email}%");
+        }
+
+        // Tìm kiếm theo fullname
+        if ($request->has('search_fullname') && $request->search_fullname) {
+            $query->where('fullname', 'like', "%{$request->search_fullname}%");
         }
 
         // Lọc theo role_id
@@ -63,24 +75,24 @@ class UserController extends Controller
         // Sắp xếp
         $sortBy = $request->get('sort_by', 'id');
         $orderBy = $request->get('order_by', 'desc');
-        
+
         // Validate sort_by
         $allowedSortBy = ['id', 'email', 'fullname', 'created_at', 'updated_at'];
         if (!in_array($sortBy, $allowedSortBy)) {
             $sortBy = 'id';
         }
-        
+
         // Validate order_by
         $orderBy = strtolower($orderBy);
         if (!in_array($orderBy, ['asc', 'desc'])) {
             $orderBy = 'desc';
         }
-        
+
         $query->orderBy($sortBy, $orderBy);
 
         $perPage = $request->get('per_page', 15);
         $perPage = min(max(1, (int)$perPage), 100); // Giới hạn từ 1-100
-        
+
         $users = $query->paginate($perPage);
 
         return response()->json([

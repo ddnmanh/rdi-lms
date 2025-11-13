@@ -169,7 +169,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-
+        $authUser = $request->user();
         $user = User::find($id);
 
         if (!$user) {
@@ -177,6 +177,24 @@ class UserController extends Controller
                 'success' => false,
                 'message' => 'Không tìm thấy người dùng'
             ], 404);
+        }
+
+        // Kiểm tra quyền: chỉ cho phép cập nhật chính mình hoặc user có level cao hơn
+        if ($authUser->id != $id) {
+            // Lấy level thấp nhất (quyền cao nhất) của auth user
+            $authUserMinLevel = $authUser->roles()->min('level');
+
+            // Lấy level thấp nhất (quyền cao nhất) của user bị cập nhật
+            $targetUserMinLevel = $user->roles()->min('level');
+
+            // Chỉ cho phép nếu level của auth user < level của user bị cập nhật
+            // (level thấp hơn = quyền cao hơn)
+            if ($authUserMinLevel === null || $targetUserMinLevel === null || $authUserMinLevel >= $targetUserMinLevel) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Bạn không có quyền cập nhật người dùng này'
+                ], 403);
+            }
         }
 
         $validator = Validator::make($request->all(), [
@@ -239,6 +257,15 @@ class UserController extends Controller
      */
     public function destroyUsers(Request $request)
     {
+        $authUser = $request->user();
+
+        if (!$authUser) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không được phép truy cập'
+            ], 401);
+        }
+
         $validator = Validator::make($request->all(), [
             'user_ids' => 'required|array',
             'user_ids.*' => 'exists:users,id',
@@ -252,13 +279,30 @@ class UserController extends Controller
             ], 422);
         }
 
-        $users = User::whereIn('id', $request->user_ids)->get();
+        $users = User::with('roles')->whereIn('id', $request->user_ids)->get();
+
+        // dd($users->toArray());
+
+        // Lấy level thấp nhất (quyền cao nhất) của user yêu cầu xóa
+        $authUserMinLevel = $authUser?->roles()->min('level');
+
+        $userWillDelete = [];
 
         foreach ($users as $user) {
-            // $user->roles()->detach();
-            // $user->courses()->detach();
-            // $user->lessonViews()->delete();
-            // $user->refreshTokens()->delete();
+            $targetUserMinLevel = $user->roles->min('level');
+
+            // Level thấp hơn = quyền cao hơn, chỉ cho phép khi authUser < targetUser
+            if ($authUserMinLevel === null || $targetUserMinLevel === null || $authUserMinLevel >= $targetUserMinLevel) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Bạn không có quyền xóa người dùng: ' . ($user->email ?? $user->id)
+                ], 403);
+            }
+
+            $userWillDelete[] = $user->id;
+        }
+
+        foreach ($userWillDelete as $user) {
             $user->delete();
         }
 

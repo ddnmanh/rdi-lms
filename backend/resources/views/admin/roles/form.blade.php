@@ -30,7 +30,7 @@
                     <label for="level" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Level * (1-255)</label>
                     <input type="number" id="level" min="1" max="255" required
                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-3">Level càng thấp thì quyền hạn càng lớn</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-3">Level càng thấp thì quyền hạn càng lớn, 1-20 có thể vào trang quản lý</p>
                 </div>
             </div>
 

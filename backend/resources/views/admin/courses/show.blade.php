@@ -217,7 +217,7 @@
         if (pageTitleEl) pageTitleEl.textContent = course.title || 'Chi tiết khóa học';
         document.getElementById('editButton').href = `/admin/courses/${course.id}/edit`;
         document.getElementById('manageLessonsButton').href = `/admin/courses/${course.id}/edit`;
-        document.getElementById('manageUsersButton').href = `/admin/courses/${course.id}/users`;
+        document.getElementById('manageUsersButton').href = `/admin/courses/${course.id}/edit`;
         setText('courseId', course.id);
         setText('courseTitle', course.title || 'Chưa có tiêu đề');
         setText('courseDescription', course.description || 'Chưa có mô tả');

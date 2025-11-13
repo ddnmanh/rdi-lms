@@ -504,7 +504,6 @@
                                 <div class="h-9 w-9 rounded-xl group-hover:scale-110 transition-transform duration-300">
                                     <img src="{{ optional(request()->user())->path_avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode(optional(request()->user())->name ?? 'A') }}" alt="Avatar" class="h-full w-full object-cover rounded-xl">
                                 </div>
-                                <span class="hidden sm:block text-sm font-semibold text-gray-700 dark:text-gray-200">{{ optional(request()->user())->name ?? 'Admin' }}</span>
                                 <i class="fas fa-caret-down text-xs text-gray-500 dark:text-gray-400 group-open:rotate-180 transition-transform duration-300"></i>
                             </summary>
 

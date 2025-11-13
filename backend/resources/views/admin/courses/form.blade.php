@@ -41,6 +41,21 @@
     .drop-indicator.active {
         opacity: 1;
     }
+    .selectable-item {
+        transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+    }
+    .selectable-item:hover {
+        border-color: #3b82f6;
+        transform: translateY(-1px);
+    }
+    .selectable-item.selected {
+        border-color: #3b82f6;
+        background-color: rgba(59, 130, 246, 0.08);
+    }
+    .dark .selectable-item.selected {
+        border-color: rgba(59, 130, 246, 0.6);
+        background-color: rgba(59, 130, 246, 0.18);
+    }
     .draggable-item.dropped {
         animation: dropSuccess 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 1001;
@@ -81,7 +96,7 @@
         }
     }
 </style>
-<div class="h-full flex flex-col items-stretch justify-start gap-4 2xl:gap-6">
+<div class=" flex flex-col items-stretch justify-start gap-4 2xl:gap-6">
     {{-- Top Bar / Breadcrumbs + Actions (Flat) --}}
     {{-- <div class="sticky top-0 z-20">
         <div class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-3 sm:px-4 py-2">
@@ -178,7 +193,7 @@
                 </div>
             </div>
 
-            <div class="flex-1 min-h-0">
+            <div class="h-[400px] flex-shrink-0">
                 <div class="h-full min-h-0 rounded-lg relative table-scroll-container flex flex-row items-stretch gap-4">
 
                     <div class="flex-1 min-h-0 flex flex-col items-stretch justify-start">
@@ -206,7 +221,7 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-col items-center justify-center">
+                    <div class="flex flex-col items-center justify-center w-[100px] 2xl:w-[120px]">
                         <i class="fa-solid fa-arrow-left"></i>
                         <i class="fa-solid fa-arrow-right"></i>
                     </div>
@@ -218,6 +233,67 @@
                         </div>
                     </div>
 
+                </div>
+            </div>
+
+            <div class="mt-[30px] h-[420px] flex-shrink-0 overflow-hidden">
+                <div class="h-full min-h-0 rounded-lg relative flex flex-col gap-4 overflow-hidden">
+                    <div class="grid h-full min-h-0 grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4">
+                        <div class="flex flex-col min-h-0 h-full">
+                            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-1 px-2">
+                                <label class="ml-2 text-sm font-semibold text-blue-700 dark:text-gray-300">Danh sách sinh viên</label>
+                                <input
+                                    id="availableStudentsSearch"
+                                    type="text"
+                                    class="w-full sm:w-64 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    placeholder="Tìm kiếm theo tên hoặc email"
+                                >
+                            </div>
+                            <div id="availableStudentsListBox" class="flex-1 min-h-0 p-2 space-y-2 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800">
+                                <div class="flex items-center justify-center h-full text-gray-400 dark:text-gray-500">
+                                    <p class="text-sm">Đang tải danh sách sinh viên...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col items-center justify-center gap-3 w-[100px] 2xl:w-[120px] h-full">
+                            <button
+                                type="button"
+                                id="moveStudentsToCourseBtn"
+                                class="px-3 py-2 w-full sm:w-auto rounded-md text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed transition"
+                                onclick="moveSelectedStudentsToEnrolled()"
+                                disabled
+                            >
+                                Thêm vào khóa
+                            </button>
+                            <button
+                                type="button"
+                                id="removeStudentsFromCourseBtn"
+                                class="px-3 py-2 w-full sm:w-auto rounded-md text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/30 disabled:bg-gray-200 disabled:text-gray-400 disabled:dark:bg-gray-700/40 disabled:dark:text-gray-500 disabled:cursor-not-allowed transition"
+                                onclick="moveSelectedStudentsToAvailable()"
+                                disabled
+                            >
+                                Gỡ khỏi khóa
+                            </button>
+                        </div>
+
+                        <div class="flex flex-col min-h-0 h-full">
+                            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-1 px-2">
+                                <label class="ml-2 text-sm font-semibold text-blue-700 dark:text-gray-300">Học viên của khóa học</label>
+                                <input
+                                    id="enrolledStudentsSearch"
+                                    type="text"
+                                    class="w-full sm:w-64 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    placeholder="Lọc học viên đã chọn"
+                                >
+                            </div>
+                            <div id="enrolledStudentsListBox" class="flex-1 min-h-0 p-2 space-y-2 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800">
+                                <div class="flex items-center justify-center h-full text-gray-400 dark:text-gray-500">
+                                    <p class="text-sm">Chưa có học viên trong khóa học</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -250,6 +326,14 @@
     let parentedLessonsList = []; // Các bài học thuộc khóa học này
     let selectedLessonIds = new Set();
     let lessonTextSearch = '';
+
+    let availableStudentsList = [];
+    let enrolledStudentsList = [];
+    let selectedAvailableStudentIds = new Set();
+    let selectedEnrolledStudentIds = new Set();
+    let initialEnrolledStudentIds = new Set();
+    let availableStudentsSearchTerm = '';
+    let enrolledStudentsSearchTerm = '';
 
     let existingThumbnail = null;
     let thumbnailPreview = null;
@@ -284,6 +368,9 @@
 
         initThumbnailPreview();
         initDropZones();
+        await initStudentsSection();
+        initStudentSearchHandlers();
+        updateStudentActionButtons();
 
     });
 
@@ -535,6 +622,287 @@
         } catch (error) {
             showNotificationModel('Lỗi khi render các bài học: ' + error.message, 'error', handleBackToPrevPage);
         }
+    }
+
+    async function initStudentsSection() {
+        try {
+            hydrateEnrolledStudentsFromCourse();
+            await loadAvailableStudents();
+            renderAvailableStudents();
+            renderEnrolledStudents();
+        } catch (error) {
+            console.error(error);
+            const container = document.getElementById('availableStudentsListBox');
+            if (container) {
+                container.innerHTML = `
+                    <div class="flex items-center justify-center h-full text-sm text-red-500 dark:text-red-400 text-center px-4">
+                        ${escapeHtml(error.message || 'Không thể tải danh sách sinh viên')}
+                    </div>
+                `;
+            }
+            showNotificationModel('Không thể tải danh sách sinh viên: ' + (error.message || ''), 'error');
+        }
+    }
+
+    function hydrateEnrolledStudentsFromCourse() {
+        if (mode === 'EDIT_COURSE' && courseData && Array.isArray(courseData.users)) {
+            enrolledStudentsList = courseData.users.map(normalizeStudent);
+        } else {
+            enrolledStudentsList = Array.isArray(enrolledStudentsList) ? enrolledStudentsList.map(normalizeStudent) : [];
+        }
+
+        sortStudentsInPlace(enrolledStudentsList);
+        initialEnrolledStudentIds = new Set(enrolledStudentsList.map(student => student.id));
+    }
+
+    async function loadAvailableStudents() {
+        const params = new URLSearchParams({
+            role_name: 'STUDENT',
+            per_page: 200
+        });
+
+        const data = await apiRequest(`/users?${params.toString()}`);
+        const apiStudents = data?.data?.data || [];
+
+        const enrolledIds = new Set(enrolledStudentsList.map(student => student.id));
+        availableStudentsList = apiStudents
+            .map(normalizeStudent)
+            .filter(student => !enrolledIds.has(student.id));
+
+        sortStudentsInPlace(availableStudentsList);
+    }
+
+    function initStudentSearchHandlers() {
+        const availableInput = document.getElementById('availableStudentsSearch');
+        if (availableInput && !availableInput.dataset.initialized) {
+            availableInput.dataset.initialized = 'true';
+            availableInput.addEventListener('input', (event) => {
+                availableStudentsSearchTerm = event.target.value.trim().toLowerCase();
+                renderAvailableStudents();
+            });
+        }
+
+        const enrolledInput = document.getElementById('enrolledStudentsSearch');
+        if (enrolledInput && !enrolledInput.dataset.initialized) {
+            enrolledInput.dataset.initialized = 'true';
+            enrolledInput.addEventListener('input', (event) => {
+                enrolledStudentsSearchTerm = event.target.value.trim().toLowerCase();
+                renderEnrolledStudents();
+            });
+        }
+    }
+
+    function normalizeStudent(raw) {
+        if (!raw) return { id: null, fullname: '', email: '' };
+        const rawId = raw.id ?? raw.user_id;
+        const id = rawId !== undefined && rawId !== null ? Number(rawId) : null;
+        return {
+            id,
+            fullname: raw.fullname || raw.name || '',
+            email: raw.email || '',
+            avatar: raw.path_avatar || raw.avatar || raw.avatar_url || '',
+            phone: raw.phone || raw.phone_number || ''
+        };
+    }
+
+    function renderAvailableStudents() {
+        const container = document.getElementById('availableStudentsListBox');
+        if (!container) return;
+
+        const searchTerm = availableStudentsSearchTerm.trim().toLowerCase();
+        const filteredStudents = availableStudentsList.filter(student => studentMatchesSearch(student, searchTerm));
+
+        if (filteredStudents.length === 0) {
+            container.innerHTML = `
+                <div class="flex items-center justify-center h-full text-gray-400 dark:text-gray-500 text-sm text-center px-4">
+                    ${searchTerm ? 'Không tìm thấy sinh viên phù hợp' : 'Không còn sinh viên nào để thêm'}
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = filteredStudents.map(student => {
+            const isSelected = selectedAvailableStudentIds.has(student.id);
+            const initial = (student.fullname || student.email || 'S').trim().charAt(0).toUpperCase();
+
+            return `
+                <label
+                    class="selectable-item flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 p-3 cursor-pointer ${isSelected ? 'selected ring-1 ring-blue-400/60' : ''}"
+                >
+                    <input
+                        type="checkbox"
+                        class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        onchange="toggleStudentSelection('available', ${student.id}, this.checked)"
+                        ${isSelected ? 'checked' : ''}
+                    >
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <div class="h-9 w-9 overflow-hidden flex-shrink-0 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300 grid place-items-center text-sm font-semibold uppercase">
+                            <img src="${student.path_avatar}" alt="" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">${escapeHtml(student.fullname || student.email || 'Không có tên')}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate">${escapeHtml(student.email || '')}</p>
+                        </div>
+                    </div>
+                </label>
+            `;
+        }).join('');
+    }
+
+    function renderEnrolledStudents() {
+        const container = document.getElementById('enrolledStudentsListBox');
+        if (!container) return;
+
+        const searchTerm = enrolledStudentsSearchTerm.trim().toLowerCase();
+        const filteredStudents = enrolledStudentsList.filter(student => studentMatchesSearch(student, searchTerm));
+
+        if (filteredStudents.length === 0) {
+            container.innerHTML = `
+                <div class="flex items-center justify-center h-full text-gray-400 dark:text-gray-500 text-sm text-center px-4">
+                    ${enrolledStudentsList.length === 0 ? 'Chưa có học viên trong khóa học' : 'Không tìm thấy học viên phù hợp'}
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = filteredStudents.map(student => {
+            const isSelected = selectedEnrolledStudentIds.has(student.id);
+            const initial = (student.fullname || student.email || 'S').trim().charAt(0).toUpperCase();
+
+            return `
+                <label
+                    class="selectable-item flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 p-3 cursor-pointer ${isSelected ? 'selected ring-1 ring-blue-400/60' : ''}"
+                >
+                    <input
+                        type="checkbox"
+                        class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        onchange="toggleStudentSelection('enrolled', ${student.id}, this.checked)"
+                        ${isSelected ? 'checked' : ''}
+                    >
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <div class="h-9 w-9 overflow-hidden flex-shrink-0 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300 grid place-items-center text-sm font-semibold uppercase">
+                            <img src="${student.path_avatar}" alt="" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">${escapeHtml(student.fullname || student.email || 'Không có tên')}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate">${escapeHtml(student.email || '')}</p>
+                        </div>
+                    </div>
+                </label>
+            `;
+        }).join('');
+    }
+
+    function toggleStudentSelection(listType, studentId, isChecked) {
+        const numericId = Number(studentId);
+        if (!Number.isFinite(numericId)) {
+            updateStudentActionButtons();
+            return;
+        }
+        const targetSet = listType === 'available' ? selectedAvailableStudentIds : selectedEnrolledStudentIds;
+
+        if (isChecked) {
+            targetSet.add(numericId);
+        } else {
+            targetSet.delete(numericId);
+        }
+
+        updateStudentActionButtons();
+    }
+
+    function moveSelectedStudentsToEnrolled() {
+        if (selectedAvailableStudentIds.size === 0) return;
+
+        const idsToMove = new Set(selectedAvailableStudentIds);
+        const movingStudents = [];
+
+        availableStudentsList = availableStudentsList.filter(student => {
+            if (idsToMove.has(student.id)) {
+                movingStudents.push(student);
+                return false;
+            }
+            return true;
+        });
+
+        if (movingStudents.length === 0) {
+            selectedAvailableStudentIds.clear();
+            updateStudentActionButtons();
+            renderAvailableStudents();
+            return;
+        }
+
+        const existingEnrolledIds = new Set(enrolledStudentsList.map(student => student.id));
+        movingStudents.forEach(student => {
+            if (!existingEnrolledIds.has(student.id)) {
+                enrolledStudentsList.push(student);
+            }
+        });
+
+        sortStudentsInPlace(enrolledStudentsList);
+        selectedAvailableStudentIds.clear();
+        renderAvailableStudents();
+        renderEnrolledStudents();
+        updateStudentActionButtons();
+    }
+
+    function moveSelectedStudentsToAvailable() {
+        if (selectedEnrolledStudentIds.size === 0) return;
+
+        const idsToMove = new Set(selectedEnrolledStudentIds);
+        const movingStudents = [];
+
+        enrolledStudentsList = enrolledStudentsList.filter(student => {
+            if (idsToMove.has(student.id)) {
+                movingStudents.push(student);
+                return false;
+            }
+            return true;
+        });
+
+        if (movingStudents.length > 0) {
+            const existingAvailableIds = new Set(availableStudentsList.map(student => student.id));
+            movingStudents.forEach(student => {
+                if (!existingAvailableIds.has(student.id)) {
+                    availableStudentsList.push(student);
+                }
+            });
+            sortStudentsInPlace(availableStudentsList);
+        }
+
+        selectedEnrolledStudentIds.clear();
+        renderAvailableStudents();
+        renderEnrolledStudents();
+        updateStudentActionButtons();
+    }
+
+    function updateStudentActionButtons() {
+        const addBtn = document.getElementById('moveStudentsToCourseBtn');
+        if (addBtn) {
+            addBtn.disabled = selectedAvailableStudentIds.size === 0;
+        }
+
+        const removeBtn = document.getElementById('removeStudentsFromCourseBtn');
+        if (removeBtn) {
+            removeBtn.disabled = selectedEnrolledStudentIds.size === 0;
+        }
+    }
+
+    function sortStudentsInPlace(list) {
+        if (!Array.isArray(list)) return;
+        list.sort((a, b) => {
+            const nameA = (a.fullname || a.email || '').toLowerCase();
+            const nameB = (b.fullname || b.email || '').toLowerCase();
+            if (nameA < nameB) return -1;
+            if (nameA > nameB) return 1;
+            return 0;
+        });
+    }
+
+    function studentMatchesSearch(student, term) {
+        if (!term) return true;
+        const fullname = (student.fullname || '').toLowerCase();
+        const email = (student.email || '').toLowerCase();
+        return fullname.includes(term) || email.includes(term);
     }
 
     function escapeHtml(str) {
@@ -1081,19 +1449,28 @@
 
 
             if (data.success) {
-                if (mode == 'EDIT_COURSE') {
-                    courseId = data.data?.id;
+                courseId = data.data?.id ?? courseId;
+                if (data.data) {
+                    courseData = data.data;
                 }
                 await handleUpdateLessonsForCourse();
+                await handleUpdateStudentsForCourse();
                 showNotificationModel(mode == 'EDIT_COURSE' ? 'Cập nhật khóa học thành công' : 'Tạo khóa học thành công', 'success', handleBackToPrevPage);
             }
         } catch (error) {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = mode === 'CREATE_COURSE' ? 'Tạo' : 'Cập nhật';
+            }
             showNotificationModel(error.message || 'Thao tác thất bại', 'error', handleBackToPrevPage);
         }
     }
 
     async function handleUpdateLessonsForCourse() {
         try {
+            if (!courseId) {
+                return;
+            }
 
             let lessons_ids_add = parentedLessonsList.map(lesson => ({id: lesson.id, display_order: lesson.display_order}));
 
@@ -1121,6 +1498,60 @@
         } catch (error) {
             throw new Error(error.message);
         }
+    }
+
+    async function handleUpdateStudentsForCourse() {
+        if (!courseId) {
+            return;
+        }
+
+        const finalIds = Array.from(new Set(
+            enrolledStudentsList
+                .map(student => student.id)
+                .filter(id => Number.isInteger(id))
+        ));
+
+        const initialIdsArray = Array.from(initialEnrolledStudentIds);
+        const finalIdSet = new Set(finalIds);
+
+        const hasChanged =
+            finalIds.length !== initialIdsArray.length ||
+            initialIdsArray.some(id => !finalIdSet.has(id));
+
+        if (!hasChanged) {
+            return;
+        }
+
+        if (finalIds.length === 0) {
+            if (initialIdsArray.length === 0) {
+                return;
+            }
+            await apiRequest(`/courses/${courseId}/users/remove`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    user_ids: initialIdsArray
+                })
+            });
+            initialEnrolledStudentIds = new Set();
+            if (!courseData) {
+                courseData = {};
+            }
+            courseData.users = [];
+            return;
+        }
+
+        await apiRequest(`/courses/${courseId}/users/add`, {
+            method: 'POST',
+            body: JSON.stringify({
+                user_ids: finalIds
+            })
+        });
+
+        initialEnrolledStudentIds = new Set(finalIds);
+        if (!courseData) {
+            courseData = {};
+        }
+        courseData.users = enrolledStudentsList.map(student => ({ ...student }));
     }
 </script>
 @endsection

@@ -4,9 +4,9 @@
 @section('description', 'Xem thông tin chi tiết của người dùng')
 
 @section('content')
-<div class="min-h-full flex flex-col gap-4 2xl:gap-6">
+<div class="flex flex-col items-stretch justify-start gap-4 2xl:gap-6">
     {{-- Top Bar / Breadcrumbs + Actions (Flat) --}}
-    <div class="sticky top-0 z-20">
+    {{-- <div class="sticky top-0 z-20">
         <div class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-3 sm:px-4 py-2">
             <div class="flex items-center justify-between gap-3">
                 <div class="flex items-center gap-2">
@@ -19,104 +19,94 @@
                     </a>
                 </div>
                 <div class="flex items-center gap-2">
-                    <a id="editButton" href="#"
-                       class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-3.5 py-2 text-sm font-semibold text-white hover:bg-amber-600 focus:outline-none">
-                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 3.487a2.25 2.25 0 113.182 3.182L7.5 19.313 3 21l1.687-4.5L16.862 3.487z"/>
-                        </svg>
-                        <span>Chỉnh sửa</span>
-                    </a>
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
+
+    {{-- <div class="w-[100px] h-[50px] bg-red-500"></div> --}}
+
 
     {{-- Loading State (Flat Skeleton) --}}
     <div id="loadingState" class="flex-1 p-6 sm:p-8">
-        <div class="mx-auto max-w-6xl">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-6 bg-white dark:bg-gray-800">
-                    <div class="mx-auto flex flex-col items-center gap-4">
-                        <div class="h-28 w-28 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
-                        <div class="h-4 w-40 rounded bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
-                        <div class="h-3 w-52 rounded bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
-                    </div>
-                    <div class="mt-6 grid grid-cols-2 gap-3">
-                        <div class="h-14 rounded-lg bg-gray-100 dark:bg-gray-900 animate-pulse"></div>
-                        <div class="h-14 rounded-lg bg-gray-100 dark:bg-gray-900 animate-pulse"></div>
+        <div class="w-fit mx-auto mt-[20dvh]">
+            <div id="SPINNER_LOADING">
+                <div id="SPINNER_LOADING_CONTAINER">
+                    <div id="SPINNER_LOADING_CONTAINER_LDS_ROLLER">
+                        <div></div> <div></div> <div></div> <div></div> <div></div> <div></div> <div></div> <div></div>
                     </div>
                 </div>
-                <div class="lg:col-span-2 grid gap-6">
-                    <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-6 bg-white dark:bg-gray-800 h-40 animate-pulse"></div>
-                    <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-6 bg-white dark:bg-gray-800 h-40 animate-pulse"></div>
+                <div id="SPINNER_LOADING_ICON">
+                    <i class="fas fa-graduation-cap"></i>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- User Detail Card (Flat) --}}
-    <div id="userDetailCard" class="hidden flex-1 w-full max-w-6xl mx-auto flex-col">
-        {{-- Personal Information --}}
-        <div class="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex items-center gap-3">
-                <div class="h-8 w-8 rounded bg-blue-600 grid place-items-center">
-                    <svg class="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A9 9 0 1118.88 17.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                </div>
-                <h3 class="text-base font-bold text-gray-900 dark:text-gray-100">Thông tin cá nhân</h3>
-            </div>
-
-            <div class="p-6 flex flex-col xl:flex-row items-start justify-start gap-5">
-                {{-- Avatar / Summary --}}
-                <div class="w-[300px] mx-auto lg:col-span-1">
-                    <div class="relative mb-4">
-                        <img id="userAvatar" src="" alt="Avatar"
-                            class="w-full object-cover border-4 border-white/70"
-                            onerror="this.src='https://ui-avatars.com/api/?name=' + encodeURIComponent(document.getElementById('userFullname').textContent || 'User') + '&background=3b82f6&color=fff&size=128'">
-                    </div>
-                </div>
-                <div class="w-full flex-1 grid grid-cols-1 md:grid-cols-2 gap-5">
-                    @php
-                        $infoField = function($label, $id, $hint = null) {
-                            $hintHtml = $hint ? '<p class="text-[11px] leading-4 text-gray-500 dark:text-gray-400">'.$hint.'</p>' : '';
-                            return <<<HTML
-                            <div class="space-y-2">
-                                <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">{$label}</label>
-                                <div class="px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40">
-                                    <p id="{$id}" class="text-sm font-semibold text-gray-900 dark:text-gray-100 break-all">-</p>
-                                    {$hintHtml}
-                                </div>
-                            </div>
-                            HTML;
-                        };
-                    @endphp
-
-                    {!! $infoField('ID', 'userId') !!}
-                    {!! $infoField('Email', 'userEmailDetail') !!}
-                    {!! $infoField('Họ và tên', 'userFullnameDetail') !!}
-                    {!! $infoField('Ngày sinh', 'userBirthday') !!}
-                    {!! $infoField('Vai trò', 'userRoles') !!}
-                    {!! $infoField('Ngày tạo', 'userCreatedAt') !!}
-                </div>
-            </div>
+    {{-- User Detail Card --}}
+    <div id="userDetailCard" class="hidden w-full max-w-[1400px] mx-auto p-4 md:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+        <div class="flex items-center justify-between mb-6">
+            <div></div>
+            <a id="editButton" href="#"
+                class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-3.5 py-2 text-sm font-semibold text-white hover:bg-amber-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 3.487a2.25 2.25 0 113.182 3.182L7.5 19.313 3 21l1.687-4.5L16.862 3.487z"/>
+                </svg>
+                <span>Chỉnh sửa</span>
+            </a>
         </div>
 
-        {{-- Courses --}}
-        <div class="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800 mt-6">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex items-center gap-3">
-                <div class="h-8 w-8 rounded bg-green-600 grid place-items-center">
-                    <svg class="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422A12.083 12.083 0 0112 21c-4.418 0-8.268-2.388-10.16-5.422L12 14z"/>
-                    </svg>
+        <div class="space-y-6">
+            {{-- Personal Information Section --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {{-- Avatar Section --}}
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-2">Ảnh đại diện</label>
+                    <div class="flex items-center gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900/40">
+                        <div class="w-[150px] aspect-square rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
+                            <img id="userAvatar" src="" alt="Avatar" class="h-full w-full object-cover hidden">
+                            <svg id="avatarPlaceholder" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-8 w-8 text-gray-400">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-3.33 0-10 1.67-10 5v1h20v-1c0-3.33-6.67-5-10-5z" />
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            {{-- <div class="text-sm text-gray-600 dark:text-gray-300">Ảnh đại diện của người dùng</div> --}}
+                        </div>
+                    </div>
                 </div>
-                <h3 class="text-base font-bold text-gray-900 dark:text-gray-100">Khóa học</h3>
+
+                {{-- Info Fields --}}
+                @php
+                    $infoField = function($label, $id) {
+                        return <<<HTML
+                        <div>
+                            <label class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">{$label}</label>
+                            <div class="px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                                <p class="{$id} text-sm text-gray-900 dark:text-gray-100 break-all">-</p>
+                            </div>
+                        </div>
+                        HTML;
+                    };
+                @endphp
+
+                {!! $infoField('ID', 'userId') !!}
+                {!! $infoField('Email', 'userEmailDetail') !!}
+                {!! $infoField('Họ và tên', 'userFullnameDetail') !!}
+                {!! $infoField('Ngày sinh', 'userBirthday') !!}
+                {!! $infoField('Vai trò', 'userRoles') !!}
+                {!! $infoField('Ngày tạo', 'userCreatedAt') !!}
             </div>
-            <div class="p-6">
-                <div id="coursesList" class="space-y-2">
-                    <div class="w-full flex justify-center py-8">
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Đang tải...</p>
+
+            {{-- Courses Section --}}
+            <div>
+                <label class="block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-2">Khóa học</label>
+                <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                    <div class="p-6">
+                        <div id="coursesList" class="space-y-2">
+                            <div class="w-full flex justify-center py-8">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Đang tải...</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -202,12 +192,18 @@
             badge.innerHTML = `<span class="inline-block h-1.5 w-1.5 rounded-full ${dot}"></span><span>${label}</span>`;
         }
 
+        // Set avatar preview
         const avatarEl = document.getElementById('userAvatar');
+        const placeholderEl = document.getElementById('avatarPlaceholder');
         if (user.path_avatar) {
             avatarEl.src = user.path_avatar;
+            avatarEl.classList.remove('hidden');
+            placeholderEl.classList.add('hidden');
         } else {
             const name = user.fullname || user.email || 'User';
             avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=3b82f6&color=fff&size=128`;
+            avatarEl.classList.remove('hidden');
+            placeholderEl.classList.add('hidden');
         }
 
         setDate('userBirthday', user.birthday, { dateOnly: true });
@@ -262,19 +258,25 @@
     }
 
     function setText(id, value) {
-        const el = document.getElementById(id);
-        if (el) el.textContent = value != null && value !== '' ? value : '-';
+        const el = document.getElementsByClassName(id);
+        for (let i=0; i<el.length; i++) {
+            if (el[i]) el[i].textContent = value != null && value !== '' ? value : '-';
+        }
     }
 
     function setDate(id, raw, opts = {}) {
-        const el = document.getElementById(id);
-        if (!el) return;
+        const el = document.getElementsByClassName(id);
+        if (!el && el.length <1) return;
         if (!raw) { el.textContent = '-'; return; }
         const dt = new Date(raw);
-        if (Number.isNaN(dt.getTime())) { el.textContent = '-'; return; }
-        el.textContent = opts.dateOnly
+        let data = '-'
+        if (Number.isNaN(dt.getTime())) { data = '-'; return; }
+        data = opts.dateOnly
             ? dt.toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' })
             : dt.toLocaleString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        for (let i=0; i<el.length; i++) {
+            if (el[i]) el[i].textContent = data;
+        }
     }
 
     function escapeHtml(str) {

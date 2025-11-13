@@ -15,19 +15,12 @@ class CreateRolePermissionTable extends Migration
     {
         Schema::create('role_permission', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('role_id');
-            $table->unsignedBigInteger('permission_id');
+            $table->unsignedBigInteger('role_id')->nullable();
+            $table->unsignedBigInteger('permission_id')->nullable();
             $table->timestamps();
             
             $table->unique(['role_id', 'permission_id'], 'uq_role_perm');
-            $table->foreign('role_id', 'fk_rp_role')
-                ->references('id')
-                ->on('roles')
-                ->onDelete('cascade');
-            $table->foreign('permission_id', 'fk_rp_perm')
-                ->references('id')
-                ->on('permissions')
-                ->onDelete('cascade');
+            // Không tạo ràng buộc khóa ngoại ở DB
             
             $table->engine = 'InnoDB';
             $table->charset = 'utf8mb4';

@@ -1,5 +1,6 @@
 
 #SPINNER_LOADING {
+    width: -moz-fit-content;
     width: fit-content;
     position: relative;
 }
@@ -129,3 +130,4 @@
     transform: translate(-50%, -50%);
     pointer-events: none;
 }
+

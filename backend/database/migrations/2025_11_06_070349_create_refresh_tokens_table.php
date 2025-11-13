@@ -15,21 +15,18 @@ class CreateRefreshTokensTable extends Migration
     {
         Schema::create('refresh_tokens', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->string('token', 500)->unique();
-            $table->dateTime('expires_at');
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->string('token', 500)->nullable()->unique();
+            $table->dateTime('expires_at')->nullable();
             $table->string('ip_address', 50)->nullable();
             $table->text('user_agent')->nullable();
-            $table->boolean('is_revoked')->default(false);
+            $table->boolean('is_revoked')->nullable()->default(false);
             $table->timestamps();
 
             $table->index(['user_id', 'is_revoked'], 'idx_rt_user');
             $table->index('token', 'idx_rt_token');
             $table->index('expires_at', 'idx_rt_expires');
-            $table->foreign('user_id', 'fk_rt_user')
-                ->references('id')
-                ->on('users')
-                ->onDelete('cascade');
+            // Không tạo ràng buộc khóa ngoại ở DB
 
             $table->engine = 'InnoDB';
             $table->charset = 'utf8mb4';

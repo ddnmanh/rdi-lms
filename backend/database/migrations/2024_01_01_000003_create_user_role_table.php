@@ -15,19 +15,12 @@ class CreateUserRoleTable extends Migration
     {
         Schema::create('user_role', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('role_id');
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('role_id')->nullable();
             $table->timestamps();
             
             $table->unique(['user_id', 'role_id'], 'uq_user_role');
-            $table->foreign('user_id', 'fk_user_role_user')
-                ->references('id')
-                ->on('users')
-                ->onDelete('cascade');
-            $table->foreign('role_id', 'fk_user_role_role')
-                ->references('id')
-                ->on('roles')
-                ->onDelete('cascade');
+            // Không tạo ràng buộc khóa ngoại ở DB
             
             $table->engine = 'InnoDB';
             $table->charset = 'utf8mb4';

@@ -6,6 +6,8 @@ use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class CourseController extends Controller
@@ -85,10 +87,10 @@ class CourseController extends Controller
                             $q2->whereNull('start_date')
                                 ->orWhereDate('start_date', '<=', $now);
                         })
-                        ->where(function ($q2) use ($now) {
-                            $q2->whereNull('end_date')
-                                ->orWhereDate('end_date', '>=', $now);
-                        });
+                            ->where(function ($q2) use ($now) {
+                                $q2->whereNull('end_date')
+                                    ->orWhereDate('end_date', '>=', $now);
+                            });
                     });
                     break;
                 case 'upcoming':
@@ -190,6 +192,7 @@ class CourseController extends Controller
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'timezone' => 'nullable|string',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -205,12 +208,21 @@ class CourseController extends Controller
         $startDate = $this->convertToUTC($request->start_date, $timezone);
         $endDate = $this->convertToUTC($request->end_date, $timezone);
 
-        $course = Course::create([
+        $courseData = [
             'title' => $request->title,
             'description' => $request->description,
             'start_date' => $startDate,
             'end_date' => $endDate,
-        ]);
+        ];
+
+        // Xử lý upload thumbnail nếu có
+        if ($request->hasFile('thumbnail')) {
+            $storedPath = $request->file('thumbnail')->store('course-thumbnails', 'public');
+            $publicUrl = Storage::url($storedPath); // ví dụ: /storage/course-thumbnails/xxx.jpg
+            $courseData['thumbnail'] = $publicUrl;
+        }
+
+        $course = Course::create($courseData);
 
         return response()->json([
             'success' => true,
@@ -239,6 +251,7 @@ class CourseController extends Controller
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'timezone' => 'nullable|string',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -254,12 +267,28 @@ class CourseController extends Controller
         $startDate = $this->convertToUTC($request->start_date, $timezone);
         $endDate = $this->convertToUTC($request->end_date, $timezone);
 
-        $course->update([
+        $updateData = [
             'title' => $request->title,
             'description' => $request->description,
             'start_date' => $startDate,
             'end_date' => $endDate,
-        ]);
+        ];
+
+        // Xử lý upload thumbnail nếu có
+        if ($request->hasFile('thumbnail')) {
+            // Xóa thumbnail cũ nếu có
+            if ($course->thumbnail) {
+                $oldPath = str_replace('/storage/', '', $course->thumbnail);
+                Storage::disk('public')->delete($oldPath);
+            }
+
+            // Lưu thumbnail mới
+            $storedPath = $request->file('thumbnail')->store('course-thumbnails', 'public');
+            $publicUrl = Storage::url($storedPath);
+            $updateData['thumbnail'] = $publicUrl;
+        }
+
+        $course->update($updateData);
 
         return response()->json([
             'success' => true,
@@ -271,18 +300,28 @@ class CourseController extends Controller
     /**
      * Xóa khóa học (soft delete)
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        $course = Course::find($id);
+        $validator = Validator::make($request->all(), [
+            'course_ids' => 'required|array',
+            'course_ids.*' => 'exists:courses,id',
+        ]);
 
-        if (!$course) {
+        if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy khóa học'
-            ], 404);
+                'message' => 'Validation errors',
+                'errors' => $validator->errors()
+            ], 422);
         }
 
-        $course->delete();
+        $courses = Course::whereIn('id', $request->course_ids)->get();
+
+        foreach ($courses as $course) {
+            $course->delete();
+            Lesson::where('course_id', $course->id)->delete();
+            $course->users()->detach();
+        }
 
         return response()->json([
             'success' => true,
@@ -291,9 +330,9 @@ class CourseController extends Controller
     }
 
     /**
-     * Phân quyền sinh viên vào khóa học
+     * Thêm n sinh viên vào khóa học
      */
-    public function assignUsers(Request $request, $id)
+    public function addUsers(Request $request, $id)
     {
         $course = Course::find($id);
 
@@ -321,83 +360,14 @@ class CourseController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Phân quyền sinh viên thành công',
+            'message' => 'Thêm sinh viên vào khóa học thành công',
             'data' => $course->load('users')
         ]);
     }
 
-    /**
-     * Thêm sinh viên vào khóa học
-     */
-    public function addUser(Request $request, $id)
-    {
-        $course = Course::find($id);
-
-        if (!$course) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Không tìm thấy khóa học'
-            ], 404);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:users,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $course->users()->attach($request->user_id);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Thêm sinh viên thành công',
-            'data' => $course->load('users')
-        ]);
-    }
 
     /**
-     * Xóa sinh viên khỏi khóa học
-     */
-    public function removeUser(Request $request, $id)
-    {
-        $course = Course::find($id);
-
-        if (!$course) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Không tìm thấy khóa học'
-            ], 404);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:users,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $course->users()->detach($request->user_id);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Xóa sinh viên thành công',
-            'data' => $course->load('users')
-        ]);
-    }
-
-    /**
-     * Xóa nhiều sinh viên khỏi khóa học
+     * Xóa n sinh viên khỏi khóa học
      */
     public function removeUsers(Request $request, $id)
     {
@@ -433,12 +403,12 @@ class CourseController extends Controller
     }
 
     /**
-     * Thêm một bài học vào khóa học
+     * Thêm và xóa n bài học của khóa học
      */
-    public function addLesson(Request $request, $id)
+    public function addAndRemoveLessons(Request $request, $id)
     {
-        $course = Course::find($id);
 
+        $course = Course::find($id);
         if (!$course) {
             return response()->json([
                 'success' => false,
@@ -447,34 +417,74 @@ class CourseController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'lesson_id' => 'required|exists:lessons,id',
+            'lessons'                 => 'required|array',
+            'lessons.*.id'            => 'required|integer|exists:lessons,id|distinct',
+            'lessons.*.display_order' => 'required|integer',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Validation errors',
-                'errors' => $validator->errors()
+                'errors'  => $validator->errors()
             ], 422);
         }
 
-        $lesson = Lesson::find($request->lesson_id);
-        $lesson->update(['course_id' => $course->id]);
+        // Lấy danh sách hiện tại của khóa
+        $oldLessonsOfCourse = Lesson::where('course_id', $id)->get();
+
+        // Chuẩn hoá input
+        $newItems = collect($request->input('lessons', []))
+            ->map(fn($item) => [
+                'id'            => (int) data_get($item, 'id'),
+                'display_order' => (int) data_get($item, 'display_order', 0),
+            ]);
+
+        $newIds = $newItems->pluck('id')->values();
+
+        // 1) Gỡ những bài cũ KHÔNG còn trong request: đặt null course_id & display_order
+        if ($newIds->isEmpty()) {
+            // Nếu request trống, gỡ toàn bộ bài của khóa
+            Lesson::where('course_id', $id)->update([
+                'course_id'     => null,
+                'display_order' => null,
+            ]);
+        } else {
+            Lesson::where('course_id', $id)
+                ->whereNotIn('id', $newIds)
+                ->update([
+                    'course_id'     => null,
+                    'display_order' => null,
+                ]);
+        }
+
+        // 2) Với các bài trong request:
+        //    - Nếu đã thuộc khóa: chỉ cập nhật display_order ([2,3,10])
+        //    - Nếu chưa thuộc khóa (hoặc thuộc khóa khác): gán course_id + display_order ([5,7])
+        foreach ($newItems as $item) {
+            Lesson::where('id', $item['id'])->update([
+                'course_id'     => $id,
+                'display_order' => $item['display_order'],
+            ]);
+        }
+
+        // Trả về khóa học với danh sách bài học mới (tuỳ chọn: sắp theo display_order)
+        $course->load(['lessons' => fn($q) => $q->orderBy('display_order')]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Thêm bài học vào khóa học thành công',
-            'data' => $course->load('lessons')
+            'message' => 'Cập nhật bài học của khóa học thành công',
+            'data'    => $course
         ]);
     }
 
     /**
-     * Thêm nhiều bài học vào khóa học
+     * Thêm n bài học vào khóa học
      */
     public function addLessons(Request $request, $id)
     {
-        $course = Course::find($id);
 
+        $course = Course::find($id);
         if (!$course) {
             return response()->json([
                 'success' => false,
@@ -483,80 +493,58 @@ class CourseController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'lesson_ids' => 'required|array',
-            'lesson_ids.*' => 'exists:lessons,id',
+            'lessons'                 => 'required|array|min:1',
+            'lessons.*.id'            => 'required|integer|exists:lessons,id|distinct',
+            'lessons.*.display_order' => 'required|integer',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Validation errors',
-                'errors' => $validator->errors()
+                'errors'  => $validator->errors(),
             ], 422);
         }
 
-        Lesson::whereIn('id', $request->lesson_ids)
-            ->update(['course_id' => $course->id]);
+        $items   = collect($request->input('lessons', []))->map(fn($it) => ['id' => (int)$it['id'], 'display_order' => (int)$it['display_order']]);
+        $idToOrder = $items->pluck('display_order', 'id'); // map: id => display_order
+        $ids    = $items->pluck('id')->values();
+
+        // Lấy trạng thái hiện tại của các lesson
+        $lessons = Lesson::whereIn('id', $ids)->get();
+
+        $eligible   = $lessons->filter(fn($l) => is_null($l->course_id) || $l->course_id = $id);             // chỉ add khi course_id == null hoặc course_id là chính course này
+        $conflicted = $lessons->reject(fn($l) => is_null($l->course_id));             // đã thuộc 1 khóa nào đó
+
+        // Cập nhật từng bản ghi vì display_order khác nhau theo từng id
+        foreach ($eligible as $l) {
+            $l->update([
+                'course_id'     => $course->id,
+                'display_order' => (int)$idToOrder[$l->id],
+            ]);
+        }
+
+        // Trả về kết quả chi tiết
+        $course->load(['lessons' => fn($q) => $q->orderBy('display_order')]);
 
         return response()->json([
-            'success' => true,
-            'message' => 'Thêm bài học vào khóa học thành công',
-            'data' => $course->load('lessons')
+            'success'  => true,
+            'message'  => 'Thêm bài học vào khóa học (chỉ các lesson chưa thuộc khóa nào).',
+            'added'    => $eligible->pluck('id')->values(),
+            'skipped'  => $conflicted->map(fn($l) => [
+                'id' => $l->id,
+                'reason' => "lesson đang thuộc course_id={$l->course_id}",
+            ])->values(),
+            'data'     => $course,
         ]);
     }
 
     /**
-     * Xóa một bài học khỏi khóa học
-     */
-    public function removeLesson(Request $request, $id)
-    {
-        $course = Course::find($id);
-
-        if (!$course) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Không tìm thấy khóa học'
-            ], 404);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'lesson_id' => 'required|exists:lessons,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $lesson = Lesson::find($request->lesson_id);
-
-        // Kiểm tra lesson có thuộc khóa học này không
-        if ($lesson->course_id != $course->id) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Bài học không thuộc khóa học này'
-            ], 422);
-        }
-
-        $lesson->update(['course_id' => null]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Xóa bài học khỏi khóa học thành công',
-            'data' => $course->load('lessons')
-        ]);
-    }
-
-    /**
-     * Xóa nhiều bài học khỏi khóa học
+     * Xóa n bài học khỏi khóa học
      */
     public function removeLessons(Request $request, $id)
     {
         $course = Course::find($id);
-
         if (!$course) {
             return response()->json([
                 'success' => false,
@@ -565,28 +553,49 @@ class CourseController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'lesson_ids' => 'required|array',
-            'lesson_ids.*' => 'exists:lessons,id',
+            'lesson_ids'   => 'required|array|min:1',
+            'lesson_ids.*' => 'required|integer|exists:lessons,id|distinct',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Validation errors',
-                'errors' => $validator->errors()
+                'errors'  => $validator->errors(),
             ], 422);
         }
 
-        // Chỉ xóa các lesson thuộc khóa học này
-        Lesson::whereIn('id', $request->lesson_ids)
-            ->where('course_id', $course->id)
-            ->update(['course_id' => null]);
+        $ids = collect($request->input('lesson_ids', []))->map(fn($v) => (int)$v)->values();
+
+        $lessons = Lesson::whereIn('id', $ids)->get();
+
+        // Chỉ cho phép remove nếu lesson đang thuộc course hiện tại
+        $eligibleIds = $lessons->filter(fn($l) => (int)$l->course_id === (int)$course->id)
+                               ->pluck('id')->values();
+
+        $ineligible = $lessons->reject(fn($l) => (int)$l->course_id === (int)$course->id)
+                              ->map(fn($l) => [
+                                  'id' => $l->id,
+                                  'reason' => is_null($l->course_id)
+                                      ? 'lesson chưa thuộc khóa nào'
+                                      : "lesson thuộc course_id={$l->course_id}, không phải {$course->id}",
+                              ])->values();
+
+        if ($eligibleIds->isNotEmpty()) {
+            Lesson::whereIn('id', $eligibleIds)->update([
+                'course_id'     => null,
+                'display_order' => null,
+            ]);
+        }
+
+        $course->load(['lessons' => fn($q) => $q->orderBy('display_order')]);
 
         return response()->json([
-            'success' => true,
-            'message' => 'Xóa bài học khỏi khóa học thành công',
-            'data' => $course->load('lessons')
+            'success'   => true,
+            'message'   => 'Đã remove các bài học đủ điều kiện khỏi khóa.',
+            'removed'   => $eligibleIds,
+            'skipped'   => $ineligible,
+            'data'      => $course,
         ]);
     }
 }
-

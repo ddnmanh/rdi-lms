@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -169,6 +169,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+
         $user = User::find($id);
 
         if (!$user) {
@@ -184,6 +185,7 @@ class UserController extends Controller
             'fullname' => 'nullable|string|max:150',
             'birthday' => 'nullable|date',
             'path_avatar' => 'nullable|string',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'role_ids' => 'nullable|array',
             'role_ids.*' => 'exists:roles,id',
         ]);
@@ -200,8 +202,19 @@ class UserController extends Controller
             'email' => $request->email,
             'fullname' => $request->fullname,
             'birthday' => $request->birthday,
-            'path_avatar' => $request->path_avatar,
         ];
+
+        // Cập nhật path_avatar nếu client gửi URL
+        if ($request->has('path_avatar')) {
+            $updateData['path_avatar'] = $request->path_avatar;
+        }
+
+        // Xử lý upload file avatar nếu có
+        if ($request->hasFile('avatar')) {
+            $storedPath = $request->file('avatar')->store('avatars', 'public');
+            $publicUrl = Storage::url($storedPath); // ví dụ: /storage/avatars/xxx.jpg
+            $updateData['path_avatar'] = $publicUrl;
+        }
 
         if ($request->has('password')) {
             $updateData['password'] = $request->password;
@@ -224,18 +237,30 @@ class UserController extends Controller
     /**
      * Xóa người dùng (soft delete)
      */
-    public function destroy($id)
+    public function destroyUsers(Request $request)
     {
-        $user = User::find($id);
+        $validator = Validator::make($request->all(), [
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'exists:users,id',
+        ]);
 
-        if (!$user) {
+        if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy người dùng'
-            ], 404);
+                'message' => 'Validation errors',
+                'errors' => $validator->errors()
+            ], 422);
         }
 
-        $user->delete();
+        $users = User::whereIn('id', $request->user_ids)->get();
+
+        foreach ($users as $user) {
+            // $user->roles()->detach();
+            // $user->courses()->detach();
+            // $user->lessonViews()->delete();
+            // $user->refreshTokens()->delete();
+            $user->delete();
+        }
 
         return response()->json([
             'success' => true,

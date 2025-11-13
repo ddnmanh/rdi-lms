@@ -15,8 +15,8 @@ class CreatePermissionsTable extends Migration
     {
         Schema::create('permissions', function (Blueprint $table) {
             $table->id();
-            $table->string('method', 6);
-            $table->string('path', 255);
+            $table->string('method', 6)->nullable();
+            $table->string('path', 255)->nullable();
             $table->timestamps();
             $table->softDeletes();
             

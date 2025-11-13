@@ -91,7 +91,7 @@ class AdminController extends Controller
      */
     public function createCourse()
     {
-        return view('admin.courses.form', ['mode' => 'create']);
+        return view('admin.courses.form', ['mode' => 'CREATE_COURSE']);
     }
 
     /**
@@ -107,7 +107,7 @@ class AdminController extends Controller
      */
     public function editCourse($id)
     {
-        return view('admin.courses.form', ['mode' => 'edit', 'courseId' => $id]);
+        return view('admin.courses.form', ['mode' => 'EDIT_COURSE', 'courseId' => $id]);
     }
 
     /**
@@ -163,7 +163,31 @@ class AdminController extends Controller
      */
     public function reports()
     {
-        return view('admin.reports');
+        return view('admin.reports.index');
+    }
+
+    /**
+     * Trang báo cáo sinh viên
+     */
+    public function reportsStudents()
+    {
+        return view('admin.reports.students');
+    }
+
+    /**
+     * Trang báo cáo khóa học
+     */
+    public function reportsCourses()
+    {
+        return view('admin.reports.courses');
+    }
+
+    /**
+     * Trang báo cáo hoạt động
+     */
+    public function reportsActivities()
+    {
+        return view('admin.reports.activities');
     }
 }
 

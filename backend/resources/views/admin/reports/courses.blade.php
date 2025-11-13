@@ -6,6 +6,7 @@
 
 @section('content')
 <div class="h-full flex flex-col items-stretch justify-start gap-2.5 2xl:gap-4">
+    <h1>Báo cáo về khóa học</h1>
 </div>
 
 @endsection

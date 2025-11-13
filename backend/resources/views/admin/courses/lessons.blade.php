@@ -54,7 +54,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
             </div>
-            <h3 class="text-base font-bold text-gray-900 dark:text-gray-100">Danh sách bài học</h3>
+            <h3 class=" font-bold text-gray-900 dark:text-gray-100">Danh sách bài học</h3>
         </div>
 
         <div id="lessonsList" class="p-6">
@@ -149,7 +149,7 @@
                 document.getElementById('courseDescription').textContent = courseData.description || '-';
             }
         } catch (error) {
-            // showAlert('Không thể tải thông tin khóa học: ' + error.message, 'error');
+            showNotificationModel('Không thể tải thông tin khóa học: ' + error.message, 'error');
         }
     }
 
@@ -247,7 +247,7 @@
                 document.getElementById('lessonModal').classList.add('flex');
             }
         } catch (error) {
-            // showAlert('Không thể tải thông tin bài học: ' + error.message, 'error');
+            showNotificationModel('Không thể tải thông tin bài học: ' + error.message, 'error');
         }
     }
 
@@ -260,11 +260,11 @@
             });
 
             if (data?.success) {
-                // showAlert(data.message || 'Xóa bài học thành công', 'success');
+                showNotificationModel(data.message || 'Xóa bài học thành công', 'success');
                 await loadLessons();
             }
         } catch (error) {
-            // showAlert(error.message, 'error');
+            showNotificationModel(error.message, 'error');
         }
     }
 
@@ -278,17 +278,17 @@
         const videoUrl = document.getElementById('video_url').value.trim();
 
         if (!title) {
-            // showAlert('Vui lòng nhập tiêu đề bài học', 'error');
+            showNotificationModel('Vui lòng nhập tiêu đề bài học', 'error');
             return;
         }
 
         if (!duration || duration < 1) {
-            // showAlert('Vui lòng nhập thời lượng hợp lệ (ít nhất 1 giây)', 'error');
+            showNotificationModel('Vui lòng nhập thời lượng hợp lệ (ít nhất 1 giây)', 'error');
             return;
         }
 
         if (!videoUrl) {
-            // showAlert('Vui lòng nhập URL video', 'error');
+            showNotificationModel('Vui lòng nhập URL video', 'error');
             return;
         }
 
@@ -316,12 +316,12 @@
             }
 
             if (data?.success) {
-                // showAlert(data.message || 'Lưu thành công', 'success');
+                showNotificationModel(data.message || 'Lưu thành công', 'success');
                 closeLessonModal();
                 await loadLessons();
             }
         } catch (error) {
-            // showAlert(error.message, 'error');
+            showNotificationModel(error.message, 'error');
         }
     }
 

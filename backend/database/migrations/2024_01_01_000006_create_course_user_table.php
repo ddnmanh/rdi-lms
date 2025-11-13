@@ -15,19 +15,12 @@ class CreateCourseUserTable extends Migration
     {
         Schema::create('course_user', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('course_id');
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('course_id')->nullable();
             $table->timestamps();
             
             $table->unique(['user_id', 'course_id'], 'uq_course_user');
-            $table->foreign('user_id', 'fk_cu_user')
-                ->references('id')
-                ->on('users')
-                ->onDelete('cascade');
-            $table->foreign('course_id', 'fk_cu_course')
-                ->references('id')
-                ->on('courses')
-                ->onDelete('cascade');
+            // Không tạo ràng buộc khóa ngoại ở DB
             
             $table->engine = 'InnoDB';
             $table->charset = 'utf8mb4';

@@ -14,9 +14,14 @@ class Lesson extends Model
         'course_id',
         'title',
         'description',
+        'thumbnail',
         'duration',
         'video_url',
         'display_order',
+    ];
+
+    protected $attributes = [
+        'course_id' => null,
     ];
 
     protected $casts = [

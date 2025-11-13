@@ -4,48 +4,7 @@
 
 @section('description', 'Quản lý tất cả người dùng trong hệ thống')
 
-@section('content')
-<style>
-    /* Custom scrollbar overlay - đè lên header, không chiếm chỗ */
-    .table-scroll-container {
-        scrollbar-width: thin;
-        scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
-    }
-
-    /* Webkit browsers (Chrome, Safari, Edge) */
-    .table-scroll-container::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-    }
-
-    .table-scroll-container::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .table-scroll-container::-webkit-scrollbar-thumb {
-        background-color: rgba(156, 163, 175, 0.5);
-        border-radius: 4px;
-        border: 2px solid transparent;
-        background-clip: padding-box;
-    }
-
-    .table-scroll-container::-webkit-scrollbar-thumb:hover {
-        background-color: rgba(156, 163, 175, 0.7);
-    }
-
-    /* Dark mode */
-    .dark .table-scroll-container {
-        scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
-    }
-
-    .dark .table-scroll-container::-webkit-scrollbar-thumb {
-        background-color: rgba(75, 85, 99, 0.5);
-    }
-
-    .dark .table-scroll-container::-webkit-scrollbar-thumb:hover {
-        background-color: rgba(75, 85, 99, 0.7);
-    }
-</style>
+@section('content') 
 <div class="h-full flex flex-col items-stretch justify-start gap-2.5 2xl:gap-4">
     <div class="flex flex-col items-stretch justify-start gap-2.5">
         {{-- Actions Bar --}}
@@ -58,7 +17,7 @@
                 </a>
             </div>
             <button
-                id="bulkDeleteActions"
+                id="btnDeleteBulk"
                 onclick="openBulkDeleteModal()"
                 disabled
                 class="group px-4 py-2.5 bg-red-600 text-white rounded-xl transition-all duration-300 font-medium flex items-center justify-center gap-2 hover:bg-red-700 opacity-50 cursor-not-allowed">
@@ -72,7 +31,7 @@
             <div class="flex flex-col lg:flex-row justify-start flex-wrap gap-4 flex-1">
                 {{-- Role Filter --}}
                 <div class="min-w-32 flex flex-col items-stretch justify-start gap-0.5">
-                    <label for="roleFilter" class="block text-sm font-medium text-gray-300 dark:text-gray-300 ml-2">
+                    <label for="roleFilter" class="block  font-medium text-gray-300 dark:text-gray-300 ml-2">
                         Vai trò
                     </label>
                     <select id="roleFilter"
@@ -83,7 +42,7 @@
 
                 {{-- Name Filter --}}
                 <div class="flex-1 min-w-40 max-w-80 flex flex-col items-stretch justify-start gap-0.5">
-                    <label for="nameFilter" class="block text-sm font-medium text-gray-300 dark:text-gray-300">
+                    <label for="nameFilter" class="block  font-medium text-gray-300 dark:text-gray-300">
                         Tên
                     </label>
                     <input type="text" id="nameFilter" placeholder="Tìm theo tên..."
@@ -93,7 +52,7 @@
 
                 {{-- Email Filter --}}
                 <div class="flex-1 min-w-40 max-w-80 flex flex-col items-stretch justify-start gap-0.5">
-                    <label for="emailFilter" class="block text-sm font-medium text-gray-300 dark:text-gray-300">
+                    <label for="emailFilter" class="block  font-medium text-gray-300 dark:text-gray-300">
                         Email
                     </label>
                     <input type="text" id="emailFilter" placeholder="Tìm theo email..."
@@ -103,7 +62,7 @@
 
                 {{-- Created From Date --}}
                 <div class="flex flex-col items-stretch justify-start gap-0.5">
-                    <label for="createdFrom" class="block text-sm font-medium text-gray-300 dark:text-gray-300">
+                    <label for="createdFrom" class="block  font-medium text-gray-300 dark:text-gray-300">
                         Ngày tạo
                     </label>
                     <div class="flex items-center gap-1">
@@ -118,12 +77,12 @@
 
             <div class="flex items-end gap-3">
                 <button onclick="resetFilters()"
-                    class="px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300">
+                    class="px-4 py-2.5  font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300">
                     <i class="fas fa-redo"></i>
                 </button>
                 <button
                     type="submit"
-                    class="px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all duration-300 flex items-center gap-2">
+                    class="px-4 py-2.5  font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all duration-300 flex items-center gap-2">
                     <i class="fas fa-filter"></i>
                     <span>Lọc</span>
                 </button>
@@ -144,13 +103,13 @@
         <div class="px-3.5 py-2 border-t border-gray-200 dark:border-gray-700">
             <div class="grid grid-cols-1 sm:grid-cols-3 justify-between items-center gap-4">
                 {{-- Info --}}
-                <span id="paginationInfo" class="text-sm text-gray-600 dark:text-gray-400 text-left"></span>
+                <span id="paginationInfo" class=" text-gray-600 dark:text-gray-400 text-left"></span>
 
                 {{-- Items per page selector --}}
                 <div class="flex items-center justify-center gap-2">
-                    <label for="itemPerPage" class="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">Số mục mỗi trang</label>
+                    <label for="itemPerPage" class="text-gray-600 dark:text-gray-400 whitespace-nowrap">Số mục mỗi trang</label>
                     <select id="itemPerPage" onchange="loadUsers(1)"
-                        class="px-2 py-0.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        class="px-2 py-0.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="10">10</option>
                         <option value="15" selected>15</option>
                         <option value="25">25</option>
@@ -160,77 +119,7 @@
                 </div>
 
                 {{-- Custom Pagination --}}
-                <div id="pagination" class="flex items-center justify-end gap-1 text-sm 2xl:text-base"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-{{-- Delete Confirmation Modal (Single & Bulk) --}}
-<div id="deleteModal" class="fixed inset-0 z-[100] overflow-y-auto overflow-x-hidden" style="display: none;">
-    {{-- Backdrop --}}
-    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="closeDeleteModal()"></div>
-
-    {{-- Modal Container --}}
-    <div class="relative flex min-h-full items-center justify-center p-4 z-10">
-        <div class="relative w-full max-w-xl p-5 flex flex-col items-stretch justify-start gap-4 transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700 transition-all"
-            onclick="event.stopPropagation()">
-            {{-- Modal Header --}}
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-red-100 dark:bg-red-900/20">
-                        <i class="fas fa-exclamation-triangle text-xl text-red-600 dark:text-red-400"></i>
-                    </div>
-                    <div>
-                        <h3 id="deleteModalTitle" class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                            Xác nhận xóa người dùng
-                        </h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">
-                            Hành động này không thể hoàn tác
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <hr class="border-gray-200 dark:border-gray-700">
-
-            {{-- Modal Body --}}
-            <div class="">
-                <p id="deleteModalMessage" class="text-gray-700 dark:text-gray-300 mb-4">
-                    Bạn có chắc chắn muốn xóa người dùng này không?
-                </p>
-                {{-- Single delete info --}}
-                <div id="singleDeleteInfo" class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 space-y-2">
-                    <div class="flex items-center gap-2">
-                        <span class="text-sm font-medium text-gray-600 dark:text-gray-400 w-20">Tên:</span>
-                        <span class="text-sm text-gray-900 dark:text-gray-100" id="deleteUserName"></span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-sm font-medium text-gray-600 dark:text-gray-400 w-20">Email:</span>
-                        <span class="text-sm text-gray-900 dark:text-gray-100 break-all" id="deleteUserEmail"></span>
-                    </div>
-                </div>
-                {{-- Bulk delete info --}}
-                <div id="bulkDeleteInfo" class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4" style="display: none;">
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                        Tất cả dữ liệu liên quan đến <span id="bulkDeleteCount" class="font-semibold text-red-600 dark:text-red-400">0</span> người dùng đã chọn sẽ bị xóa vĩnh viễn và không thể khôi phục.
-                    </p>
-                </div>
-            </div>
-
-            <hr class="border-gray-200 dark:border-gray-700">
-
-            {{-- Modal Footer --}}
-            <div class="flex items-center justify-end gap-3">
-                <button type="button" onclick="closeDeleteModal()"
-                    class="px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300">
-                    Hủy
-                </button>
-                <button type="button" onclick="confirmDelete()"
-                    class="px-4 py-2.5 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-all duration-300 flex items-center gap-2">
-                    <i class="fas fa-trash"></i>
-                    <span>Xác nhận xóa</span>
-                </button>
+                <div id="pagination" class="flex items-center justify-end gap-1"></div>
             </div>
         </div>
     </div>
@@ -325,13 +214,13 @@
     function getSortIcon(column) {
         if (sortBy !== column) {
             // Not sorted by this column - show neutral icon
-            return '<i class="fas fa-sort text-gray-300 dark:text-gray-500 text-sm ml-1"></i>';
+            return '<i class="fas fa-sort text-gray-300 dark:text-gray-500  ml-1"></i>';
         } else if (sortOrder === 'asc') {
             // Sorted ascending
-            return '<i class="fas fa-sort-up text-white text-sm ml-1"></i>';
+            return '<i class="fas fa-sort-up text-white  ml-1"></i>';
         } else {
             // Sorted descending
-            return '<i class="fas fa-sort-down text-white text-sm ml-1"></i>';
+            return '<i class="fas fa-sort-down text-white  ml-1"></i>';
         }
     }
 
@@ -360,20 +249,24 @@
     function renderTableLoading() {
         const tableContainer = document.getElementById('usersTable');
         tableContainer.innerHTML = `
-            <div class="pt-40 flex flex-col items-center justify-center gap-2">
+            <div class="w-fit mx-auto mt-[20dvh]">
                 <div id="SPINNER_LOADING">
-                    <div id="SPINNER_LOADING_LDS_ROLLER">
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
+                    <div id="SPINNER_LOADING_CONTAINER">
+                        <div id="SPINNER_LOADING_CONTAINER_LDS_ROLLER">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                    </div>
+                    <div id="SPINNER_LOADING_ICON">
+                        <i class="fas fa-graduation-cap"></i>
                     </div>
                 </div>
-                <div class="text-sm text-[#9ca3af80] dark:text-[#9ca3af80]">Đang tải dữ liệu...</div>
             </div>
         `;
     }
@@ -425,15 +318,16 @@
 
         if (users.length === 0) {
             tableContainer.innerHTML = `
-                <table class="w-full table-fixed border-separate border-spacing-0 text-sm">
+                <table class="w-full table-fixed border-separate border-spacing-0 ">
                     <colgroup>
-                        <col class="w-[4%]">
-                        <col class="w-[7%]">
-                        <col class="w-[18%]">
-                        <col class="w-[20%]">
-                        <col class="w-[13%]">
-                        <col class="w-[13%]">
-                        <col class="w-[25%]">
+                        <col class="w-[40px] 2xl:w-[80px]">
+                        <col class="w-[80px] 2xl:w-[110px]">
+                        <col class="w-[80px] 2xl:w-[150px]">
+                        <col class="w-[250px] 2xl:w-[400px]">
+                        <col class="w-[350px] 2xl:w-[500px]">
+                        <col class="">
+                        <col class="w-[120px] 2xl:w-[180px]">
+                        <col class="w-[130px] 2xl:w-[230px]">
                     </colgroup>
                     <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
                         <tr>
@@ -443,6 +337,7 @@
                             <th onclick="handleSort('id')" class="${getHeaderClass('id')}">
                                 ID${getSortIcon('id')}
                             </th>
+                            <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Avatar</th>
                             <th onclick="handleSort('fullname')" class="${getHeaderClass('fullname')}">
                                 Tên${getSortIcon('fullname')}
                             </th>
@@ -464,7 +359,7 @@
                                         <i class="fas fa-inbox text-3xl text-gray-400 dark:text-gray-500"></i>
                                     </div>
                                     <p class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-1">Không tìm thấy người dùng</p>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Hãy thử lại với các điều kiện lọc khác</p>
+                                    <p class=" text-gray-500 dark:text-gray-400">Hãy thử lại với các điều kiện lọc khác</p>
                                 </div>
                             </td>
                         </tr>
@@ -475,15 +370,16 @@
         }
 
         let html = `
-            <table class="w-full table-fixed border-separate border-spacing-0 text-sm">
+            <table class="w-full table-fixed border-separate border-spacing-0">
                 <colgroup>
-                    <col class="w-[4%]">
-                    <col class="w-[7%]">
-                    <col class="w-[18%]">
-                    <col class="w-[20%]">
-                    <col class="w-[13%]">
-                    <col class="w-[13%]">
-                    <col class="w-[25%]">
+                    <col class="w-[40px] 2xl:w-[80px]">
+                    <col class="w-[80px] 2xl:w-[110px]">
+                    <col class="w-[80px] 2xl:w-[150px]">
+                    <col class="w-[250px] 2xl:w-[400px]">
+                    <col class="w-[350px] 2xl:w-[500px]">
+                    <col class="">
+                    <col class="w-[120px] 2xl:w-[180px]">
+                    <col class="w-[130px] 2xl:w-[230px]">
                 </colgroup>
                 <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
                     <tr>
@@ -493,6 +389,7 @@
                         <th onclick="handleSort('id')" class="${getHeaderClass('id')}">
                             ID${getSortIcon('id')}
                         </th>
+                        <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Avatar</th>
                         <th onclick="handleSort('fullname')" class="${getHeaderClass('fullname')}">
                             Tên${getSortIcon('fullname')}
                         </th>
@@ -512,15 +409,15 @@
         users.forEach(user => {
             const roleBadge = user?.roles?.map(r => {
                 if (r.name === 'ROOT') {
-                    return `<span class="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-bold rounded-xl bg-gradient-to-r from-red-500 to-red-500 text-white">${r.name}</span>`;
+                    return `<span class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-xl bg-gradient-to-r from-red-500 to-red-500 text-white">${r.name}</span>`;
                 } else if (r.name === 'ADMIN') {
-                    return `<span class="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-bold rounded-xl bg-gradient-to-r from-amber-500 to-amber-500 text-white">${r.name}</span>`;
+                    return `<span class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-xl bg-gradient-to-r from-amber-500 to-amber-500 text-white">${r.name}</span>`;
                 } else if (r.name === 'TEACHER') {
-                    return `<span class="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-bold rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-500 text-white">${r.name}</span>`;
+                    return `<span class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-500 text-white">${r.name}</span>`;
                 } else if (r.name === 'STUDENT') {
-                    return `<span class="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-bold rounded-xl bg-gradient-to-r from-blue-500 to-blue-500 text-white">${r.name}</span>`;
+                    return `<span class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-xl bg-gradient-to-r from-blue-500 to-blue-500 text-white">${r.name}</span>`;
                 } else {
-                    return `<span class="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-bold rounded-xl bg-gradient-to-r from-gray-500 to-gray-500 text-white">${r.name}</span>`;
+                    return `<span class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-xl bg-gradient-to-r from-gray-500 to-gray-500 text-white">${r.name}</span>`;
                 }
             }).join(' ');
 
@@ -537,6 +434,9 @@
                     <td class="${getCellClass('id')} text-center">
                         <span class="text-gray-600 dark:text-gray-300">${user.id}</span>
                     </td>
+                    <td class="px-4 py-3 align-center whitespace-normal break-words">
+                        <img src="${user.path_avatar ? user.path_avatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullname || user.email || 'User')}&background=3b82f6&color=fff&size=128`}" alt="Avatar" class="w-10 h-10 mx-auto rounded-sm">
+                    </td>
                     <td class="${getCellClass('fullname')} text-gray-600 dark:text-gray-300">
                         ${user.fullname || '-'}
                     </td>
@@ -550,21 +450,21 @@
                         ${formatDate(user.created_at)}
                     </td>
                     <td class="px-4 py-3 align-top">
-                        <div class="flex flex-wrap items-center justify-end gap-2">
+                        <div class="flex flex-nowrap items-center justify-end gap-2 overflow-x-auto">
                             <a href="/admin/users/${user.id}"
-                                class="group/action inline-flex items-center justify-center w-7 2xl:w-8 aspect-square rounded-md border border-blue-500 hover:border-blue-600 text-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300"
+                                class="inline-flex shrink-0 size-7 2xl:size-8 items-center justify-center rounded-md border border-blue-500 hover:border-blue-600 text-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300"
                                 title="Xem chi tiết">
-                                <i class="fas fa-eye text-sm 2xl:text-sm"></i>
+                                <i class="fas fa-eye  2xl:"></i>
                             </a>
                             <a href="/admin/users/${user.id}/edit"
-                                class="group/action inline-flex items-center justify-center w-7 2xl:w-8 aspect-square rounded-md border border-amber-500 hover:border-amber-600 text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-300"
+                                class="inline-flex shrink-0 size-7 2xl:size-8 items-center justify-center rounded-md border border-amber-500 hover:border-amber-600 text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-300"
                                 title="Chỉnh sửa">
-                                <i class="fa-solid fa-pen text-sm 2xl:text-sm"></i>
+                                <i class="fa-solid fa-pen  2xl:"></i>
                             </a>
-                            <button onclick="openDeleteModal(${user.id}, '${(user.fullname || '').replace(/'/g, "\\'")}', '${user.email.replace(/'/g, "\\'")}')"
-                                class="group/action inline-flex items-center justify-center w-7 2xl:w-8 aspect-square rounded-md border border-red-500 hover:border-red-600 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300"
+                            <button onclick="openSingleDeleteModal(${user.id}, '${(user.fullname || '').replace(/'/g, "\\'")}', '${user.email.replace(/'/g, "\\'")}')"
+                                class="inline-flex shrink-0 size-7 2xl:size-8 items-center justify-center rounded-md border border-red-500 hover:border-red-600 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300"
                                 title="Xóa">
-                                <i class="fas fa-trash text-sm 2xl:text-sm"></i>
+                                <i class="fas fa-trash  2xl:"></i>
                             </button>
                         </div>
                     </td>
@@ -575,7 +475,7 @@
         html += '</tbody></table>';
         tableContainer.innerHTML = html;
         updateSelectAllCheckbox();
-        updateBulkDeleteActions();
+        toggleBulkDeleteBtn();
     }
 
     function renderPaginationInfo(paginationData = {}) {
@@ -668,160 +568,6 @@
         pagination.innerHTML = html;
     }
 
-
-    function openDeleteModal(id, userName, userEmail) {
-        isBulkDelete = false;
-        deleteUserId = id;
-
-        // Update modal for single delete
-        document.getElementById('deleteModalTitle').textContent = 'Xác nhận xóa người dùng';
-        document.getElementById('deleteModalMessage').textContent = 'Bạn có chắc chắn muốn xóa người dùng này không?';
-        document.getElementById('singleDeleteInfo').style.display = 'block';
-        document.getElementById('bulkDeleteInfo').style.display = 'none';
-        document.getElementById('deleteUserName').textContent = userName || '-';
-        document.getElementById('deleteUserEmail').textContent = userEmail;
-
-        document.getElementById('deleteModal').style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeDeleteModal() {
-        document.getElementById('deleteModal').style.display = 'none';
-        document.body.style.overflow = '';
-        deleteUserId = null;
-        isBulkDelete = false;
-    }
-
-    async function confirmDelete() {
-        if (isBulkDelete) {
-            // Bulk delete
-            if (selectedUserIds.size === 0) return;
-
-            const userIds = Array.from(selectedUserIds);
-
-            try {
-                let successCount = 0;
-                let failCount = 0;
-
-                for (const userId of userIds) {
-                    try {
-                        const data = await apiRequest(`/users/${userId}`, {
-                            method: 'DELETE'
-                        });
-                        if (data.success) {
-                            successCount++;
-                        } else {
-                            failCount++;
-                        }
-                    } catch (error) {
-                        failCount++;
-                        console.error(`Error deleting user ${userId}:`, error);
-                    }
-                }
-
-                if (successCount > 0) {
-                    showNotificationModel(`Đã xóa thành công ${successCount} người dùng${failCount > 0 ? `, ${failCount} người dùng xóa thất bại` : ''}`);
-                    selectedUserIds.clear();
-                    closeDeleteModal();
-                    loadUsers(currentPage);
-                } else {
-                    showNotificationModel('Không thể xóa người dùng đã chọn', 'error');
-                }
-            } catch (error) {
-                showNotificationModel(error.message, 'error');
-            }
-        } else {
-            // Single delete
-            if (!deleteUserId) return;
-
-            try {
-                const data = await apiRequest(`/users/${deleteUserId}`, {
-                    method: 'DELETE'
-                });
-
-                if (data.success) {
-                    closeDeleteModal();
-                    showNotificationModel(data.message || 'Xóa thành công');
-                    selectedUserIds.delete(deleteUserId);
-                    loadUsers(currentPage);
-                }
-            } catch (error) {
-                showNotificationModel(error.message, 'error');
-            }
-        }
-    }
-
-    // Alert Modal Functions
-    function showNotificationModel(message, type = 'success') {
-        const alertModal = document.getElementById('alertModal');
-        const alertIcon = document.getElementById('alertIcon');
-        const alertIconClass = document.getElementById('alertIconClass');
-        const alertTitle = document.getElementById('alertTitle');
-        const alertMessage = document.getElementById('alertMessage');
-        const alertButton = document.getElementById('alertButton');
-
-        // Set message
-        alertMessage.textContent = message;
-
-        // Set type-specific styles
-        switch (type) {
-            case 'success':
-                alertIcon.className = 'flex h-12 w-12 items-center justify-center rounded-xl bg-green-100 dark:bg-green-900/20';
-                alertIconClass.className = 'fas fa-check-circle text-xl text-green-600 dark:text-green-400';
-                alertTitle.textContent = 'Thành công';
-                alertButton.className = 'px-4 py-2.5 text-sm font-semibold text-white bg-green-600 rounded-xl hover:bg-green-700 transition-all duration-300 flex items-center gap-2';
-                break;
-            case 'error':
-                alertIcon.className = 'flex h-12 w-12 items-center justify-center rounded-xl bg-red-100 dark:bg-red-900/20';
-                alertIconClass.className = 'fas fa-exclamation-circle text-xl text-red-600 dark:text-red-400';
-                alertTitle.textContent = 'Lỗi';
-                alertButton.className = 'px-4 py-2.5 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-all duration-300 flex items-center gap-2';
-                break;
-            case 'warning':
-                alertIcon.className = 'flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/20';
-                alertIconClass.className = 'fas fa-exclamation-triangle text-xl text-amber-600 dark:text-amber-400';
-                alertTitle.textContent = 'Cảnh báo';
-                alertButton.className = 'px-4 py-2.5 text-sm font-semibold text-white bg-amber-600 rounded-xl hover:bg-amber-700 transition-all duration-300 flex items-center gap-2';
-                break;
-            case 'info':
-                alertIcon.className = 'flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/20';
-                alertIconClass.className = 'fas fa-info-circle text-xl text-blue-600 dark:text-blue-400';
-                alertTitle.textContent = 'Thông tin';
-                alertButton.className = 'px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all duration-300 flex items-center gap-2';
-                break;
-            default:
-                alertIcon.className = 'flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-700';
-                alertIconClass.className = 'fas fa-bell text-xl text-gray-600 dark:text-gray-400';
-                alertTitle.textContent = 'Thông báo';
-                alertButton.className = 'px-4 py-2.5 text-sm font-semibold text-white bg-gray-600 rounded-xl hover:bg-gray-700 transition-all duration-300 flex items-center gap-2';
-        }
-
-        // Show modal
-        alertModal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeAlertModal() {
-        const alertModal = document.getElementById('alertModal');
-        alertModal.style.display = 'none';
-        document.body.style.overflow = '';
-    }
-
-    // Close modals on Escape key
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            const deleteModal = document.getElementById('deleteModal');
-            const alertModal = document.getElementById('alertModal');
-
-            if (deleteModal && deleteModal.style.display !== 'none') {
-                closeDeleteModal();
-            }
-            if (alertModal && alertModal.style.display !== 'none') {
-                closeAlertModal();
-            }
-        }
-    });
-
     function toggleUserSelection(userId, checked) {
         if (checked) {
             selectedUserIds.add(userId);
@@ -829,7 +575,7 @@
             selectedUserIds.delete(userId);
         }
         updateSelectAllCheckbox();
-        updateBulkDeleteActions();
+        toggleBulkDeleteBtn();
     }
 
     function toggleSelectAll(checked) {
@@ -843,7 +589,7 @@
                 selectedUserIds.delete(userId);
             }
         });
-        updateBulkDeleteActions();
+        toggleBulkDeleteBtn();
     }
 
     function updateSelectAllCheckbox() {
@@ -868,90 +614,66 @@
         }
     }
 
-    function updateBulkDeleteActions() {
-        const bulkDeleteActions = document.getElementById('bulkDeleteActions');
+    function toggleBulkDeleteBtn() {
+        const btnDeleteBulk = document.getElementById('btnDeleteBulk');
         const selectedCount = document.getElementById('selectedCount');
 
         if (selectedUserIds.size > 0) {
-            bulkDeleteActions.disabled = false;
-            bulkDeleteActions.style.opacity = '1';
-            bulkDeleteActions.style.cursor = 'pointer';
-            // selectedCount.textContent = `${selectedUserIds.size}`;
+            btnDeleteBulk.disabled = false;
+            btnDeleteBulk.style.opacity = '1';
+            btnDeleteBulk.style.cursor = 'pointer';
+            selectedCount.textContent = selectedUserIds.size;
         } else {
-            bulkDeleteActions.disabled = true;
-            bulkDeleteActions.style.opacity = '0.5';
-            bulkDeleteActions.style.cursor = 'not-allowed';
+            btnDeleteBulk.disabled = true;
+            btnDeleteBulk.style.opacity = '0.5';
+            btnDeleteBulk.style.cursor = 'not-allowed';
+            selectedCount.textContent = '0';
         }
     }
 
-    function openBulkDeleteModal() {
-        if (selectedUserIds.size === 0) {
-            showNotificationModel('Vui lòng chọn ít nhất một người dùng để xóa', 'error');
-            return;
-        }
 
-        isBulkDelete = true;
-        deleteUserId = null;
-
-        // Update modal for bulk delete
-        document.getElementById('deleteModalTitle').textContent = 'Xác nhận xóa nhiều người dùng';
-        document.getElementById('deleteModalMessage').textContent = `Bạn có chắc chắn muốn xóa ${selectedUserIds.size} người dùng đã chọn không?`;
-        document.getElementById('singleDeleteInfo').style.display = 'none';
-        document.getElementById('bulkDeleteInfo').style.display = 'block';
-        document.getElementById('bulkDeleteCount').textContent = selectedUserIds.size;
-
-        document.getElementById('deleteModal').style.display = 'block';
-        document.body.style.overflow = 'hidden';
+    // Xử lý khi xóa một mục
+    async function openSingleDeleteModal(userId, userName, userEmail) {
+        openSingleDeleteModalGeneric({
+            objectName: OBJECTNAMEMODAL.USER,
+            idDelete: userId,
+            nameValue: userName || '-',
+            descValue: userEmail || '',
+            deleteFuncCallback: () => handleDeleteUsers([userId]),
+            successFuncCallback: () => loadUsers(currentPage),
+            failFuncCallback: () => {}
+        });
     }
+
+    // Xử lý khi xóa nhiều mục cùng lúc
+    async function openBulkDeleteModal() {
+        openBulkDeleteModalGeneric({
+            arrayIds: Array.from(selectedUserIds),
+            objectName: OBJECTNAMEMODAL.USER,
+            deleteFuncCallback: () => handleDeleteUsers(Array.from(selectedUserIds)),
+            successFuncCallback: () => loadUsers(currentPage),
+            failFuncCallback: () => {}
+        });
+    }
+
+    async function handleDeleteUsers(arrayIds = []) {
+        try {
+            const data = await apiRequest(`/users/`, {
+                method: 'DELETE',
+                body: JSON.stringify({
+                    user_ids: [...arrayIds]
+                })
+            });
+            if (data.success) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (error) {
+            return false;
+        }
+    }
+
 </script>
 
-
-{{-- Alert Notification Modal --}}
-<div id="alertModal" class="fixed inset-0 z-[100] overflow-y-auto overflow-x-hidden" style="display: none;">
-    {{-- Backdrop --}}
-    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="closeAlertModal()"></div>
-
-    {{-- Modal Container --}}
-    <div class="relative flex min-h-full items-center justify-center p-4 z-10">
-        <div class="relative w-full max-w-xl p-5 flex flex-col items-stretch justify-start gap-4 transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700 transition-all"
-            onclick="event.stopPropagation()">
-            {{-- Modal Header --}}
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div id="alertIcon" class="flex h-12 w-12 items-center justify-center rounded-xl">
-                        <i id="alertIconClass" class="text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 id="alertTitle" class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                            Thông báo
-                        </h3>
-                    </div>
-                </div>
-                {{-- <button type="button" onclick="closeAlertModal()"
-                    class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-                    <i class="fas fa-times text-xl"></i>
-                </button> --}}
-            </div>
-
-            <hr class="border-gray-200 dark:border-gray-700">
-
-            {{-- Modal Body --}}
-            <div class="">
-                <p id="alertMessage" class="text-gray-700 dark:text-gray-300">
-                </p>
-            </div>
-
-            <hr class="border-gray-200 dark:border-gray-700">
-
-            {{-- Modal Footer --}}
-            <div class="flex items-center justify-end gap-3">
-                <button type="button" onclick="closeAlertModal()"
-                    id="alertButton"
-                    class="px-4 py-2.5 text-sm font-semibold text-white rounded-xl transition-all duration-300 flex items-center gap-2">
-                    <span>Đóng</span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 @endsection

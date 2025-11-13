@@ -89,6 +89,7 @@ class ScanRoutesCommand extends Command
                 // Nếu có metadata trong route, sử dụng nó; nếu không thì tự động generate
                 $name = $permissionMeta['name'] ?? $this->generatePermissionName($method, $normalizedPath);
                 $description = $permissionMeta['description'] ?? $this->generatePermissionDescription($method, $normalizedPath);
+                $group = $permissionMeta['group'] ?? $this->generatePermissionGroup($normalizedPath);
 
                 // Kiểm tra permission đã tồn tại chưa
                 $existingPermission = Permission::where('method', $method)
@@ -100,22 +101,24 @@ class ScanRoutesCommand extends Command
                     if ($existingPermission->trashed()) {
                         $existingPermission->restore();
                         // Nếu route có permission metadata, luôn cập nhật; nếu không thì chỉ cập nhật khi chưa có
-                        $shouldUpdate = $permissionMeta !== null || !$existingPermission->name || !$existingPermission->description;
+                        $shouldUpdate = $permissionMeta !== null || !$existingPermission->name || !$existingPermission->description || !$existingPermission->group;
                         if ($shouldUpdate) {
                             $existingPermission->update([
                                 'name' => $name,
                                 'description' => $description,
+                                'group' => $group,
                             ]);
                         }
                         $updated++;
                         $this->line("  ✓ Restored: {$method} {$normalizedPath}");
                     } else {
                         // Nếu route có permission metadata, luôn cập nhật; nếu không thì chỉ cập nhật khi chưa có
-                        $shouldUpdate = $permissionMeta !== null || !$existingPermission->name || !$existingPermission->description;
+                        $shouldUpdate = $permissionMeta !== null || !$existingPermission->name || !$existingPermission->description || !$existingPermission->group;
                         if ($shouldUpdate) {
                             $existingPermission->update([
                                 'name' => $name,
                                 'description' => $description,
+                                'group' => $group,
                             ]);
                             $updated++;
                             $this->line("  ✓ Updated: {$method} {$normalizedPath}" . ($permissionMeta ? ' (từ route metadata)' : ''));
@@ -131,6 +134,7 @@ class ScanRoutesCommand extends Command
                     Permission::create([
                         'name' => $name,
                         'description' => $description,
+                        'group' => $group,
                         'method' => $method,
                         'path' => $normalizedPath,
                     ]);
@@ -301,6 +305,59 @@ class ScanRoutesCommand extends Command
         }
 
         return $resource;
+    }
+
+    /**
+     * Tạo group permission từ path
+     */
+    private function generatePermissionGroup($path)
+    {
+        // Loại bỏ prefix /api nếu có
+        $pathWithoutPrefix = preg_replace('/^\/api\//', '/', $path);
+        $pathWithoutPrefix = ltrim($pathWithoutPrefix, '/');
+
+        // Lấy segment đầu tiên làm group
+        $segments = explode('/', $pathWithoutPrefix);
+        if (count($segments) > 0) {
+            $group = $segments[0];
+            // Loại bỏ {id} nếu có
+            $group = str_replace('{id}', '', $group);
+            $group = trim($group, '/');
+            
+            // Format group name (chuyển từ kebab-case/snake_case sang title case)
+            $group = str_replace(['-', '_'], ' ', $group);
+            $group = ucwords($group);
+            
+            // Mapping một số group phổ biến
+            $mapping = [
+                'Users' => 'Người dùng',
+                'User' => 'Người dùng',
+                'Roles' => 'Vai trò',
+                'Role' => 'Vai trò',
+                'Permissions' => 'Phân quyền',
+                'Permission' => 'Phân quyền',
+                'Courses' => 'Khóa học',
+                'Course' => 'Khóa học',
+                'Lessons' => 'Bài học',
+                'Lesson' => 'Bài học',
+                'Auth' => 'Xác thực',
+                'Login' => 'Xác thực',
+                'Logout' => 'Xác thực',
+                'Register' => 'Xác thực',
+                'Refresh' => 'Xác thực',
+            ];
+
+            foreach ($mapping as $key => $value) {
+                if (stripos($group, $key) !== false) {
+                    $group = $value;
+                    break;
+                }
+            }
+            
+            return $group ?: 'Khác';
+        }
+
+        return 'Khác';
     }
 }
 

@@ -149,7 +149,7 @@
                 document.getElementById('courseDescription').textContent = courseData.description || '-';
             }
         } catch (error) {
-            showNotificationModel('Không thể tải thông tin khóa học: ' + error.message, 'error');
+            showNotificationModel_Global('Không thể tải thông tin khóa học: ' + error.message, 'error');
         }
     }
 
@@ -163,7 +163,7 @@
             document.getElementById('lessonsList').innerHTML = `
                 <div class="flex items-center justify-center py-12">
                     <div class="text-center">
-                        <p class="text-red-600 dark:text-red-400">${escapeHtml(error.message)}</p>
+                        <p class="text-red-600 dark:text-red-400">${escapeHtml_Global(error.message)}</p>
                     </div>
                 </div>
             `;
@@ -195,11 +195,11 @@
                             </svg>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml(lesson.title ?? 'Không có tên')}</h4>
+                            <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(lesson.title ?? 'Không có tên')}</h4>
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                Thời lượng: ${durationFormatted} | Thứ tự: ${escapeHtml(String(lesson.display_order ?? '-'))}
+                                Thời lượng: ${durationFormatted} | Thứ tự: ${escapeHtml_Global(String(lesson.display_order ?? '-'))}
                             </p>
-                            ${lesson.description ? `<p class="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">${escapeHtml(String(lesson.description))}</p>` : ''}
+                            ${lesson.description ? `<p class="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">${escapeHtml_Global(String(lesson.description))}</p>` : ''}
                         </div>
                     </div>
                     <div class="flex items-center gap-2 ml-4">
@@ -247,7 +247,7 @@
                 document.getElementById('lessonModal').classList.add('flex');
             }
         } catch (error) {
-            showNotificationModel('Không thể tải thông tin bài học: ' + error.message, 'error');
+            showNotificationModel_Global('Không thể tải thông tin bài học: ' + error.message, 'error');
         }
     }
 
@@ -260,11 +260,11 @@
             });
 
             if (data?.success) {
-                showNotificationModel(data.message || 'Xóa bài học thành công', 'success');
+                showNotificationModel_Global(data.message || 'Xóa bài học thành công', 'success');
                 await loadLessons();
             }
         } catch (error) {
-            showNotificationModel(error.message, 'error');
+            showNotificationModel_Global(error.message, 'error');
         }
     }
 
@@ -278,17 +278,17 @@
         const videoUrl = document.getElementById('video_url').value.trim();
 
         if (!title) {
-            showNotificationModel('Vui lòng nhập tiêu đề bài học', 'error');
+            showNotificationModel_Global('Vui lòng nhập tiêu đề bài học', 'error');
             return;
         }
 
         if (!duration || duration < 1) {
-            showNotificationModel('Vui lòng nhập thời lượng hợp lệ (ít nhất 1 giây)', 'error');
+            showNotificationModel_Global('Vui lòng nhập thời lượng hợp lệ (ít nhất 1 giây)', 'error');
             return;
         }
 
         if (!videoUrl) {
-            showNotificationModel('Vui lòng nhập URL video', 'error');
+            showNotificationModel_Global('Vui lòng nhập URL video', 'error');
             return;
         }
 
@@ -316,16 +316,16 @@
             }
 
             if (data?.success) {
-                showNotificationModel(data.message || 'Lưu thành công', 'success');
+                showNotificationModel_Global(data.message || 'Lưu thành công', 'success');
                 closeLessonModal();
                 await loadLessons();
             }
         } catch (error) {
-            showNotificationModel(error.message, 'error');
+            showNotificationModel_Global(error.message, 'error');
         }
     }
 
-    function escapeHtml(str) {
+    function escapeHtml_Global(str) {
         return String(str)
             .replaceAll('&', '&amp;')
             .replaceAll('<', '&lt;')

@@ -2,7 +2,7 @@
 {{-- Alert Notification Modal --}}
 <div id="NOTIFICATION_MODAL" class="fixed inset-0 z-[200] overflow-y-auto overflow-x-hidden" style="display: none;">
     {{-- Backdrop --}}
-    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="closeNotificationModal()"></div>
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="closeNotificationModal_Global()"></div>
 
     {{-- Modal Container --}}
     <div class="relative flex min-h-full items-center justify-center p-4 z-10">
@@ -20,7 +20,7 @@
                         </h3>
                     </div>
                 </div>
-                {{-- <button type="button" onclick="closeNotificationModal()"
+                {{-- <button type="button" onclick="closeNotificationModal_Global()"
                     class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
                     <i class="fas fa-times text-xl"></i>
                 </button> --}}
@@ -38,7 +38,7 @@
 
             {{-- Modal Footer --}}
             <div class="flex items-center justify-end gap-3">
-                <button type="button" onclick="closeNotificationModal()"
+                <button type="button" onclick="closeNotificationModal_Global()"
                     id="NOTIFICATION_MODAL_CLOSE_BTN"
                     class="px-4 py-2.5 text-sm font-semibold text-white rounded-xl transition-all duration-300 flex items-center gap-2">
                     <span>Đóng</span>
@@ -51,7 +51,7 @@
     /**
      * functionCallback: Hàm sẽ gọi lại khi nhấn vào nút đóng
      * **/
-    function showNotificationModel(message, type = 'success', functionCallback = () => {}) {
+    function showNotificationModel_Global(message, type = 'success', functionCallback = () => {}) {
 
         const alertModal = document.getElementById('NOTIFICATION_MODAL');
         const alertIcon = document.getElementById('alertIcon');
@@ -100,12 +100,12 @@
         alertModal.style.display = 'block';
         document.body.style.overflow = 'hidden';
         alertButton.addEventListener('click', async () => {
-            closeNotificationModal();
+            closeNotificationModal_Global();
             functionCallback();
         })
     }
 
-    function closeNotificationModal() {
+    function closeNotificationModal_Global() {
         const alertModal = document.getElementById('NOTIFICATION_MODAL');
         alertModal.style.display = 'none';
         document.body.style.overflow = '';
@@ -115,7 +115,7 @@
 {{-- Delete Confirmation Modal (Single & Bulk) --}}
 <div id="DELETE_MODAL" class="fixed inset-0 z-[200] overflow-y-auto overflow-x-hidden" style="display: none;">
     {{-- Backdrop --}}
-    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="closeDeleteModalGeneric()"></div>
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="closeDeleteModalGeneric_Global()"></div>
 
     {{-- Modal Container --}}
     <div class="relative flex min-h-full items-center justify-center p-4 z-10">
@@ -162,7 +162,7 @@
 
             {{-- Modal Footer --}}
             <div class="flex items-center justify-end gap-3">
-                <button type="button" onclick="closeDeleteModalGeneric()"
+                <button type="button" onclick="closeDeleteModalGeneric_Global()"
                     class="px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300">
                     Hủy
                 </button>
@@ -204,7 +204,66 @@
      * @param {string|null} options.title - Tiêu đề modal tuỳ chỉnh
      * @param {string|null} options.message - Nội dung cảnh báo tuỳ chỉnh
      */
-    function openSingleDeleteModalGeneric({
+    function openLogoutModalGeneric_Global({ 
+        title = null,
+        message = null,
+        deleteFuncCallback = async () => { return false; },
+        successFuncCallback = async () => { return false; },
+        failFuncCallback = async () => { return false; },
+    } = {}) { 
+
+        document.getElementById('deleteModalTitle').textContent = title == null ? `Đăng xuất` : title;
+        document.getElementById('deleteModalMessage').textContent = message == null ? `Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?` : message;
+
+        document.getElementById('bulkDeleteInfo').style.display = 'none';
+        document.getElementById('singleDeleteInfo').style.display = 'none'; 
+
+        document.getElementById('DELETE_MODAL').style.display = 'block';
+        
+        document.getElementById('confirmDeleteBtn').getElementsByTagName('span')[0].textContent = 'Xác nhận đăng xuất';
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+            try {
+                const result = await deleteFuncCallback();
+                console.log(result);
+                
+                if (result) {
+                    closeDeleteModalGeneric_Global();
+                    showNotificationModel_Global(`Đăng xuất người dùng thành công`, 'success', successFuncCallback);
+                } else {
+                    closeDeleteModalGeneric_Global();
+                    showNotificationModel_Global(`Có lỗi đăng xuất người dùng`, 'error', failFuncCallback);
+                }
+            } catch (error) {
+                console.log(error);
+                
+                closeDeleteModalGeneric_Global();
+                showNotificationModel_Global(error.message, 'error', failFuncCallback);
+            }
+        });
+        document.body.style.overflow = 'hidden';
+    }
+
+    /**
+     * Hiển thị modal xác nhận xóa cho một đối tượng (người dùng, vai trò, khóa học, bài học hoặc đối tượng khác).
+     *
+     * Các tham số truyền vào cho phép tuỳ chỉnh đối tượng, id, tên, mô tả, callback xóa và callback sau khi thành công/thất bại.
+     *
+     * Khi người dùng xác nhận xóa, sẽ thực thi `deleteFuncCallback`, nếu thành công sẽ đóng modal và hiển thị thông báo thành công,
+     * ngược lại sẽ hiển thị thông báo lỗi.
+     *
+     * @param {Object} options
+     * @param {string} options.objectName - Loại đối tượng (USER, ROLE, COURSE, LESSON, OTHER)
+     * @param {number|null} options.idDelete - ID đối tượng sẽ xóa
+     * @param {string} options.nameValue - Tên đối tượng
+     * @param {string} options.descValue - Mô tả bổ sung cho đối tượng (email, level, v.v...)
+     * @param {Function} options.deleteFuncCallback - Hàm callback xử lý xóa, trả về true/false
+     * @param {Function} options.successFuncCallback - Callback khi xóa thành công
+     * @param {Function} options.failFuncCallback - Callback khi xóa thất bại
+     * @param {string|null} options.title - Tiêu đề modal tuỳ chỉnh
+     * @param {string|null} options.message - Nội dung cảnh báo tuỳ chỉnh
+     */
+    function openSingleDeleteModalGeneric_Global({
         objectName = OBJECTNAMEMODAL.OTHER,
         idDelete = null,
         nameValue = '-',
@@ -259,19 +318,49 @@
             try {
                 const result = await deleteFuncCallback();
                 if (result) {
-                    closeDeleteModalGeneric();
-                    showNotificationModel(`Xóa thành công ${objectNameLabel} ${nameValue}`, 'success', successFuncCallback);
+                    closeDeleteModalGeneric_Global();
+                    showNotificationModel_Global(`Xóa thành công ${objectNameLabel} ${nameValue}`, 'success', successFuncCallback);
                 } else {
-                    closeDeleteModalGeneric();
-                    showNotificationModel(`Có lỗi khi xóa ${objectNameLabel} ${nameValue}`, 'error', failFuncCallback);
+                    closeDeleteModalGeneric_Global();
+                    showNotificationModel_Global(`Có lỗi khi xóa ${objectNameLabel} ${nameValue}`, 'error', failFuncCallback);
                 }
             } catch (error) {
-                closeDeleteModalGeneric();
-                showNotificationModel(error.message, 'error', failFuncCallback);
+                closeDeleteModalGeneric_Global();
+                showNotificationModel_Global(error.message, 'error', failFuncCallback);
             }
         });
         document.body.style.overflow = 'hidden';
     }
+
+    // function openLogoutModel_Global({ 
+    //     deleteFuncCallback = async () => { return false; },
+    //     successFuncCallback = async () => { return false; },
+    //     failFuncCallback = async () => { return false; }
+    // } = {}) {
+    //     document.getElementById('deleteModalTitle').textContent = 'Bạn có chắc chắn muốn đăng xuất?';
+    //     document.getElementById('deleteModalMessage').textContent = 'Bạn sẽ cần đăng nhập lại để truy cập vào hệ thống quản trị. hãy chắc chắn rằng bạn đã lưu lại tất cả công việc của mình trước khi đăng xuất.';
+    //     document.getElementById('bulkDeleteInfo').style.display = 'none';
+    //     // document.getElementById('deleteNameValue').textContent = nameValue || '-';
+    //     // document.getElementById('deleteDescValue').textContent = descValue || '-';
+    //     document.getElementById('DELETE_MODAL').style.display = 'block';
+
+    //     document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+    //         try {
+    //             const result = await deleteFuncCallback();
+    //             if (result) {
+    //                 closeDeleteModalGeneric_Global();
+    //                 // showNotificationModel_Global(`Xóa thành công ${objectNameLabel} ${nameValue}`, 'success', successFuncCallback);
+    //             } else {
+    //                 closeDeleteModalGeneric_Global();
+    //                 // showNotificationModel_Global(`Có lỗi khi xóa ${objectNameLabel} ${nameValue}`, 'error', failFuncCallback);
+    //             }
+    //         } catch (error) {
+    //             closeDeleteModalGeneric_Global();
+    //             // showNotificationModel_Global(error.message, 'error', failFuncCallback);
+    //         }
+    //     });
+    //     document.body.style.overflow = 'hidden';
+    // }
 
 
     /**
@@ -286,7 +375,7 @@
      * @param {string|null} params.title - Tiêu đề modal, nếu null sẽ tự động sinh phù hợp.
      * @param {string|null} params.message - Nội dung thông điệp modal, nếu null sẽ tự động sinh phù hợp.
      */
-    function openBulkDeleteModalGeneric({
+    function openBulkDeleteModalGeneric_Global({
         arrayIds = [],
         objectName = OBJECTNAMEMODAL.OTHER,
         deleteFuncCallback = async () => { return false; },
@@ -325,22 +414,22 @@
             try {
                 const result = await deleteFuncCallback();
                 if (result) {
-                    closeDeleteModalGeneric();
-                    showNotificationModel(`Xóa thành công ${arrayIds.length} ${objectNameLabel}`, 'success', successFuncCallback);
+                    closeDeleteModalGeneric_Global();
+                    showNotificationModel_Global(`Xóa thành công ${arrayIds.length} ${objectNameLabel}`, 'success', successFuncCallback);
                 } else {
-                    closeDeleteModalGeneric();
-                    showNotificationModel(`Đã xảy ra lỗi khi xóa ${arrayIds.length} ${objectNameLabel}`, 'error', failFuncCallback);
+                    closeDeleteModalGeneric_Global();
+                    showNotificationModel_Global(`Đã xảy ra lỗi khi xóa ${arrayIds.length} ${objectNameLabel}`, 'error', failFuncCallback);
                 }
             } catch (error) {
-                closeDeleteModalGeneric();
-                showNotificationModel(error.message, 'error', failFuncCallback);
+                closeDeleteModalGeneric_Global();
+                showNotificationModel_Global(error.message, 'error', failFuncCallback);
             }
         });
         document.body.style.overflow = 'hidden';
     }
 
     // Close model
-    function closeDeleteModalGeneric() {
+    function closeDeleteModalGeneric_Global() {
         document.getElementById('DELETE_MODAL').style.display = 'none';
         document.body.style.overflow = '';
     }
@@ -353,10 +442,10 @@
             const alertModal = document.getElementById('NOTIFICATION_MODAL');
 
             if (deleteModal && deleteModal.style.display !== 'none') {
-                closeDeleteModalGeneric();
+                closeDeleteModalGeneric_Global();
             }
             if (alertModal && alertModal.style.display !== 'none') {
-                closeNotificationModal();
+                closeNotificationModal_Global();
             }
         }
     });
@@ -368,7 +457,7 @@
 <script>
     // ===== Timezone Utilities =====
     // Tự động nhận biết timezone của client
-    function getClientTimezone() {
+    function getClientTimezone_Global() {
         try {
             return Intl.DateTimeFormat().resolvedOptions().timeZone;
         } catch (e) {
@@ -403,7 +492,7 @@
 
     // Format date - hiển thị theo timezone của client
     // Laravel lưu và trả về datetime ở UTC, JavaScript tự động chuyển sang local time
-    function formatDate(dateString) {
+    function formatDate_Global(dateString) {
         if (!dateString) return '-';
         const date = new Date(dateString);
         if (isNaN(date.getTime())) return '-';
@@ -417,13 +506,13 @@
         const hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
 
-        return `${day}/${month}/${year} ${hours}:${minutes}`;
+        return `${hours}:${minutes} ${day}/${month}/${year}`;
     }
 </script>
 
 
 <script>
-    function removeVietnameseAccentsInString(str) {
+    function removeVietnameseAccentsInString_Global(str) {
         str = str.toLowerCase();
         str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
         str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
@@ -437,5 +526,14 @@
         // str = str.replace(/[^0-9a-z ]/g, "");
 
         return str;
+    }
+
+    function escapeHtml_Global(str) {
+        return String(str)
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
     }
 </script>

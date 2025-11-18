@@ -1,6 +1,6 @@
-# Hướng dẫn cấu hình upload file lớn (450MB)
+# Hướng dẫn cấu hình upload file lớn (10GB)
 
-Dự án đã được cấu hình để hỗ trợ upload file tối đa **450MB**. Để đảm bảo cấu hình hoạt động đúng, bạn cần kiểm tra và cấu hình các thành phần sau:
+Dự án đã được cấu hình để hỗ trợ upload file tối đa **10GB**. Để đảm bảo cấu hình hoạt động đúng, bạn cần kiểm tra và cấu hình các thành phần sau:
 
 ## 1. Cấu hình PHP (php.ini)
 
@@ -14,19 +14,19 @@ php --ini
 ### Các giá trị cần cấu hình trong php.ini:
 
 ```ini
-upload_max_filesize = 450M
-post_max_size = 450M
-max_execution_time = 3600
-max_input_time = 3600
-memory_limit = 512M
+upload_max_filesize = 10240M
+post_max_size = 10240M
+max_execution_time = 7200
+max_input_time = 7200
+memory_limit = 1024M
 ```
 
 **Giải thích:**
-- `upload_max_filesize`: Kích thước tối đa của một file được upload (450MB)
+- `upload_max_filesize`: Kích thước tối đa của một file được upload (10GB = 10240MB)
 - `post_max_size`: Kích thước tối đa của dữ liệu POST (phải >= upload_max_filesize)
-- `max_execution_time`: Thời gian tối đa để script chạy (3600 giây = 1 giờ)
-- `max_input_time`: Thời gian tối đa để parse input (3600 giây = 1 giờ)
-- `memory_limit`: Giới hạn bộ nhớ cho PHP script (512MB)
+- `max_execution_time`: Thời gian tối đa để script chạy (7200 giây = 2 giờ)
+- `max_input_time`: Thời gian tối đa để parse input (7200 giây = 2 giờ)
+- `memory_limit`: Giới hạn bộ nhớ cho PHP script (1024MB = 1GB)
 
 ### Sau khi cấu hình, khởi động lại web server:
 ```bash
@@ -46,8 +46,8 @@ sudo systemctl restart php-fpm
 Nếu bạn sử dụng Nginx, thêm các dòng sau vào file cấu hình Nginx (thường là `/etc/nginx/sites-available/your-site`):
 
 ```nginx
-client_max_body_size 450M;
-client_body_timeout 3600s;
+client_max_body_size 10240M;
+client_body_timeout 7200s;
 ```
 
 Sau đó khởi động lại Nginx:
@@ -62,11 +62,11 @@ File `.htaccess` trong thư mục `public/` đã được cấu hình. Tuy nhiê
 
 ```apache
 <Directory "/path/to/your/project/public">
-    php_value upload_max_filesize 450M
-    php_value post_max_size 450M
-    php_value max_execution_time 3600
-    php_value max_input_time 3600
-    php_value memory_limit 512M
+    php_value upload_max_filesize 10240M
+    php_value post_max_size 10240M
+    php_value max_execution_time 7200
+    php_value max_input_time 7200
+    php_value memory_limit 1024M
 </Directory>
 ```
 
@@ -94,7 +94,7 @@ Các validation rules đã được cập nhật trong:
 - `app/Http/Requests/lessons/StoreRequest.php`
 - `app/Http/Requests/lessons/UpdateRequest.php`
 
-Giới hạn validation: **460800 KB = 450MB**
+Giới hạn validation: **10485760 KB = 10GB**
 
 ## 6. Lưu ý quan trọng
 

@@ -148,7 +148,7 @@
                 renderPermissionsCheckboxes([], permissionFilterText);
             }
         } catch (error) {
-            showNotificationModel('Không thể tải danh sách permissions: ' + error.message, 'error', handleBackPrevPage);
+            showNotificationModel_Global('Không thể tải danh sách permissions: ' + error.message, 'error', handleBackPrevPage);
         }
     }
 
@@ -365,7 +365,7 @@
                 renderPermissionsCheckboxes(rolePermissionIds, permissionFilterText);
             }
         } catch (error) {
-            showNotificationModel('Không thể tải thông tin vai trò: ' + error.message, 'error', handleBackPrevPage); 
+            showNotificationModel_Global('Không thể tải thông tin vai trò: ' + error.message, 'error', handleBackPrevPage); 
         }
     }
 
@@ -403,10 +403,10 @@
             }
 
             if (data.success) {
-                showNotificationModel(data.message || 'Lưu thành công', 'success', handleBackPrevPage);
+                showNotificationModel_Global(data.message || 'Lưu thành công', 'success', handleBackPrevPage);
             }
         } catch (error) {
-            showNotificationModel(error.message, 'error', handleBackPrevPage);
+            showNotificationModel_Global(error.message, 'error', handleBackPrevPage);
         }
     }
 

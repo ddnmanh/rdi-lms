@@ -151,7 +151,7 @@
     @include('admin.util')
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="shrink-0 w-[180px] h-screen bg-white dark:bg-gray-900 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700/60 overflow-hidden transition-all duration-300 z-40 flex flex-col">
+    <aside id="sidebar" class="shrink-0 w-[180px] 2xl:w-[230px] h-screen bg-white dark:bg-gray-900 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700/60 overflow-hidden transition-all duration-300 z-40 flex flex-col">
         <!-- Sidebar Header -->
         <div class="h-16 sidebar-item flex items-center px-4 flex-shrink-0">
             <a href="{{ route('admin.dashboard') }}"
@@ -310,8 +310,8 @@
                     <div class="relative">
                         <details class="group">
                             <summary class="list-none flex items-center gap-2.5 cursor-pointer select-none rounded-xl p-1.5 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20 transition-all duration-300 hover:scale-105">
-                                <div class="h-9 w-9 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                                    <img src="{{ optional(request()->user())->path_avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode(optional(request()->user())->name ?? 'A') }}" alt="Avatar" class="h-full w-full object-cover rounded-xl">
+                                <div class="group-hover:scale-110 transition-transform duration-300">
+                                    <img src="{{ optional(request()->user())->path_avatar }}" alt="Avatar" class="w-9 aspect-square rounded-full object-cover">
                                 </div>
                                 <i class="fas fa-caret-down text-xs text-gray-500 dark:text-gray-400 group-open:rotate-180 transition-transform duration-300"></i>
                             </summary>
@@ -331,7 +331,7 @@
                                         <i
                                             class="fas fa-chevron-right ml-auto text-xs opacity-0 group-hover/item:opacity-100 group-hover/item:translate-x-1 transition-all"></i>
                                     </a>
-                                    <button type="button" onclick="handleLogout(event)"
+                                    <button type="button" onclick="openVerifyLogoutModal(event)"
                                         class="w-full text-left flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 dark:hover:from-red-900/20 dark:hover:to-pink-900/20 transition-all duration-200">
                                         <i class="fas fa-sign-out-alt"></i>
                                         <span>Đăng xuất</span>
@@ -420,29 +420,43 @@
             }
         }
 
-        // Logout function
-        async function handleLogout(event) {
+        async function openVerifyLogoutModal(event) {
             event.preventDefault();
-            if (!confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-                return;
-            }
+            openLogoutModalGeneric_Global({ 
+                title: 'Xác nhận đăng xuất',
+                message: 'Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?',
+                deleteFuncCallback: () => handleLogout(),
+                successFuncCallback: () => handleGotoLoginPage(),
+                failFuncCallback: () => {}
+            });
+        }
 
+        function handleGotoLoginPage() {
+            window.location.href = '/admin/login';
+        }
+
+        // Logout function
+        async function handleLogout() { 
             try {
-                const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+                const response = await fetch(`/api/auth/logout`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
                     },
                     credentials: 'include'
-                });
-
-                // Dù có lỗi hay không, vẫn redirect về login
-                window.location.href = '/admin/login';
+                }); 
+                const data = await response.json();
+                console.log(data);
+                
+                if (data.success) { 
+                    return true;
+                } else { 
+                    return false;
+                }
             } catch (error) {
-                console.error('Logout error:', error);
-                // Vẫn redirect về login dù có lỗi
-                window.location.href = '/admin/login';
+                console.error('Logout error:', error); 
+                return false;
             }
         }
 

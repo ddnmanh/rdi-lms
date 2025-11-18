@@ -23,7 +23,7 @@ class UpdateRequest extends FormRequest
             'thumbnail_path' => 'nullable|string',
             'thumbnail_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'video_path' => 'nullable|string',
-            'video_file' => 'nullable|file|mimes:mp4,avi,mov,webm|max:460800', // 450MB
+            'video_file' => 'nullable|file|mimes:mp4,avi,mov,webm|max:10485760', // 10GB
             'duration' => 'required|integer|min:0',
             'display_order' => 'nullable|integer|min:0',
         ];
@@ -112,10 +112,10 @@ class UpdateRequest extends FormRequest
                         return;
                     }
 
-                    // Kiểm tra kích thước (max 460800 KB = 450MB)
+                    // Kiểm tra kích thước (max 10485760 KB = 10GB)
                     $sizeInKB = $value->getSize() / 1024;
-                    if ($sizeInKB > 460800) {
-                        $fail('Video không được vượt quá 460800 kilobytes (450MB).');
+                    if ($sizeInKB > 10485760) {
+                        $fail('Video không được vượt quá 10485760 kilobytes (10GB).');
                         return;
                     }
                 },

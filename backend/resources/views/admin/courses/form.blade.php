@@ -343,7 +343,7 @@
         // Hiển thị timezone của client
         const timezoneIndicator = document.getElementById('timezoneIndicator');
         if (timezoneIndicator) {
-            const clientTimezone = getClientTimezone();
+            const clientTimezone = getClientTimezone_Global();
             timezoneIndicator.textContent = `(Múi giờ: ${clientTimezone})`;
         }
 
@@ -411,12 +411,12 @@
         }
 
         if (!ALLOWED_TYPES.includes(file.type)) {
-            showNotificationModel('Định dạng không hỗ trợ. Hãy chọn ảnh PNG, JPG, WEBP hoặc GIF.', 'error');
+            showNotificationModel_Global('Định dạng không hỗ trợ. Hãy chọn ảnh PNG, JPG, WEBP hoặc GIF.', 'error');
             return;
         }
 
         if (file.size > MAX_SIZE) {
-            showNotificationModel('Ảnh quá lớn. Kích thước tối đa 2MB.', 'error');
+            showNotificationModel_Global('Ảnh quá lớn. Kích thước tối đa 2MB.', 'error');
             return;
         }
 
@@ -514,7 +514,7 @@
                 placeholderEl.classList.remove('hidden');
             }
         } catch (error) {
-            showNotificationModel('Không thể tải thông tin khóa học: ' + error.message, 'error', handleBackToPrevPage);
+            showNotificationModel_Global('Không thể tải thông tin khóa học: ' + error.message, 'error', handleBackToPrevPage);
         }
     }
 
@@ -551,13 +551,13 @@
                             <img src="${orphanedLesson.thumbnail}" alt="" class="w-[70px] aspect-video object-cover rounded-lg">
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml(orphanedLesson.title ?? 'Không có tên')}</h4>
+                            <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(orphanedLesson.title ?? 'Không có tên')}</h4>
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">ID: ${orphanedLesson.id ?? '-'}</p>
                         </div>
                     </div>
                     <div class="flex flex-row items-center gap-4">
                         <div class="hidden md:block ml-4 max-w-xs">
-                            <span class="text-xs text-gray-500 dark:text-gray-400 truncate block">${orphanedLesson.description ? escapeHtml(orphanedLesson.description.slice(0, 40) + (orphanedLesson.description.length > 40 ? '…' : '')) : ''}</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 truncate block">${orphanedLesson.description ? escapeHtml_Global(orphanedLesson.description.slice(0, 40) + (orphanedLesson.description.length > 40 ? '…' : '')) : ''}</span>
                         </div>
                         <div class="flex flex-row items-center gap-0.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer">
                             <i class="fa-solid fa-grip-vertical"></i>
@@ -570,7 +570,7 @@
             attachDragListeners(orphanedLessonsListBox, 'orphaned');
 
         } catch (error) {
-            showNotificationModel('Lỗi khi render các bài học: ' + error.message, 'error', handleBackToPrevPage);
+            showNotificationModel_Global('Lỗi khi render các bài học: ' + error.message, 'error', handleBackToPrevPage);
         }
     }
 
@@ -601,13 +601,13 @@
                             <img src="${parentedLesson.thumbnail}" alt="" class="w-[70px] aspect-video object-cover rounded-lg">
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml(parentedLesson.title ?? 'Không có tên')}</h4>
+                            <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(parentedLesson.title ?? 'Không có tên')}</h4>
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">ID: ${parentedLesson.id ?? '-'} | Thứ tự: ${parentedLesson.display_order ?? '-'}</p>
                         </div>
                     </div>
                     <div class="flex flex-row items-center gap-4">
                         <div class="hidden md:block ml-4 max-w-xs">
-                            <span class="text-xs text-gray-500 dark:text-gray-400 truncate block">${parentedLesson.description ? escapeHtml(parentedLesson.description.slice(0, 80) + (parentedLesson.description.length > 80 ? '…' : '')) : ''}</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 truncate block">${parentedLesson.description ? escapeHtml_Global(parentedLesson.description.slice(0, 80) + (parentedLesson.description.length > 80 ? '…' : '')) : ''}</span>
                         </div>
                         <div class="flex flex-row items-center gap-0.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer">
                             <i class="fa-solid fa-grip-vertical"></i>
@@ -620,7 +620,7 @@
             attachDragListeners(parentedLessonsListBox, 'parented');
 
         } catch (error) {
-            showNotificationModel('Lỗi khi render các bài học: ' + error.message, 'error', handleBackToPrevPage);
+            showNotificationModel_Global('Lỗi khi render các bài học: ' + error.message, 'error', handleBackToPrevPage);
         }
     }
 
@@ -636,11 +636,11 @@
             if (container) {
                 container.innerHTML = `
                     <div class="flex items-center justify-center h-full text-sm text-red-500 dark:text-red-400 text-center px-4">
-                        ${escapeHtml(error.message || 'Không thể tải danh sách sinh viên')}
+                        ${escapeHtml_Global(error.message || 'Không thể tải danh sách sinh viên')}
                     </div>
                 `;
             }
-            showNotificationModel('Không thể tải danh sách sinh viên: ' + (error.message || ''), 'error');
+            showNotificationModel_Global('Không thể tải danh sách sinh viên: ' + (error.message || ''), 'error');
         }
     }
 
@@ -740,8 +740,8 @@
                             <img src="${student.path_avatar}" alt="" class="w-full h-full object-cover">
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">${escapeHtml(student.fullname || student.email || 'Không có tên')}</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate">${escapeHtml(student.email || '')}</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(student.fullname || student.email || 'Không có tên')}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate">${escapeHtml_Global(student.email || '')}</p>
                         </div>
                     </div>
                 </label>
@@ -784,8 +784,8 @@
                             <img src="${student.path_avatar}" alt="" class="w-full h-full object-cover">
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">${escapeHtml(student.fullname || student.email || 'Không có tên')}</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate">${escapeHtml(student.email || '')}</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(student.fullname || student.email || 'Không có tên')}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate">${escapeHtml_Global(student.email || '')}</p>
                         </div>
                     </div>
                 </label>
@@ -905,7 +905,7 @@
         return fullname.includes(term) || email.includes(term);
     }
 
-    function escapeHtml(str) {
+    function escapeHtml_Global(str) {
         return String(str)
             .replaceAll('&', '&amp;')
             .replaceAll('<', '&lt;')
@@ -1345,7 +1345,7 @@
                 courseData = data.data;
             }
         } catch (error) {
-            showNotificationModel('Không thể tải thông tin khóa học: ' + error.message, 'error', handleBackToPrevPage);
+            showNotificationModel_Global('Không thể tải thông tin khóa học: ' + error.message, 'error', handleBackToPrevPage);
         }
     }
 
@@ -1357,7 +1357,7 @@
                 parentedLessonsList = [...data.data?.data];
             }
         } catch (error) {
-            showNotificationModel('Xảy ra lỗi khi lấy các bài học: ' + error.message, 'error', handleBackToPrevPage);
+            showNotificationModel_Global('Xảy ra lỗi khi lấy các bài học: ' + error.message, 'error', handleBackToPrevPage);
         }
     }
 
@@ -1369,7 +1369,7 @@
                 orphanedLessonsList = [...data.data?.data];
             }
         } catch (error) {
-            showNotificationModel('Xảy ra lỗi khi lấy các bài học: ' + error.message, 'error', handleBackToPrevPage);
+            showNotificationModel_Global('Xảy ra lỗi khi lấy các bài học: ' + error.message, 'error', handleBackToPrevPage);
         }
     }
 
@@ -1393,7 +1393,7 @@
 
         // Validation
         if (!title) {
-            showNotificationModel('Vui lòng nhập tiêu đề khóa học', 'error');
+            showNotificationModel_Global('Vui lòng nhập tiêu đề khóa học', 'error');
             if (submitBtn) {
                 submitBtn.disabled = false;
                 submitBtn.textContent = mode === 'CREATE_COURSE' ? 'Tạo' : 'Cập nhật';
@@ -1405,7 +1405,7 @@
             const start = new Date(startDate);
             const end = new Date(endDate);
             if (end < start) {
-                showNotificationModel('Ngày kết thúc phải sau ngày bắt đầu', 'error');
+                showNotificationModel_Global('Ngày kết thúc phải sau ngày bắt đầu', 'error');
                 if (submitBtn) {
                     submitBtn.disabled = false;
                     submitBtn.textContent = mode === 'CREATE_COURSE' ? 'Tạo' : 'Cập nhật';
@@ -1414,7 +1414,7 @@
             }
         }
 
-        const clientTimezone = getClientTimezone();
+        const clientTimezone = getClientTimezone_Global();
 
         try {
             let data;
@@ -1455,14 +1455,14 @@
                 }
                 await handleUpdateLessonsForCourse();
                 await handleUpdateStudentsForCourse();
-                showNotificationModel(mode == 'EDIT_COURSE' ? 'Cập nhật khóa học thành công' : 'Tạo khóa học thành công', 'success', handleBackToPrevPage);
+                showNotificationModel_Global(mode == 'EDIT_COURSE' ? 'Cập nhật khóa học thành công' : 'Tạo khóa học thành công', 'success', handleBackToPrevPage);
             }
         } catch (error) {
             if (submitBtn) {
                 submitBtn.disabled = false;
                 submitBtn.textContent = mode === 'CREATE_COURSE' ? 'Tạo' : 'Cập nhật';
             }
-            showNotificationModel(error.message || 'Thao tác thất bại', 'error', handleBackToPrevPage);
+            showNotificationModel_Global(error.message || 'Thao tác thất bại', 'error', handleBackToPrevPage);
         }
     }
 

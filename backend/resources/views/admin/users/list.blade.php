@@ -447,7 +447,7 @@
                         ${roleBadge}
                     </td>
                     <td class="${getCellClass('created_at')} text-gray-600 dark:text-gray-300">
-                        ${formatDate(user.created_at)}
+                        ${formatDate_Global(user.created_at)}
                     </td>
                     <td class="px-4 py-3 align-top">
                         <div class="flex flex-nowrap items-center justify-end gap-2 overflow-x-auto">
@@ -634,7 +634,7 @@
 
     // Xử lý khi xóa một mục
     async function openSingleDeleteModal(userId, userName, userEmail) {
-        openSingleDeleteModalGeneric({
+        openSingleDeleteModalGeneric_Global({
             objectName: OBJECTNAMEMODAL.USER,
             idDelete: userId,
             nameValue: userName || '-',
@@ -647,7 +647,7 @@
 
     // Xử lý khi xóa nhiều mục cùng lúc
     async function openBulkDeleteModal() {
-        openBulkDeleteModalGeneric({
+        openBulkDeleteModalGeneric_Global({
             arrayIds: Array.from(selectedUserIds),
             objectName: OBJECTNAMEMODAL.USER,
             deleteFuncCallback: () => handleDeleteUsers(Array.from(selectedUserIds)),

@@ -168,7 +168,7 @@
 
     document.addEventListener('DOMContentLoaded', async function () {
         if (!roleId) {
-            showNotificationModel('Không tìm thấy thông tin vai trò cần xem', 'error', handleBackToList);
+            showNotificationModel_Global('Không tìm thấy thông tin vai trò cần xem', 'error', handleBackToList);
             return;
         }
 
@@ -198,7 +198,7 @@
             renderRoleUsers(role.users || []);
             renderPermissionsTable(rolePermissions);
         } catch (error) {
-            showNotificationModel(error.message, 'error', handleBackToList);
+            showNotificationModel_Global(error.message, 'error', handleBackToList);
         }
     }
 
@@ -212,8 +212,8 @@
         document.getElementById('roleDescriptionHeading').textContent = description;
         document.getElementById('roleIdLabel').textContent = role.id ?? '-';
         document.getElementById('roleLevelLabel').textContent = level;
-        document.getElementById('roleCreatedAtLabel').textContent = formatDate(role.created_at);
-        document.getElementById('roleUpdatedAtLabel').textContent = formatDate(role.updated_at);
+        document.getElementById('roleCreatedAtLabel').textContent = formatDate_Global(role.created_at);
+        document.getElementById('roleUpdatedAtLabel').textContent = formatDate_Global(role.updated_at);
         document.getElementById('roleNameValue').textContent = name;
         document.getElementById('roleDescriptionValue').textContent = description;
         document.getElementById('roleLevelValue').textContent = level;
@@ -419,7 +419,7 @@
         return colors[index];
     }
 
-    function formatDate(dateString) {
+    function formatDate_Global(dateString) {
         if (!dateString) return '-';
         try {
             const date = new Date(dateString);

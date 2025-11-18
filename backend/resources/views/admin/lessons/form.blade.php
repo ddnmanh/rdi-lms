@@ -212,7 +212,7 @@
             }
         } catch (error) {
             console.log(error);
-            showNotificationModel('Không thể tải thông tin bài học: ' + error.message, 'error', handleBackToPrevPage);
+            showNotificationModel_Global('Không thể tải thông tin bài học: ' + error.message, 'error', handleBackToPrevPage);
         }
     }
 
@@ -291,12 +291,12 @@
         }
 
         if (!ALLOWED_TYPES.includes(file.type)) {
-            showNotificationModel('Định dạng không hỗ trợ. Hãy chọn ảnh PNG, JPG, WEBP hoặc GIF.', 'error');
+            showNotificationModel_Global('Định dạng không hỗ trợ. Hãy chọn ảnh PNG, JPG, WEBP hoặc GIF.', 'error');
             return;
         }
 
         if (file.size > MAX_SIZE) {
-            showNotificationModel('Ảnh quá lớn. Kích thước tối đa 2MB.', 'error');
+            showNotificationModel_Global('Ảnh quá lớn. Kích thước tối đa 2MB.', 'error');
             return;
         }
 
@@ -397,14 +397,14 @@
         }
 
         if (!ALLOWED_TYPES.includes(file.type)) {
-            showNotificationModel('Định dạng không hỗ trợ. Hãy chọn video MP4, AVI, MOV hoặc WEBM.', 'error');
+            showNotificationModel_Global('Định dạng không hỗ trợ. Hãy chọn video MP4, AVI, MOV hoặc WEBM.', 'error');
             return;
         }
 
-        if (file.size > MAX_SIZE) {
-            showNotificationModel('Video quá lớn. Kích thước tối đa 500MB.', 'error');
-            return;
-        }
+        // if (file.size > MAX_SIZE) {
+        //     showNotificationModel_Global('Video quá lớn. Kích thước tối đa 500MB.', 'error');
+        //     return;
+        // }
 
         videoFile = file;
         const clearBtn = document.getElementById('btnClearNewVideo');
@@ -662,7 +662,7 @@
         const videoFile = videoInput && videoInput.files && videoInput.files[0] ? videoInput.files[0] : null;
 
         if (!title) {
-            showNotificationModel('Vui lòng nhập tiêu đề bài học', 'error');
+            showNotificationModel_Global('Vui lòng nhập tiêu đề bài học', 'error');
             return;
         }
 
@@ -707,10 +707,10 @@
             }
 
             if (data.success) {
-                showNotificationModel(data.message || 'Lưu thành công', 'success', handleBackToPrevPage);
+                showNotificationModel_Global(data.message || 'Lưu thành công', 'success', handleBackToPrevPage);
             }
         } catch (error) {
-            showNotificationModel(error.message, 'error', handleBackToPrevPage);
+            showNotificationModel_Global(error.message, 'error', handleBackToPrevPage);
         }
     }
 

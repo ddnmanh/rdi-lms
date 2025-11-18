@@ -726,7 +726,7 @@
 
     // Xử lý khi xóa một mục
     async function openSingleDeleteModal(lessonId, lessonTitle, courseName) {
-        openSingleDeleteModalGeneric({
+        openSingleDeleteModalGeneric_Global({
             objectName: OBJECTNAMEMODAL.LESSON,
             idDelete: lessonId,
             nameValue: lessonTitle || '-',
@@ -739,7 +739,7 @@
 
     // Xử lý khi xóa nhiều mục cùng lúc
     async function openBulkDeleteModal() {
-        openBulkDeleteModalGeneric({
+        openBulkDeleteModalGeneric_Global({
             arrayIds: Array.from(selectedLessonIds),
             objectName: OBJECTNAMEMODAL.LESSON,
             deleteFuncCallback: () => handleDeleteLessons(Array.from(selectedLessonIds)),

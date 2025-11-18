@@ -527,10 +527,10 @@
                             ${course.description ? (course.description.substring(0, 75) + (course.description.length > 75 ? '...' : '')) : '-'}
                         </td>
                         <td class="${getCellClass('start_date')} text-gray-600 dark:text-gray-300">
-                            ${formatDate(course.start_date)}
+                            ${formatDate_Global(course.start_date)}
                         </td>
                         <td class="${getCellClass('end_date')} text-gray-600 dark:text-gray-300">
-                            ${formatDate(course.end_date)}
+                            ${formatDate_Global(course.end_date)}
                         </td>
                         <td class="${getCellClass('status')} text-center">
                             <span class="inline-flex items-center px-2.5 py-1 rounded-full font-medium ${statusClass}">
@@ -746,7 +746,7 @@
 
         // Xử lý khi xóa một mục
         async function openSingleDeleteModal(courseId, name, desc) {
-            openSingleDeleteModalGeneric({
+            openSingleDeleteModalGeneric_Global({
                 objectName: OBJECTNAMEMODAL.COURSE,
                 idDelete: courseId,
                 nameValue: name || '-',
@@ -759,7 +759,7 @@
 
         // Xử lý khi xóa nhiều mục cùng lúc
         async function openBulkDeleteModal() {
-            openBulkDeleteModalGeneric({
+            openBulkDeleteModalGeneric_Global({
                 arrayIds: Array.from(selectedCourseIds),
                 objectName: OBJECTNAMEMODAL.COURSE,
                 deleteFuncCallback: () => handleDeleteUsers(Array.from(selectedCourseIds)),

@@ -20,9 +20,9 @@
     RewriteRule ^ index.php [L]
 </IfModule>
 
-# Cấu hình upload file lớn (tối đa 450MB)
-php_value upload_max_filesize 450M
-php_value post_max_size 450M
-php_value max_execution_time 3600
-php_value max_input_time 3600
-php_value memory_limit 512M
+# Cấu hình upload file lớn (tối đa 10GB)
+php_value upload_max_filesize 10240M
+php_value post_max_size 10240M
+php_value max_execution_time 7200
+php_value max_input_time 7200
+php_value memory_limit 1024M

@@ -118,7 +118,7 @@
                 document.getElementById('courseDescription').textContent = courseData.description || '-';
             }
         } catch (error) {
-            showNotificationModel('Không thể tải thông tin khóa học: ' + error.message, 'error');
+            showNotificationModel_Global('Không thể tải thông tin khóa học: ' + error.message, 'error');
         }
     }
 
@@ -133,7 +133,7 @@
             document.getElementById('usersList').innerHTML = `
                 <div class="flex items-center justify-center py-12">
                     <div class="text-center">
-                        <p class="text-red-600 dark:text-red-400">${escapeHtml(error.message)}</p>
+                        <p class="text-red-600 dark:text-red-400">${escapeHtml_Global(error.message)}</p>
                     </div>
                 </div>
             `;
@@ -157,11 +157,11 @@
                 <div class="group flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 p-4 hover:bg-gray-100 dark:hover:bg-gray-800 mb-2">
                     <div class="flex items-center gap-4 flex-1 min-w-0">
                         <div class="h-10 w-10 flex-shrink-0 rounded-full bg-purple-600 grid place-items-center text-white text-sm font-semibold">
-                            ${escapeHtml(initial)}
+                            ${escapeHtml_Global(initial)}
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml(user.fullname || user.email || 'Không có tên')}</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">${escapeHtml(user.email || '')}</p>
+                            <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(user.fullname || user.email || 'Không có tên')}</h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">${escapeHtml_Global(user.email || '')}</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2 ml-4">
@@ -213,7 +213,7 @@
             } catch (error) {
                 document.getElementById('availableUsers').innerHTML = `
                     <div class="flex items-center justify-center py-8">
-                        <p class="text-sm text-red-600 dark:text-red-400">${escapeHtml(error.message)}</p>
+                        <p class="text-sm text-red-600 dark:text-red-400">${escapeHtml_Global(error.message)}</p>
                     </div>
                 `;
             }
@@ -250,11 +250,11 @@
                 <div class="flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 p-4 hover:bg-gray-100 dark:hover:bg-gray-800">
                     <div class="flex items-center gap-4 flex-1 min-w-0">
                         <div class="h-10 w-10 flex-shrink-0 rounded-full bg-purple-600 grid place-items-center text-white text-sm font-semibold">
-                            ${escapeHtml(initial)}
+                            ${escapeHtml_Global(initial)}
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml(user.fullname || user.email || 'Không có tên')}</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">${escapeHtml(user.email || '')}</p>
+                            <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(user.fullname || user.email || 'Không có tên')}</h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">${escapeHtml_Global(user.email || '')}</p>
                         </div>
                     </div>
                     <button onclick="addUser(${user.id})"
@@ -274,12 +274,12 @@
             });
 
             if (data?.success) {
-                showNotificationModel(data.message || 'Thêm học viên thành công', 'success');
+                showNotificationModel_Global(data.message || 'Thêm học viên thành công', 'success');
                 closeUserModal();
                 await loadCourseUsers();
             }
         } catch (error) {
-            showNotificationModel(error.message, 'error');
+            showNotificationModel_Global(error.message, 'error');
         }
     }
 
@@ -293,15 +293,15 @@
             });
 
             if (data?.success) {
-                showNotificationModel(data.message || 'Xóa học viên thành công', 'success');
+                showNotificationModel_Global(data.message || 'Xóa học viên thành công', 'success');
                 await loadCourseUsers();
             }
         } catch (error) {
-            showNotificationModel(error.message, 'error');
+            showNotificationModel_Global(error.message, 'error');
         }
     }
 
-    function escapeHtml(str) {
+    function escapeHtml_Global(str) {
         return String(str)
             .replaceAll('&', '&amp;')
             .replaceAll('<', '&lt;')

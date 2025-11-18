@@ -4,7 +4,7 @@
 @section('description', 'Xem thông tin chi tiết của khóa học')
 
 @section('content')
-<div class="w-full h-full flex flex-col overflow-hidde"> {{-- khung ngoài chiếm toàn bộ viewport, chặn tràn --}}
+<div class="w-full h-full flex flex-col overflow-hidden"> {{-- khung ngoài chiếm toàn bộ viewport, chặn tràn --}}
     {{-- Loading State (Flat Skeleton) --}}
     <div id="loadingState" class="flex-1 overflow-auto p-6 sm:p-8">
         <div class="w-fit mx-auto mt-[20dvh]">
@@ -112,7 +112,7 @@
                 </div>
 
                 {{-- Lessons --}}
-                <div class="tab-panel hidden h-full min-h-0 overflow-y-auto" data-tab-content="tab-lessons">
+                <div class="tab-panel hidden h-full flex flex-col items-stretch justify-start" data-tab-content="tab-lessons">
                     <div class="px-6 py-4 flex items-center justify-between gap-3 rounded-t-none">
                         <div class="flex items-center gap-3"></div>
                         <a id="manageLessonsButton" href="#"
@@ -257,13 +257,13 @@
                             <img src="${lesson.thumbnail_path}" alt="" class="w-[70px] aspect-video object-cover rounded-lg">
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml(lesson.title ?? 'Không có tên')}</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">ID: ${escapeHtml(String(lesson.id ?? '-'))} | Thứ tự: ${escapeHtml(String(lesson.display_order ?? '-'))}</p>
+                            <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(lesson.title ?? 'Không có tên')}</h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">ID: ${escapeHtml_Global(String(lesson.id ?? '-'))} | Thứ tự: ${escapeHtml_Global(String(lesson.display_order ?? '-'))}</p>
                         </div>
                     </div>
                     ${lesson.description ? `
                         <div class="hidden md:block ml-4 max-w-xs">
-                            <span class="text-xs text-gray-500 dark:text-gray-400 truncate block">${escapeHtml(String(lesson.description)).slice(0, 80)}${String(lesson.description).length > 80 ? '…' : ''}</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 truncate block">${escapeHtml_Global(String(lesson.description)).slice(0, 80)}${String(lesson.description).length > 80 ? '…' : ''}</span>
                         </div>` : ''
                     }
                 </div>
@@ -282,12 +282,12 @@
                             <img src="${user.path_avatar}" alt="" class="w-[50px] aspect-square object-cover">
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml(user.fullname || user.email || 'Không có tên')}</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">${escapeHtml(user.email || '')}</p>
+                            <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(user.fullname || user.email || 'Không có tên')}</h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">${escapeHtml_Global(user.email || '')}</p>
                         </div>
                     </div>
                     <div class="ml-4">
-                        <span class="text-xs text-gray-500 dark:text-gray-400">ID: ${escapeHtml(String(user.id ?? '-'))}</span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">ID: ${escapeHtml_Global(String(user.id ?? '-'))}</span>
                     </div>
                 </div>
             `).join('');
@@ -333,7 +333,7 @@
         }
     }
 
-    function escapeHtml(str) {
+    function escapeHtml_Global(str) {
         return String(str)
             .replaceAll('&', '&amp;')
             .replaceAll('<', '&lt;')

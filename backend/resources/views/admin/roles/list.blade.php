@@ -554,7 +554,7 @@
 
     // Xử lý khi xóa một mục
     async function openSingleDeleteModal(roleId, roleName, roleDescription) {
-        openSingleDeleteModalGeneric({
+        openSingleDeleteModalGeneric_Global({
             objectName: OBJECTNAMEMODAL.ROLE,
             idDelete: roleId,
             nameValue: roleName || '-',
@@ -567,7 +567,7 @@
 
     // Xử lý khi xóa nhiều mục cùng lúc
     async function openBulkDeleteModal() {
-        openBulkDeleteModalGeneric({
+        openBulkDeleteModalGeneric_Global({
             arrayIds: Array.from(selectedRoleIds),
             objectName: OBJECTNAMEMODAL.ROLE,
             deleteFuncCallback: () => handleDeleteRoles(Array.from(selectedRoleIds)),

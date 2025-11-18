@@ -184,7 +184,7 @@
                 renderRolesCheckboxes();
             }
         } catch (error) {
-            showNotificationModel('Không thể tải danh sách vai trò: ' + error.message, 'error');
+            showNotificationModel_Global('Không thể tải danh sách vai trò: ' + error.message, 'error');
         }
     }
 
@@ -242,7 +242,7 @@
                 renderRolesCheckboxes(userRoleIds);
             }
         } catch (error) {
-            showNotificationModel('Không thể tải thông tin người dùng: ' + error.message, 'error');
+            showNotificationModel_Global('Không thể tải thông tin người dùng: ' + error.message, 'error');
             setTimeout(() => {
                 window.location.href = '{{ route('admin.users.list') }}';
             }, 2000);
@@ -282,12 +282,12 @@
         }
 
         if (!ALLOWED_TYPES.includes(file.type)) {
-            showNotificationModel('Định dạng không hỗ trợ. Hãy chọn ảnh PNG, JPG, WEBP hoặc GIF.', 'error');
+            showNotificationModel_Global('Định dạng không hỗ trợ. Hãy chọn ảnh PNG, JPG, WEBP hoặc GIF.', 'error');
             return;
         }
 
         if (file.size > MAX_SIZE) {
-            showNotificationModel('Ảnh quá lớn. Kích thước tối đa 2MB.', 'error');
+            showNotificationModel_Global('Ảnh quá lớn. Kích thước tối đa 2MB.', 'error');
             return;
         }
 
@@ -385,7 +385,7 @@
 
         const roleCheckboxes = document.querySelectorAll('input[name="role_ids[]"]:checked');
         if (roleCheckboxes.length === 0) {
-            showNotificationModel('Vui lòng chọn ít nhất một vai trò', 'error');
+            showNotificationModel_Global('Vui lòng chọn ít nhất một vai trò', 'error');
             if (submitBtn) {
                 submitBtn.disabled = false;
                 submitBtn.textContent = mode === 'create' ? 'Tạo' : 'Cập nhật';
@@ -448,13 +448,13 @@
             }
 
             if (data.success) {
-                showNotificationModel(isEdit ? 'Cập nhật thông tin người dùng thành công' : 'Tạo người dùng thành công');
+                showNotificationModel_Global(isEdit ? 'Cập nhật thông tin người dùng thành công' : 'Tạo người dùng thành công');
                 setTimeout(() => {
                     handleBack();
                 }, 1500);
             }
         } catch (error) {
-            showNotificationModel(error.message || 'Thao tác thất bại', 'error');
+            showNotificationModel_Global(error.message || 'Thao tác thất bại', 'error');
             if (submitBtn) {
                 submitBtn.disabled = false;
                 submitBtn.textContent = mode === 'create' ? 'Tạo' : 'Cập nhật';

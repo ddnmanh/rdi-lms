@@ -130,8 +130,6 @@ class AuthController extends Controller
         try {
             $token = JWTAuth::getToken();
 
-            dd($token);
-
             // Revoke refresh token từ cookie hoặc request
             $refreshToken = $request->cookie('refresh_token') ?? $request->input('refresh_token');
             if ($refreshToken && $request->user()) {

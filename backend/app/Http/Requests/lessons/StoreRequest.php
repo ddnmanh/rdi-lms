@@ -22,7 +22,7 @@ class StoreRequest extends FormRequest
             'thumbnail_path' => 'nullable|string',
             'thumbnail_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'video_path' => 'nullable|string',
-            'video_file' => 'nullable|file|mimes:mp4,avi,mov,webm|max:460800', // 450MB
+            'video_file' => 'nullable|file|mimes:mp4,avi,mov,webm|max:10485760', // 10GB
             'duration' => 'nullable|integer|min:0',
             'display_order' => 'nullable|integer|min:0',
         ];

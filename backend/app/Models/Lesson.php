@@ -14,10 +14,12 @@ class Lesson extends Model
         'course_id',
         'title',
         'description',
-        'thumbnail',
+        'thumbnail_path',
         'duration',
-        'video_url',
+        'video_path',
         'display_order',
+        'created_by',
+        'deleted_by',
     ];
 
     protected $attributes = [
@@ -37,6 +39,16 @@ class Lesson extends Model
     public function views()
     {
         return $this->hasMany(LessonView::class);
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function deleter()
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
     }
 }
 

@@ -61,7 +61,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {{-- Avatar Section --}}
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-2">Ảnh đại diện</label>
+                    <label class="block ml-4 text-sm font-semibold text-blue-700 dark:text-gray-300 mb-2">Ảnh đại diện</label>
                     <div class="flex items-center gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900/40">
                         <div class="w-[150px] aspect-square rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
                             <img id="userAvatar" src="" alt="Avatar" class="h-full w-full object-cover hidden">
@@ -99,7 +99,7 @@
 
             {{-- Courses Section --}}
             <div>
-                <label class="block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-2">Khóa học</label>
+                <label class="block ml-4 text-sm font-semibold text-blue-700 dark:text-gray-300 mb-2">Khóa học</label>
                 <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                     <div class="p-6">
                         <div id="coursesList" class="space-y-2">

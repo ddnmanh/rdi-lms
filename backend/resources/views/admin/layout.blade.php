@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <link rel="stylesheet" href="{{ mix('css/app.css') }}" />
+    <link rel="stylesheet" href="{{ mix('css/layout.css') }}" />
+    <link rel="stylesheet" href="{{ mix('css/loading.css') }}" />
+    <link rel="stylesheet" href="{{ mix('css/table.css') }}" />
 
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 
@@ -53,13 +56,7 @@
             }
         }
 
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
-        }
-
+        // Tự động chuyển trạng thái sidebar khi gọi hàm
         function toggleSidebarCollapse() {
             const sidebar = document.getElementById('sidebar');
             const toggleBtn = document.getElementById('sidebarToggle');
@@ -77,6 +74,36 @@
                 details.forEach(detail => detail.removeAttribute('open'));
             }
         }
+
+        // Hàm chủ động chuyển trạng thái sidebar
+        function handleSidebarCollapse(status = 'EXPAND') { // 'COLLAPSE' | 'EXPAND'
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('sidebarToggle');
+
+            if ((status === 'COLLAPSE' && sidebarCollapsed) || (status === 'EXPAND' && !sidebarCollapsed)) {
+                return; // Không thay đổi gì
+            }
+
+            if (status === 'COLLAPSE') {
+                sidebarCollapsed = true;
+            } else if (status === 'EXPAND') {
+                sidebarCollapsed = false;
+            }
+
+            localStorage.setItem('sidebarCollapsed', sidebarCollapsed);
+            sidebar.classList.toggle('collapsed');
+            if (toggleBtn) {
+                toggleBtn.innerHTML = sidebarCollapsed ?
+                    '<i class="fas fa-chevron-right text-xl"></i>' :
+                    '<i class="fas fa-chevron-left text-xl"></i>';
+            }
+            // Đóng tất cả submenu khi sidebar collapsed
+            if (sidebarCollapsed) {
+                const details = sidebar.querySelectorAll('details');
+                details.forEach(detail => detail.removeAttribute('open'));
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             initSidebar();
             // Quick keyboard: Ctrl+B toggle collapse
@@ -99,236 +126,22 @@
                     }
                 });
             }
+
+            // Lắng nghe sự kiện resize để tự động collapse/expand sidebar
+            window.addEventListener('resize', () => {
+                const width = window.innerWidth;
+                if (width < 1580) {
+                    handleSidebarCollapse('COLLAPSE');
+                } else {
+                    handleSidebarCollapse('EXPAND');
+                }
+            });
         });
+
+
+        
+
     </script>
-
-    <style>
-        /* ===== Font Family ===== */
-        html,
-        body {
-            font-family: 'UTM Avo', sans-serif;
-        }
-
-        /* ===== Sidebar micro-interactions ===== */
-        #sidebar {
-            transition: width .3s cubic-bezier(.4, 0, .2, 1);
-        }
-
-        #sidebar.collapsed {
-            width: 60px;
-        }
-
-        #sidebar.collapsed .sidebar-text {
-            display: none;
-        }
-
-        #sidebar.collapsed .sidebar-group-label {
-            display: none;
-        }
-
-        #sidebar.collapsed .sidebar-item {
-            justify-content: center;
-            padding-left: 0;
-            padding-right: 0;
-        }
-
-        #sidebar.collapsed details summary .fa-chevron-down {
-            display: none;
-        }
-
-        #sidebar.collapsed details > div {
-            display: none !important;
-        }
-
-        #sidebar.collapsed details[open] {
-            pointer-events: none;
-        }
-
-        #sidebar.collapsed details summary {
-            pointer-events: auto;
-            cursor: default;
-        }
-
-        .sidebar-item {
-            position: relative;
-            transition: transform .3s cubic-bezier(.4, 0, .2, 1), background-color .3s ease, box-shadow .3s ease;
-        }
-
-        .sidebar-item:not(.active):hover {
-            transform: translateX(4px);
-        }
-
-        #sidebar.collapsed .sidebar-item:not(.active):hover {
-            transform: scale(1.08);
-        }
-
-        .sidebar-item.active {
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
-        }
-
-        .sidebar-text {
-            transition: opacity .3s ease;
-            white-space: nowrap;
-        }
-
-        .sidebar-tooltip {
-            display: none;
-            position: absolute;
-            left: calc(100% + 12px);
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(12px);
-            color: #111827;
-            padding: 10px 14px;
-            border-radius: 12px;
-            white-space: nowrap;
-            z-index: 1000;
-            font-size: 12px;
-            font-weight: 600;
-            pointer-events: none;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .dark .sidebar-tooltip {
-            background: rgba(31, 41, 55, 0.95);
-            color: #f3f4f6;
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .sidebar-tooltip::before {
-            content: '';
-            position: absolute;
-            right: 100%;
-            top: 50%;
-            transform: translateY(-50%);
-            border: 8px solid transparent;
-            border-right-color: rgba(255, 255, 255, 0.95);
-        }
-
-        .dark .sidebar-tooltip::before {
-            border-right-color: rgba(31, 41, 55, 0.95);
-        }
-
-        #sidebar.collapsed .sidebar-item:hover .sidebar-tooltip {
-            display: block;
-            animation: fadeInTooltip .18s ease;
-        }
-
-        @keyframes fadeInTooltip {
-            from {
-                opacity: 0;
-                transform: translateY(-50%) translateX(-8px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(-50%) translateX(0);
-            }
-        }
-
-        @media (max-width: 1023px) {
-            #sidebar.collapsed {
-                width: 256px;
-            }
-        }
-
-        /* Modern scrollbars */
-        *::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
-
-        *::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        *::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, rgba(99, 102, 241, 0.4), rgba(139, 92, 246, 0.4));
-            border-radius: 10px;
-            border: 2px solid transparent;
-            background-clip: padding-box;
-        }
-
-
-
-        *::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, rgba(99, 102, 241, 0.6), rgba(139, 92, 246, 0.6));
-            background-clip: padding-box;
-        }
-
-        .dark *::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, rgba(99, 102, 241, 0.5), rgba(139, 92, 246, 0.5));
-            background-clip: padding-box;
-        }
-
-        .dark *::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, rgba(99, 102, 241, 0.7), rgba(139, 92, 246, 0.7));
-            background-clip: padding-box;
-        }
-
-
-        html,
-        body,
-        main {
-            overflow-x: hidden;
-            max-width: 100%;
-            font-size: 12px;
-            color: #314158;
-        }
-
-        @media (min-width: 1536px) {
-            html,
-            body,
-            main {
-                font-size: 14px;
-            }
-        }
-
-    </style>
-
-    {{-- Dành cho các table --}}
-    <style>
-        /* Custom scrollbar overlay - đè lên header, không chiếm chỗ */
-        .table-scroll-container {
-            scrollbar-width: thin;
-            scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
-        }
-
-        /* Webkit browsers (Chrome, Safari, Edge) */
-        .table-scroll-container::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        .table-scroll-container::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .table-scroll-container::-webkit-scrollbar-thumb {
-            background-color: rgba(156, 163, 175, 0.5);
-            border-radius: 4px;
-            border: 2px solid transparent;
-            background-clip: padding-box;
-        }
-
-        .table-scroll-container::-webkit-scrollbar-thumb:hover {
-            background-color: rgba(156, 163, 175, 0.7);
-        }
-
-        /* Dark mode */
-        .dark .table-scroll-container {
-            scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
-        }
-
-        .dark .table-scroll-container::-webkit-scrollbar-thumb {
-            background-color: rgba(75, 85, 99, 0.5);
-        }
-
-        .dark .table-scroll-container::-webkit-scrollbar-thumb:hover {
-            background-color: rgba(75, 85, 99, 0.7);
-        }
-    </style>
 
     @stack('styles')
 </head>
@@ -338,7 +151,7 @@
     @include('admin.util')
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="w-64 h-screen bg-white dark:bg-gray-900 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700/60 overflow-hidden transition-all duration-300 z-40 lg:translate-x-0 -translate-x-full flex flex-col">
+    <aside id="sidebar" class="shrink-0 w-[180px] h-screen bg-white dark:bg-gray-900 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700/60 overflow-hidden transition-all duration-300 z-40 flex flex-col">
         <!-- Sidebar Header -->
         <div class="h-16 sidebar-item flex items-center px-4 flex-shrink-0">
             <a href="{{ route('admin.dashboard') }}"
@@ -455,13 +268,9 @@
         <div
             class="mt-auto border-t border-gray-200/60 dark:border-gray-700/60 flex-shrink-0 bg-gradient-to-t from-gray-50/50 to-transparent dark:from-gray-900/50">
             <!-- Toggle Buttons -->
-            <div class="p-3 flex items-center justify-center gap-2">
-                <button onclick="toggleSidebar()"
-                    class="lg:hidden flex items-center justify-center w-11 h-11 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20 transition-all duration-300 hover:scale-110">
-                    <i class="fas fa-bars text-lg"></i>
-                </button>
+            <div class="p-3 flex items-center justify-center gap-2"> 
                 <button id="sidebarToggle" onclick="toggleSidebarCollapse()"
-                    class="hidden lg:flex items-center justify-center w-11 h-11 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20 transition-all duration-300 hover:scale-110">
+                    class="flex items-center justify-center w-11 h-11 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20 transition-all duration-300 hover:scale-110">
                     <i class="fas fa-chevron-left text-lg"></i>
                 </button>
             </div>
@@ -539,12 +348,6 @@
         <main class="z-[100] h-[calc(100dvh-55px)] 2xl:h-[calc(100dvh-65px)] mt-[55px] 2xl:mt-[64px] p-2 md:p-6 transition-all duration-300 bg-gray-100 dark:bg-gray-900 overflow-y-auto">
             @yield('content')
         </main>
-    </div>
-
-
-    <!-- Overlay for mobile -->
-    <div id="overlay" onclick="toggleSidebar()"
-        class="fixed top-0 left-0 right-0 bottom-0 bg-black/50 backdrop-blur-sm z-30 lg:hidden hidden transition-opacity duration-300">
     </div>
 
     <script>

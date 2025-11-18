@@ -31,7 +31,7 @@
             <div class="flex flex-col lg:flex-row justify-start flex-wrap gap-4 flex-1">
                 {{-- Role Filter --}}
                 <div class="min-w-32 flex flex-col items-stretch justify-start gap-0.5">
-                    <label for="roleFilter" class="block  font-medium text-gray-300 dark:text-gray-300 ml-2">
+                    <label for="roleFilter" class="block ml-3 font-medium text-gray-300 dark:text-gray-300 ml-2">
                         Vai trò
                     </label>
                     <select id="roleFilter"
@@ -42,7 +42,7 @@
 
                 {{-- Name Filter --}}
                 <div class="flex-1 min-w-40 max-w-80 flex flex-col items-stretch justify-start gap-0.5">
-                    <label for="nameFilter" class="block  font-medium text-gray-300 dark:text-gray-300">
+                    <label for="nameFilter" class="block ml-3 font-medium text-gray-300 dark:text-gray-300">
                         Tên
                     </label>
                     <input type="text" id="nameFilter" placeholder="Tìm theo tên..."
@@ -52,7 +52,7 @@
 
                 {{-- Email Filter --}}
                 <div class="flex-1 min-w-40 max-w-80 flex flex-col items-stretch justify-start gap-0.5">
-                    <label for="emailFilter" class="block  font-medium text-gray-300 dark:text-gray-300">
+                    <label for="emailFilter" class="block ml-3 font-medium text-gray-300 dark:text-gray-300">
                         Email
                     </label>
                     <input type="text" id="emailFilter" placeholder="Tìm theo email..."
@@ -62,7 +62,7 @@
 
                 {{-- Created From Date --}}
                 <div class="flex flex-col items-stretch justify-start gap-0.5">
-                    <label for="createdFrom" class="block  font-medium text-gray-300 dark:text-gray-300">
+                    <label for="createdFrom" class="block ml-3 font-medium text-gray-300 dark:text-gray-300">
                         Ngày tạo
                     </label>
                     <div class="flex items-center gap-1">
@@ -435,7 +435,7 @@
                         <span class="text-gray-600 dark:text-gray-300">${user.id}</span>
                     </td>
                     <td class="px-4 py-3 align-center whitespace-normal break-words">
-                        <img src="${user.path_avatar ? user.path_avatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullname || user.email || 'User')}&background=3b82f6&color=fff&size=128`}" alt="Avatar" class="w-10 h-10 mx-auto rounded-sm">
+                        <img src="${user.path_avatar ?? ''}" alt="Avatar" class="m-auto w-10 aspect-square object-cover rounded-full">
                     </td>
                     <td class="${getCellClass('fullname')} text-gray-600 dark:text-gray-300">
                         ${user.fullname || '-'}

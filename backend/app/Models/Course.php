@@ -15,7 +15,9 @@ class Course extends Model
         'description',
         'start_date',
         'end_date',
-        'thumbnail',
+        'thumbnail_path',
+        'created_by',
+        'deleted_by',
     ];
 
     protected $casts = [
@@ -31,6 +33,16 @@ class Course extends Model
     public function users()
     {
         return $this->belongsToMany(User::class, 'course_user', 'course_id', 'user_id');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function deleter()
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
     }
 }
 

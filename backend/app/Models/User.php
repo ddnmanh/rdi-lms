@@ -181,4 +181,15 @@ class User extends Authenticatable implements JWTSubject
 
         return true;
     }
+
+    // Cần kiểm tra lại khi sử dụng
+    // public function creator()
+    // {
+    //     return $this->belongsTo(User::class, 'created_by');
+    // }
+
+    // public function deleter()
+    // {
+    //     return $this->belongsTo(User::class, 'deleted_by');
+    // }
 }

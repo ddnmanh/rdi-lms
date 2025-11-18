@@ -229,8 +229,8 @@
         // Hiển thị thumbnail
         const thumbnailEl = document.getElementById('courseThumbnail');
         if (thumbnailEl) {
-            if (course.thumbnail) {
-                thumbnailEl.src = course.thumbnail;
+            if (course.thumbnail_path) {
+                thumbnailEl.src = course.thumbnail_path;
                 thumbnailEl.classList.remove('hidden');
             } else {
                 thumbnailEl.classList.add('hidden');
@@ -254,7 +254,7 @@
                 <div class="group flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 p-4 hover:bg-gray-100 dark:hover:bg-gray-800">
                     <div class="flex items-center gap-4 flex-1 min-w-0">
                         <div class="flex-shrink-0 rounded-lg bg-gray-200 dark:bg-gray-700 grid place-items-center">
-                            <img src="${lesson.thumbnail}" alt="" class="w-[70px] aspect-video object-cover rounded-lg">
+                            <img src="${lesson.thumbnail_path}" alt="" class="w-[70px] aspect-video object-cover rounded-lg">
                         </div>
                         <div class="flex-1 min-w-0">
                             <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml(lesson.title ?? 'Không có tên')}</h4>

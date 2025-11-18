@@ -79,6 +79,13 @@ class AdminController extends Controller
     }
 
     /**
+     * Trang xem chi tiết role
+     */
+    public function showRole($id) {
+        return view('admin.roles.show', ['roleId' => $id]);
+    }
+
+    /**
      * Trang quản lý courses
      */
     public function courses()
@@ -139,7 +146,7 @@ class AdminController extends Controller
      */
     public function createLesson()
     {
-        return view('admin.lessons.form', ['mode' => 'create']);
+        return view('admin.lessons.form', ['mode' => "CREATE"]);
     }
 
     /**
@@ -155,7 +162,7 @@ class AdminController extends Controller
      */
     public function editLesson($id)
     {
-        return view('admin.lessons.form', ['mode' => 'edit', 'lessonId' => $id]);
+        return view('admin.lessons.form', ['mode' => 'EDIT', 'lessonId' => $id]);
     }
 
     /**

@@ -110,7 +110,7 @@
                 </div>
 
                 <div class="flex flex-col gap-0.5">
-                    <label for="video_url" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1 ml-3">Video URL *</label>
+                    <label for="video_url" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1 ml-3">Video Path *</label>
                     <input type="url" id="video_url" required
                         class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700/50 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 outline-none">
                 </div>
@@ -242,7 +242,7 @@
                 document.getElementById('description').value = lesson.description || '';
                 document.getElementById('duration').value = lesson.duration || '';
                 document.getElementById('display_order').value = lesson.display_order || '0';
-                document.getElementById('video_url').value = lesson.video_url || '';
+                document.getElementById('video_url').value = lesson.video_path || '';
                 document.getElementById('lessonModal').classList.remove('hidden');
                 document.getElementById('lessonModal').classList.add('flex');
             }
@@ -297,7 +297,7 @@
             title: title,
             description: description || null,
             duration: duration,
-            video_url: videoUrl,
+            video_path: videoUrl,
             display_order: displayOrder,
         };
 

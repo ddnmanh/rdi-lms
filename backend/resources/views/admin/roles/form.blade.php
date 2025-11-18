@@ -148,7 +148,7 @@
                 renderPermissionsCheckboxes([], permissionFilterText);
             }
         } catch (error) {
-            showNotificationModel('Không thể tải danh sách permissions: ' + error.message, 'error');
+            showNotificationModel('Không thể tải danh sách permissions: ' + error.message, 'error', handleBackPrevPage);
         }
     }
 
@@ -365,10 +365,7 @@
                 renderPermissionsCheckboxes(rolePermissionIds, permissionFilterText);
             }
         } catch (error) {
-            showNotificationModel('Không thể tải thông tin vai trò: ' + error.message, 'error');
-            // setTimeout(() => {
-            //     window.location.href = '{{ route('admin.roles.list') }}';
-            // }, 2000);
+            showNotificationModel('Không thể tải thông tin vai trò: ' + error.message, 'error', handleBackPrevPage); 
         }
     }
 
@@ -406,14 +403,15 @@
             }
 
             if (data.success) {
-                showNotificationModel(data.message || 'Lưu thành công', 'success');
-                // setTimeout(() => {
-                //     window.location.href = '{{ route('admin.roles.list') }}';
-                // }, 1000);
+                showNotificationModel(data.message || 'Lưu thành công', 'success', handleBackPrevPage);
             }
         } catch (error) {
-            showNotificationModel(error.message, 'error');
+            showNotificationModel(error.message, 'error', handleBackPrevPage);
         }
+    }
+
+    function handleBackPrevPage() {
+        window.location.href = '{{ route('admin.roles.list') }}';
     }
 </script>
 @endsection

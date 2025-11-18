@@ -29,7 +29,7 @@
                 <div class="flex flex-col lg:flex-row justify-start flex-wrap gap-4 flex-1">
                     {{-- Title Filter --}}
                     <div class="flex-1 min-w-40 max-w-80 flex flex-col items-stretch justify-start gap-0.5">
-                        <label for="titleFilter" class="block text-sm font-medium text-gray-300 dark:text-gray-300">
+                        <label for="titleFilter" class="block ml-3 text-sm font-medium text-gray-300 dark:text-gray-300">
                             Tiêu đề
                         </label>
                         <input type="text" id="titleFilter" placeholder="Tìm theo tiêu đề..."
@@ -39,7 +39,7 @@
                     {{-- Date Range Filter --}}
                     <div class="flex flex-col items-stretch justify-start gap-0.5">
                         <label for="dateRangeFilter"
-                            class="block text-sm font-medium text-gray-300 dark:text-gray-300 ml-2">
+                            class="block ml-3 text-sm font-medium text-gray-300 dark:text-gray-300 ml-2">
                             Trạng thái
                         </label>
                         <select id="dateRangeFilter"
@@ -53,7 +53,7 @@
 
                     {{-- Date From Filter --}}
                     <div class="flex flex-col items-stretch justify-start gap-0.5">
-                        <label for="startDateFrom" class="block text-sm font-medium text-gray-300 dark:text-gray-300">
+                        <label for="startDateFrom" class="block ml-3 text-sm font-medium text-gray-300 dark:text-gray-300">
                             Ngày bắt đầu
                         </label>
                         <div class="flex items-center gap-1">

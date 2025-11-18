@@ -1,0 +1,154 @@
+
+/* ===== Sidebar micro-interactions ===== */
+#sidebar {
+    transition: width .3s cubic-bezier(.4, 0, .2, 1);
+}
+
+#sidebar.collapsed {
+    width: 60px;
+}
+
+#sidebar.collapsed .sidebar-text {
+    display: none;
+}
+
+#sidebar.collapsed .sidebar-group-label {
+    display: none;
+}
+
+#sidebar.collapsed .sidebar-item {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#sidebar.collapsed details summary .fa-chevron-down {
+    display: none;
+}
+
+#sidebar.collapsed details>div {
+    display: none !important;
+}
+
+#sidebar.collapsed details[open] {
+    pointer-events: none;
+}
+
+#sidebar.collapsed details summary {
+    pointer-events: auto;
+    cursor: default;
+}
+
+.sidebar-item {
+    position: relative;
+    transition: transform .3s cubic-bezier(.4, 0, .2, 1), background-color .3s ease, box-shadow .3s ease;
+}
+
+.sidebar-item:not(.active):hover {
+    transform: translateX(4px);
+}
+
+#sidebar.collapsed .sidebar-item:not(.active):hover {
+    transform: scale(1.08);
+}
+
+.sidebar-item.active {
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.sidebar-text {
+    transition: opacity .3s ease;
+    white-space: nowrap;
+}
+
+.sidebar-tooltip {
+    display: none;
+    position: absolute;
+    left: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    color: #111827;
+    padding: 10px 14px;
+    border-radius: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+    font-size: 12px;
+    font-weight: 600;
+    pointer-events: none;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .sidebar-tooltip {
+    background: rgba(31, 41, 55, 0.95);
+    color: #f3f4f6;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-tooltip::before {
+    content: '';
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 8px solid transparent;
+    border-right-color: rgba(255, 255, 255, 0.95);
+}
+
+.dark .sidebar-tooltip::before {
+    border-right-color: rgba(31, 41, 55, 0.95);
+}
+
+#sidebar.collapsed .sidebar-item:hover .sidebar-tooltip {
+    display: block;
+    animation: fadeInTooltip .18s ease;
+}
+
+@keyframes fadeInTooltip {
+    from {
+        opacity: 0;
+        transform: translateY(-50%) translateX(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+    }
+}
+
+/* Modern scrollbars */
+*::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(99, 102, 241, 0.4), rgba(139, 92, 246, 0.4));
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+
+
+*::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(99, 102, 241, 0.6), rgba(139, 92, 246, 0.6));
+    background-clip: padding-box;
+}
+
+.dark *::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(99, 102, 241, 0.5), rgba(139, 92, 246, 0.5));
+    background-clip: padding-box;
+}
+
+.dark *::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(99, 102, 241, 0.7), rgba(139, 92, 246, 0.7));
+    background-clip: padding-box;
+}
+

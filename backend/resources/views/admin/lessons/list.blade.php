@@ -31,7 +31,7 @@
             <div class="flex flex-col lg:flex-row justify-start flex-wrap gap-4 flex-1">
                 {{-- Course Filter --}}
                 <div class="min-w-32 flex flex-col items-stretch justify-start gap-0.5">
-                    <label for="courseFilter" class="block text-sm font-medium text-gray-300 dark:text-gray-300 ml-2">
+                    <label for="courseFilter" class="block ml-3 text-sm font-medium text-gray-300 dark:text-gray-300 ml-2">
                         Khóa học
                     </label>
                     <select id="courseFilter"
@@ -42,7 +42,7 @@
 
                 {{-- Search Filter --}}
                 <div class="flex-1 min-w-40 max-w-80 flex flex-col items-stretch justify-start gap-0.5">
-                    <label for="searchFilter" class="block text-sm font-medium text-gray-300 dark:text-gray-300">
+                    <label for="searchFilter" class="block ml-3 text-sm font-medium text-gray-300 dark:text-gray-300">
                         Tìm kiếm
                     </label>
                     <input type="text" id="searchFilter" placeholder="Tìm theo tiêu đề, mô tả..."
@@ -51,7 +51,7 @@
 
                 {{-- Duration Range Filter --}}
                 <div class="flex flex-col items-stretch justify-start gap-0.5">
-                    <label for="durationMin" class="block text-sm font-medium text-gray-300 dark:text-gray-300">
+                    <label for="durationMin" class="block ml-3 text-sm font-medium text-gray-300 dark:text-gray-300">
                         Thời lượng từ (giây)
                     </label>
                     <div class="flex items-center gap-1">
@@ -448,7 +448,7 @@
                     </thead>
                     <tbody class="[&>tr:not(:first-child)>td]:border-t [&>tr:not(:first-child)>td]:border-gray-200 dark:[&>tr:not(:first-child)>td]:border-gray-700">
                         <tr>
-                            <td colspan="7" class="pt-40 text-center">
+                            <td colspan="9" class="pt-40 text-center">
                                 <div class="flex flex-col items-center justify-center">
                                     <div class="h-20 w-20 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center mb-4 shadow-lg">
                                         <i class="fas fa-inbox text-3xl text-gray-400 dark:text-gray-500"></i>
@@ -523,7 +523,7 @@
                         <span class="text-gray-600 dark:text-gray-300">${lesson.id}</span>
                     </td>
                     <td class="px-4 py-3 text-gray-600 dark:text-gray-300">
-                        <img src="${lesson.thumbnail}" alt="${lesson.title?.slice(0, 10) ?? 'Thumbnail'}" class="w-[60px] 2xl:w-[70px] aspect-video object-cover rounded-lg">
+                        <img src="${lesson.thumbnail_path}" alt="${lesson.title?.slice(0, 10) ?? 'Thumbnail'}" class="w-[60px] 2xl:w-[70px] aspect-video m-auto object-cover rounded-lg">
                     </td>
                     <td class="${getCellClass('title')} text-gray-600 dark:text-gray-300">
                         ${lesson.title || '-'}

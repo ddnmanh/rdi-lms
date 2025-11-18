@@ -66,17 +66,34 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                 {{-- Avatar Section --}}
-                <div class="md:col-span-2">
-                    <label class="block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-2">Thumbnail</label>
-                    <div class="flex items-center gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900/40">
-                        <div class="w-[300px] aspect-video rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
-                            <img id="userAvatar" src="" alt="Avatar" class="h-full w-full object-cover hidden">
-                            <svg id="avatarPlaceholder" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-8 w-8 text-gray-400">
-                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-3.33 0-10 1.67-10 5v1h20v-1c0-3.33-6.67-5-10-5z" />
-                            </svg>
+                <div class="md:col-span-2 flex flex-row items-stretch gap-4">
+                    <div class="flex-1">
+                        <label class="block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-2">Thumbnail</label>
+                        <div class="px-4 py-3 flex items-center gap-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900/40">
+                            <div class="w-full aspect-video rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
+                                <img id="userAvatar" src="" alt="Avatar" class="h-full w-full object-cover hidden">
+                                <svg id="avatarPlaceholder" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-8 w-8 text-gray-400">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-3.33 0-10 1.67-10 5v1h20v-1c0-3.33-6.67-5-10-5z" />
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                {{-- <div class="text-sm text-gray-600 dark:text-gray-300">Thumbnail của người dùng</div> --}}
+                            </div>
                         </div>
-                        <div class="flex-1">
-                            {{-- <div class="text-sm text-gray-600 dark:text-gray-300">Thumbnail của người dùng</div> --}}
+                    </div>
+                    <div class="flex-1">
+                        <label class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Video</label>
+                        <div class="px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40">
+                            <div id="videoContainer" class="w-full">
+                                <video id="lessonVideo" controls class="w-full aspect-video rounded-lg" style="display: none;">
+                                    <source id="videoSource" src="" type="video/mp4">
+                                    Trình duyệt của bạn không hỗ trợ video.
+                                </video>
+                                <a id="videoLink" href="#" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline" style="display: none;">
+                                    <i class="fas fa-external-link-alt mr-2"></i>
+                                    <span id="videoLinkText">Mở video trong tab mới</span>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -99,7 +116,7 @@
                 {!! $infoField('Khóa học', 'lessonCourse') !!}
                 {!! $infoField('Thời lượng', 'lessonDuration') !!}
                 {!! $infoField('Thứ tự hiển thị', 'lessonDisplayOrder') !!}
-                {!! $infoField('Video URL', 'lessonVideoUrl') !!}
+                {!! $infoField('Video Path', 'lessonVideoUrl') !!}
                 {!! $infoField('Ngày tạo', 'lessonCreatedAt') !!}
                 {!! $infoField('Ngày cập nhật', 'lessonUpdatedAt') !!}
             </div>
@@ -109,23 +126,6 @@
                 <label class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Mô tả</label>
                 <div class="px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                     <p class="lessonDescription text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">-</p>
-                </div>
-            </div>
-
-            {{-- Video Preview --}}
-            <div class="">
-                <label class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Video</label>
-                <div class="px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40">
-                    <div id="videoContainer" class="w-full">
-                        <video id="lessonVideo" controls class="w-full aspect-video rounded-lg" style="display: none;">
-                            <source id="videoSource" src="" type="video/mp4">
-                            Trình duyệt của bạn không hỗ trợ video.
-                        </video>
-                        <a id="videoLink" href="#" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline" style="display: none;">
-                            <i class="fas fa-external-link-alt mr-2"></i>
-                            <span id="videoLinkText">Mở video trong tab mới</span>
-                        </a>
-                    </div>
                 </div>
             </div>
         </div>
@@ -190,8 +190,8 @@
         // Set avatar preview
         const avatarEl = document.getElementById('userAvatar');
         const placeholderEl = document.getElementById('avatarPlaceholder');
-        if (lesson.thumbnail) {
-            avatarEl.src = lesson.thumbnail;
+        if (lesson.thumbnail_path) {
+            avatarEl.src = lesson.thumbnail_path;
             avatarEl.classList.remove('hidden');
             placeholderEl.classList.add('hidden');
         } else {
@@ -200,8 +200,6 @@
             avatarEl.classList.remove('hidden');
             placeholderEl.classList.add('hidden');
         }
-
-
 
         setText('lessonId', lesson.id);
         setText('lessonTitle', lesson.title || 'Chưa có tiêu đề');
@@ -234,8 +232,8 @@
         }
         setText('lessonDuration', durationText.trim() || '0 giây');
 
-        // // Video URL
-        const videoUrl = lesson.video_url || '';
+        // // Video Path
+        const videoUrl = lesson.video_path || '';
         setText('lessonVideoUrl', videoUrl || 'Chưa có video');
 
         // Video preview
@@ -243,6 +241,7 @@
         const videoElement = document.getElementById('lessonVideo');
         const videoSource = document.getElementById('videoSource');
         const videoLink = document.getElementById('videoLink');
+        
 
         if (videoUrl) {
             // Check if it's a direct video file
@@ -251,6 +250,8 @@
 
             if (isVideoFile) {
                 videoSource.src = videoUrl;
+                videoSource.type = getVideoMimeType(videoUrl);
+                videoElement.load();
                 videoElement.style.display = 'block';
                 videoLink.style.display = 'none';
             } else {
@@ -300,6 +301,20 @@
             .replaceAll('>', '&gt;')
             .replaceAll('"', '&quot;')
             .replaceAll("'", '&#039;');
+    }
+
+    function getVideoMimeType(url) {
+        const extension = url.split('?')[0].split('.').pop().toLowerCase();
+        const mimeTypes = {
+            mp4: 'video/mp4',
+            webm: 'video/webm',
+            ogg: 'video/ogg',
+            mov: 'video/quicktime',
+            avi: 'video/x-msvideo',
+            mpeg: 'video/mpeg'
+        };
+
+        return mimeTypes[extension] || 'video/mp4';
     }
 </script>
 @endsection

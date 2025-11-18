@@ -75,7 +75,7 @@ Route::prefix('auth')->group(function () {
         'group' => 'Xác thực',
         'name' => 'Refresh token',
         'description' => 'Làm mới access token'
-    ]);
+    ])->middleware('throttle:6,1'); // Giới hạn gọi 6 lần mỗi phút
 });
 
 // Protected routes - require authentication
@@ -121,11 +121,11 @@ Route::middleware('auth:api')->group(function () {
             'name' => 'Xóa Người dùng',
             'description' => 'Cho phép xóa n người dùng khỏi hệ thống'
         ]);
-        routeWithPermission('post', '/{id}/roles', [UserController::class, 'assignRoles'], [
-            'group' => 'Người dùng',
-            'name' => 'Gán vai trò cho Người dùng',
-            'description' => 'Cho phép gán hoặc thay đổi vai trò của người dùng'
-        ]);
+        // routeWithPermission('post', '/{id}/roles', [UserController::class, 'assignRoles'], [
+        //     'group' => 'Người dùng',
+        //     'name' => 'Gán vai trò cho Người dùng',
+        //     'description' => 'Cho phép gán hoặc thay đổi vai trò của người dùng'
+        // ]);
     });
 
     // Role Management (Admin) - yêu cầu permission
@@ -150,7 +150,7 @@ Route::middleware('auth:api')->group(function () {
             'name' => 'Cập nhật Vai trò',
             'description' => 'Cho phép cập nhật thông tin của vai trò'
         ]);
-        routeWithPermission('delete', '/{id}', [RoleController::class, 'destroy'], [
+        routeWithPermission('delete', '/', [RoleController::class, 'destroy'], [
             'group' => 'Vai trò',
             'name' => 'Xóa Vai trò',
             'description' => 'Cho phép xóa vai trò khỏi hệ thống'

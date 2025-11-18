@@ -1,34 +1,16 @@
 @extends('admin.layout')
 
-@section('title', $mode === 'create' ? 'Thêm bài học' : 'Chỉnh sửa bài học')
+@section('title', $mode === 'CREATE' ? 'Thêm bài học' : 'Chỉnh sửa bài học')
 
-@section('description', $mode === 'create' ? 'Thêm bài học mới vào hệ thống' : 'Chỉnh sửa thông tin bài học')
+@section('description', $mode === 'CREATE' ? 'Thêm bài học mới vào hệ thống' : 'Chỉnh sửa thông tin bài học')
 
 @section('content')
 <div class="h-full flex flex-col items-stretch justify-start gap-4 2xl:gap-6">
-    {{-- Top Bar / Breadcrumbs + Actions (Flat) --}}
-    {{-- <div class="sticky top-0 z-20">
-        <div class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-3 sm:px-4 py-2">
-            <div class="flex items-center justify-between gap-3">
-                <div class="flex items-center gap-2">
-                    <a href="{{ route('admin.lessons.list') }}"
-                       class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">
-                        <svg class="h-4 w-4 -ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                        </svg>
-                        <span>Quay lại</span>
-                    </a>
-                </div>
-                <div class="flex items-center gap-2">
-                </div>
-            </div>
-        </div>
-    </div> --}}
 
     {{-- Form Card --}}
     <form id="lessonForm" onsubmit="saveLesson(event)" class="w-full max-w-[1400px] mx-auto bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-        <input type="hidden" id="lessonId" value="{{ $mode === 'edit' ? ($lessonId ?? '') : '' }}">
-        <input type="hidden" id="path_thumbnail" value="">
+        <input type="hidden" id="lessonId" value="{{ $mode === 'EDIT' ? ($lessonId ?? '') : '' }}">
+        <input type="hidden" id="thumbnail_path" value="">
         <div class="flex flex-col gap-6">
 
             {{-- Thumbnail Upload Section --}}
@@ -40,9 +22,7 @@
                 >
                     <div class="w-[150px] aspect-video rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
                         <img id="thumbnailPreview" alt="thumbnail preview" class="h-full w-full object-cover hidden">
-                        <svg id="thumbnailPlaceholder" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-8 w-8 text-gray-400">
-                            <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
-                        </svg>
+                        <i id="thumbnailIconPlaceholder" class="fa-solid fa-image text-[20px] text-gray-400"></i>
                     </div>
 
                     <div class="flex-1">
@@ -77,32 +57,27 @@
                 </label>
                 <div class="flex items-center gap-2 mb-2">
                     <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="video_type" value="url" id="video_type_url" checked class="w-4 h-4 text-blue-600">
-                        <span class="text-sm text-gray-700 dark:text-gray-300">URL Video</span>
+                        <input type="radio" name="video_type" value="file" id="video_type_file" checked class="w-4 h-4 text-blue-600">
+                        <span class="text-sm text-gray-700 dark:text-gray-300">Video file</span>
                     </label>
                     <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="video_type" value="file" id="video_type_file" class="w-4 h-4 text-blue-600">
-                        <span class="text-sm text-gray-700 dark:text-gray-300">Upload File</span>
+                        <input type="radio" name="video_type" value="url" id="video_type_url" class="w-4 h-4 text-blue-600">
+                        <span class="text-sm text-gray-700 dark:text-gray-300">URL Video</span>
                     </label>
-                </div>
-
-                {{-- Video URL Input --}}
-                <div id="videoUrlSection" class="flex flex-col gap-2">
-                    <input type="url" id="video_url" placeholder="https://example.com/video.mp4"
-                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 ml-3">Đường dẫn đến video bài học</p>
                 </div>
 
                 {{-- Video File Upload --}}
-                <div id="videoFileSection" class="hidden">
+                <div id="videoFileSection">
                     <div
                         id="videoDropZone"
                         class="flex items-center gap-4 p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg"
                     >
-                        <div class="w-[150px] aspect-video rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-8 w-8 text-gray-400">
-                                <path d="M8 5v14l11-7z" />
-                            </svg>
+                        <div id="videoPreviewContainer" class="flex flex-col gap-2">
+                            <div class="relative w-[150px] aspect-video bg-gray-100 dark:bg-gray-900 rounded-lg overflow-hidden flex items-center justify-center">
+                                <video id="videoFilePreview" controls class="hidden w-full h-full object-cover bg-black"></video>
+                                <iframe id="videoUrlPreview" class="hidden w-full h-full" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+                                <i id="videoIconPlaceholder" class="fa-solid fa-video text-[20px] text-gray-400 dark:text-gray-400"></i>
+                            </div>
                         </div>
 
                         <div class="flex-1">
@@ -119,6 +94,7 @@
                                     Xóa video mới
                                 </button>
                                 <input
+                                    name="video_file"
                                     id="video_file"
                                     type="file"
                                     accept="video/*"
@@ -129,7 +105,17 @@
                             <div id="videoFileName" class="mt-2 text-sm text-gray-700 dark:text-gray-300 hidden"></div>
                         </div>
                     </div>
+
                 </div>
+
+                {{-- Video URL Input --}}
+                <div id="videoUrlSection" class="flex flex-col gap-2 hidden">
+                    <input type="url" id="video_url" placeholder="https://example.com/video.mp4"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 ml-3">Đường dẫn đến video bài học</p>
+                </div>
+
+
             </div>
 
             <div class="flex flex-col gap-0.5 hidden">
@@ -162,9 +148,9 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="flex flex-col gap-0.5">
                     <label for="duration" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">
-                        Thời lượng (giây) <span class="text-red-500">*</span>
+                        Thời lượng (giây)
                     </label>
-                    <input type="number" id="duration" min="1" required
+                    <input type="number" id="duration" min="0" value="0"
                         class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-3">Thời lượng bài học tính bằng giây</p>
                 </div>
@@ -197,90 +183,78 @@
 
 <script>
     const mode = '{{ $mode }}';
-    const lessonId = @if($mode === 'edit' && isset($lessonId)) {{ $lessonId }} @else null @endif;
-    let existingThumbnail = null;
+    const lessonId = @if($mode === 'EDIT' && isset($lessonId)) {{ $lessonId }} @else null @endif;
+    let lessonData = null;
     let thumbnailPreview = null;
     let videoFile = null;
+    let existingVideoSource = null;
+    let existingVideoIsExternal = false;
+    let videoPreviewObjectUrl = null;
     let isThumbnailDragActive = false;
     let isVideoDragActive = false;
 
     document.addEventListener('DOMContentLoaded', async function() {
-        await loadCourses();
-        if (mode === 'edit' && lessonId) {
-            await loadLessonData(lessonId);
+        if (mode === 'EDIT' && lessonId) {
+            lessonData = await loadLessonData(lessonId);
+            if (lessonData) {
+                await renderLesson(lessonData);
+            }
         }
         initThumbnailPreviewForm();
         initVideoUploadForm();
     });
 
-    async function loadCourses() {
-        try {
-            const data = await apiRequest('/courses?per_page=100');
-            if (data.success) {
-                const courses = data.data.data || [];
-                const courseSelect = document.getElementById('course_id');
-
-                // Clear existing options except first one
-                courseSelect.innerHTML = '<option value="">Chọn khóa học</option>';
-
-                courses.forEach(course => {
-                    const option = document.createElement('option');
-                    option.value = course.id;
-                    option.textContent = course.title;
-                    courseSelect.appendChild(option);
-                });
-            }
-        } catch (error) {
-            console.error('Error loading courses:', error);
-            showNotificationModel('Không thể tải danh sách khóa học: ' + error.message, 'error');
-        }
-    }
-
     async function loadLessonData(id) {
         try {
             const data = await apiRequest(`/lessons/${id}`);
             if (data.success) {
-                const lesson = data.data;
-                document.getElementById('course_id').value = lesson.course_id || '';
-                document.getElementById('title').value = lesson.title || '';
-                document.getElementById('description').value = lesson.description || '';
-                document.getElementById('duration').value = lesson.duration || '';
-                document.getElementById('display_order').value = lesson.display_order || 0;
-                document.getElementById('path_thumbnail').value = lesson.thumbnail || '';
-
-                // Set thumbnail preview
-                const thumbnailEl = document.getElementById('thumbnailPreview');
-                const thumbnailPlaceholderEl = document.getElementById('thumbnailPlaceholder');
-                if (lesson.thumbnail) {
-                    thumbnailEl.src = lesson.thumbnail;
-                    thumbnailEl.classList.remove('hidden');
-                    thumbnailPlaceholderEl.classList.add('hidden');
-                    existingThumbnail = lesson.thumbnail;
-                }
-
-                // Set video - check if it's a URL or file path
-                if (lesson.video_url) {
-                    // Check if it's a URL (starts with http:// or https://)
-                    if (lesson.video_url.startsWith('http://') || lesson.video_url.startsWith('https://')) {
-                        document.getElementById('video_type_url').checked = true;
-                        document.getElementById('video_url').value = lesson.video_url;
-                        document.getElementById('videoUrlSection').classList.remove('hidden');
-                        document.getElementById('videoFileSection').classList.add('hidden');
-                    } else {
-                        // It's a file path, show in file section
-                        document.getElementById('video_type_file').checked = true;
-                        document.getElementById('videoUrlSection').classList.add('hidden');
-                        document.getElementById('videoFileSection').classList.remove('hidden');
-                        document.getElementById('videoFileName').textContent = lesson.video_url.split('/').pop();
-                        document.getElementById('videoFileName').classList.remove('hidden');
-                    }
-                }
+                return data.data;
             }
         } catch (error) {
-            showNotificationModel('Không thể tải thông tin bài học: ' + error.message, 'error');
-            setTimeout(() => {
-                window.location.href = '{{ route('admin.lessons.list') }}';
-            }, 2000);
+            console.log(error);
+            showNotificationModel('Không thể tải thông tin bài học: ' + error.message, 'error', handleBackToPrevPage);
+        }
+    }
+
+    async function renderLesson() {
+        document.getElementById('course_id').value = lessonData.course_id || '';
+        document.getElementById('title').value = lessonData.title || '';
+        document.getElementById('description').value = lessonData.description || '';
+        document.getElementById('duration').value = lessonData.duration || 0;
+        document.getElementById('display_order').value = lessonData.display_order || 0;
+        document.getElementById('thumbnail_path').value = lessonData.thumbnail_path || '';
+
+        // Set thumbnail preview
+        const thumbnailEl = document.getElementById('thumbnailPreview');
+        const thumbnailIconPlaceholderEl = document.getElementById('thumbnailIconPlaceholder');
+        if (lessonData.thumbnail_path) {
+            thumbnailEl.src = lessonData.thumbnail_path;
+            thumbnailEl.classList.remove('hidden');
+            thumbnailIconPlaceholderEl.classList.add('hidden');
+        }
+
+        // Set video - check if it's a URL or file path
+        if (lessonData.video_path) {
+            // Check if it's a URL (starts with http:// or https://)
+            if (lessonData.video_path.startsWith('http://') || lessonData.video_path.startsWith('https://')) {
+                existingVideoIsExternal = true;
+                document.getElementById('video_type_url').checked = true;
+                document.getElementById('video_url').value = lessonData.video_path;
+                document.getElementById('videoUrlSection').classList.remove('hidden');
+                document.getElementById('videoFileSection').classList.add('hidden');
+                existingVideoSource = lessonData.video_path;
+                handleVideoUrlInput(true);
+            } else {
+                // It's a file path, show in file section
+                existingVideoIsExternal = false;
+                document.getElementById('video_type_file').checked = true;
+                document.getElementById('videoUrlSection').classList.add('hidden');
+                document.getElementById('videoFileSection').classList.remove('hidden');
+                document.getElementById('videoFileName').textContent = lessonData.video_path.split('/').pop();
+                document.getElementById('videoFileName').classList.remove('hidden');
+                existingVideoSource = lessonData.video_path;
+                showVideoFilePreview(lessonData.video_path);
+            }
         }
     }
 
@@ -298,12 +272,12 @@
 
         if (!file) {
             const thumbnailEl = document.getElementById('thumbnailPreview');
-            const placeholderEl = document.getElementById('thumbnailPlaceholder');
+            const placeholderEl = document.getElementById('thumbnailIconPlaceholder');
             const clearBtn = document.getElementById('btnClearNewThumbnail');
             const input = document.getElementById('thumbnail');
 
-            if (existingThumbnail) {
-                thumbnailEl.src = existingThumbnail;
+            if (lessonData?.thumbnail_path) {
+                thumbnailEl.src = lessonData?.thumbnail_path;
                 thumbnailEl.classList.remove('hidden');
                 placeholderEl.classList.add('hidden');
             } else {
@@ -330,7 +304,7 @@
         thumbnailPreview = previewUrl;
 
         const thumbnailEl = document.getElementById('thumbnailPreview');
-        const placeholderEl = document.getElementById('thumbnailPlaceholder');
+        const placeholderEl = document.getElementById('thumbnailIconPlaceholder');
         const clearBtn = document.getElementById('btnClearNewThumbnail');
 
         thumbnailEl.src = previewUrl;
@@ -345,9 +319,9 @@
         const clearBtn = document.getElementById('btnClearNewThumbnail');
 
         // Default preview for create mode
-        if (!existingThumbnail && mode === 'create') {
+        if (!lessonData?.thumbnail_path && mode === 'CREATE') {
             const thumbnailEl = document.getElementById('thumbnailPreview');
-            const placeholderEl = document.getElementById('thumbnailPlaceholder');
+            const placeholderEl = document.getElementById('thumbnailIconPlaceholder');
             thumbnailEl.classList.add('hidden');
             placeholderEl.classList.remove('hidden');
         }
@@ -402,6 +376,7 @@
     function handleVideoFile(file) {
         const MAX_SIZE = 500 * 1024 * 1024; // 500MB
         const ALLOWED_TYPES = ['video/mp4', 'video/avi', 'video/quicktime', 'video/webm', 'video/x-msvideo'];
+        const videoTypeUrlRadio = document.getElementById('video_type_url');
 
         if (!file) {
             const clearBtn = document.getElementById('btnClearNewVideo');
@@ -411,6 +386,13 @@
             fileNameEl.classList.add('hidden');
             if (input) input.value = '';
             videoFile = null;
+            if (!videoTypeUrlRadio || !videoTypeUrlRadio.checked) {
+                if (existingVideoSource && !existingVideoIsExternal) {
+                    showVideoFilePreview(existingVideoSource);
+                } else {
+                    resetVideoPreview();
+                }
+            }
             return;
         }
 
@@ -430,6 +412,144 @@
         clearBtn.classList.remove('hidden');
         fileNameEl.textContent = file.name;
         fileNameEl.classList.remove('hidden');
+        showVideoFilePreview(file, true);
+    }
+
+    function getYoutubeEmbedUrl(url) {
+        try {
+            const parsed = new URL(url);
+            const host = parsed.hostname.replace('www.', '');
+            let videoId = null;
+
+            if (host === 'youtu.be') {
+                videoId = parsed.pathname.replace('/', '');
+            } else if (host === 'youtube.com' || host.endsWith('.youtube.com')) {
+                videoId = parsed.searchParams.get('v');
+                if (!videoId && parsed.pathname.startsWith('/embed/')) {
+                    videoId = parsed.pathname.replace('/embed/', '');
+                }
+            }
+
+            return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    function isDirectVideoUrl(url) {
+        return /\.(mp4|mov|webm|ogg|m3u8)(\?.*)?$/i.test(url);
+    }
+
+    function getVideoPreviewElements() {
+        return {
+            container: document.getElementById('videoPreviewContainer'),
+            videoEl: document.getElementById('videoFilePreview'),
+            iframeEl: document.getElementById('videoUrlPreview'),
+            placeholder: document.getElementById('videoIconPlaceholder')
+        };
+    }
+
+    function resetVideoPreview() {
+        const { container, videoEl, iframeEl, placeholder } = getVideoPreviewElements();
+        if (!container || !videoEl || !iframeEl || !placeholder) return;
+
+        if (videoPreviewObjectUrl) {
+            try {
+                URL.revokeObjectURL(videoPreviewObjectUrl);
+            } catch (e) {
+                // noop
+            } finally {
+                videoPreviewObjectUrl = null;
+            }
+        }
+
+        videoEl.pause();
+        videoEl.removeAttribute('src');
+        videoEl.load();
+        iframeEl.src = '';
+
+        videoEl.classList.add('hidden');
+        iframeEl.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+        // container.classList.add('hidden');
+    }
+
+    function showVideoFilePreview(source, isBlobSource = false) {
+        const { container, videoEl, iframeEl, placeholder } = getVideoPreviewElements();
+        if (!container || !videoEl || !iframeEl || !placeholder) return;
+
+        if (videoPreviewObjectUrl) {
+            try {
+                URL.revokeObjectURL(videoPreviewObjectUrl);
+            } catch (e) {
+                // noop
+            } finally {
+                videoPreviewObjectUrl = null;
+            }
+        }
+
+        let finalSrc = source;
+        if (isBlobSource && source instanceof File) {
+            finalSrc = URL.createObjectURL(source);
+            videoPreviewObjectUrl = finalSrc;
+        }
+
+        // container.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+        iframeEl.classList.add('hidden');
+        videoEl.classList.remove('hidden');
+        videoEl.src = finalSrc;
+        videoEl.load();
+    }
+
+    function showVideoUrlPreview(url) {
+        const { container, videoEl, iframeEl, placeholder } = getVideoPreviewElements();
+        if (!container || !videoEl || !iframeEl || !placeholder) return;
+
+        if (videoPreviewObjectUrl) {
+            try {
+                URL.revokeObjectURL(videoPreviewObjectUrl);
+            } catch (e) {
+                // noop
+            } finally {
+                videoPreviewObjectUrl = null;
+            }
+        }
+
+        // container.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+        videoEl.classList.add('hidden');
+        iframeEl.classList.remove('hidden');
+        iframeEl.src = url;
+    }
+
+    function handleVideoUrlInput(force = false) {
+        const videoTypeUrlRadio = document.getElementById('video_type_url');
+        if (!videoTypeUrlRadio || (!videoTypeUrlRadio.checked && !force)) {
+            return;
+        }
+
+        const videoUrlInput = document.getElementById('video_url');
+        if (!videoUrlInput) return;
+
+        const url = videoUrlInput.value.trim();
+        if (!url) {
+            resetVideoPreview();
+            return;
+        }
+
+        const youtubeEmbedUrl = getYoutubeEmbedUrl(url);
+        if (youtubeEmbedUrl) {
+            showVideoUrlPreview(youtubeEmbedUrl);
+            return;
+        }
+
+        if (isDirectVideoUrl(url) || (!url.startsWith('http://') && !url.startsWith('https://'))) {
+            showVideoFilePreview(url);
+            return;
+        }
+
+        showVideoUrlPreview(url);
     }
 
     function initVideoUploadForm() {
@@ -450,6 +570,7 @@
                     videoFileSection.classList.add('hidden');
                     videoUrlInput.required = true;
                     if (input) input.required = false;
+                    handleVideoUrlInput(true);
                 }
             });
         }
@@ -461,6 +582,13 @@
                     videoFileSection.classList.remove('hidden');
                     videoUrlInput.required = false;
                     if (input) input.required = true;
+                    if (videoFile) {
+                        showVideoFilePreview(videoFile, true);
+                    } else if (existingVideoSource && !existingVideoIsExternal) {
+                        showVideoFilePreview(existingVideoSource);
+                    } else {
+                        resetVideoPreview();
+                    }
                 }
             });
         }
@@ -510,47 +638,31 @@
                 handleVideoFile(null);
             });
         }
+
+        if (videoUrlInput) {
+            videoUrlInput.addEventListener('input', () => handleVideoUrlInput());
+            videoUrlInput.addEventListener('change', () => handleVideoUrlInput());
+            videoUrlInput.addEventListener('blur', () => handleVideoUrlInput());
+        }
     }
 
     async function saveLesson(event) {
         event.preventDefault();
         const lessonIdValue = document.getElementById('lessonId').value;
-        // const courseId = document.getElementById('course_id').value;
         const title = document.getElementById('title').value.trim();
         const description = document.getElementById('description').value.trim();
         const duration = document.getElementById('duration').value;
         const displayOrder = document.getElementById('display_order').value || 0;
-        const pathThumbnail = document.getElementById('path_thumbnail').value || null;
+        const pathThumbnail = document.getElementById('thumbnail_path').value || null;
         const thumbnailInput = document.getElementById('thumbnail');
         const thumbnailFile = thumbnailInput && thumbnailInput.files && thumbnailInput.files[0] ? thumbnailInput.files[0] : null;
-        const videoTypeUrl = document.getElementById('video_type_url').checked;
-        const videoUrl = videoTypeUrl ? document.getElementById('video_url').value.trim() : '';
+        const isChoiceVideoUrl = document.getElementById('video_type_url').checked;
+        const videoUrl = isChoiceVideoUrl ? document.getElementById('video_url').value.trim() : '';
         const videoInput = document.getElementById('video_file');
         const videoFile = videoInput && videoInput.files && videoInput.files[0] ? videoInput.files[0] : null;
 
-        // Validation
-        // if (!courseId) {
-        //     showNotificationModel('Vui lòng chọn khóa học', 'error');
-        //     return;
-        // }
-
         if (!title) {
             showNotificationModel('Vui lòng nhập tiêu đề bài học', 'error');
-            return;
-        }
-
-        if (!duration || parseInt(duration) < 1) {
-            showNotificationModel('Vui lòng nhập thời lượng hợp lệ (ít nhất 1 giây)', 'error');
-            return;
-        }
-
-        if (videoTypeUrl && !videoUrl) {
-            showNotificationModel('Vui lòng nhập URL video', 'error');
-            return;
-        }
-
-        if (!videoTypeUrl && !videoFile) {
-            showNotificationModel('Vui lòng chọn file video', 'error');
             return;
         }
 
@@ -558,61 +670,40 @@
         const url = isEdit ? `/lessons/${lessonIdValue}` : '/lessons';
 
         try {
-            let data;
-            // Use multipart/form-data when file is selected or existing thumbnail
-            if (thumbnailFile || videoFile || existingThumbnail) {
-                const fd = new FormData();
-                // Laravel/Symfony không parse multipart cho PUT/PATCH -> dùng POST + _method
-                if (isEdit) {
-                    fd.append('_method', 'PUT');
-                }
-                // fd.append('course_id', parseInt(courseId) ? parseInt(courseId) : null);
-                fd.append('title', title);
-                if (description) fd.append('description', description);
-                fd.append('duration', parseInt(duration));
-                fd.append('display_order', parseInt(displayOrder) || 0);
+            const fd = new FormData();
+            // Laravel/Symfony không parse multipart cho PUT/PATCH -> dùng POST + _method
+            if (isEdit) {
+                fd.append('_method', 'PUT');
+            }
+            fd.append('title', title || '');
+            fd.append('description', description || '');
+            fd.append('duration', parseInt(duration) || 0);
+            fd.append('display_order', parseInt(displayOrder) || 0);
 
-                if (existingThumbnail) fd.append('existingThumbnail', existingThumbnail);
-                if (pathThumbnail) fd.append('path_thumbnail', pathThumbnail);
-                if (thumbnailFile) fd.append('thumbnail', thumbnailFile);
+            fd.append('thumbnail_path', lessonData?.thumbnail_path || '');
+            if (thumbnailFile) {
+                fd.append('thumbnail_file', thumbnailFile);
+            }
 
-                if (videoTypeUrl) {
-                    fd.append('video_url', videoUrl);
-                } else if (videoFile) {
-                    fd.append('video', videoFile);
-                }
-
-                const response = await fetch(`/api${url}`, {
-                    method: 'POST',
-                    body: fd,
-                    credentials: 'include',
-                    headers: {
-                        'Accept': 'application/json'
-                        // DO NOT set Content-Type here; browser will set with boundary
-                    }
-                });
-                const json = await response.json();
-                if (!response.ok) {
-                    throw new Error(json.message || 'Có lỗi xảy ra');
-                }
-                data = json;
+            // Nếu chọn URL video
+            if (isChoiceVideoUrl) {
+                fd.append('video_path', document.getElementById('video_url')?.value?.trim());
             } else {
-                // Fallback to JSON request when no file selected
-                const payload = {
-                    // course_id: parseInt(courseId),
-                    title: title,
-                    description: description || null,
-                    duration: parseInt(duration),
-                    display_order: parseInt(displayOrder) || 0,
-                };
-                if (videoTypeUrl) {
-                    payload.video_url = videoUrl;
-                }
+                fd.append('video_path', lessonData?.video_path);
+                fd.append('video_file', videoFile);
+            } 
 
-                data = await apiRequest(url, {
-                    method: isEdit ? 'PUT' : 'POST',
-                    body: JSON.stringify(payload)
-                });
+            const response = await fetch(`/api${url}`, {
+                method: 'POST',
+                body: fd,
+                credentials: 'include',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'Có lỗi xảy ra');
             }
 
             if (data.success) {

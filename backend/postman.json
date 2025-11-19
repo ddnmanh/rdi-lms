@@ -300,7 +300,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"email\": \"student@example.com\",\n  \"password\": \"password123\",\n  \"fullname\": \"Sinh Viên A\",\n  \"birthday\": \"2000-01-01\",\n  \"path_avatar\": \"/storage/avatars/avatar.jpg\",\n  \"role_ids\": [2]\n}"
+                            "raw": "{\n  \"email\": \"student@example.com\",\n  \"password\": \"password123\",\n  \"fullname\": \"Sinh Viên A\",\n  \"birthday\": \"2000-01-01\",\n  \"avatar_path\": \"/storage/avatars/avatar.jpg\",\n  \"role_ids\": [2]\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/api/users",
@@ -433,7 +433,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"email\": \"student@example.com\",\n  \"password\": \"newpassword123\",\n  \"fullname\": \"Sinh Viên A Updated\",\n  \"birthday\": \"2000-01-01\",\n  \"path_avatar\": \"/storage/avatars/avatar.jpg\",\n  \"role_ids\": [2]\n}"
+                            "raw": "{\n  \"email\": \"student@example.com\",\n  \"password\": \"newpassword123\",\n  \"fullname\": \"Sinh Viên A Updated\",\n  \"birthday\": \"2000-01-01\",\n  \"avatar_path\": \"/storage/avatars/avatar.jpg\",\n  \"role_ids\": [2]\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/api/users/:id",

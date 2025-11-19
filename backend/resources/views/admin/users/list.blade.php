@@ -40,25 +40,28 @@
                     </select>
                 </div>
 
-                {{-- Name Filter --}}
-                <div class="flex-1 min-w-40 max-w-80 flex flex-col items-stretch justify-start gap-0.5">
-                    <label for="nameFilter" class="block ml-3 font-medium text-gray-300 dark:text-gray-300">
-                        Tên
-                    </label>
-                    <input type="text" id="nameFilter" placeholder="Tìm theo tên..."
-                        {{-- onkeyup="debounceLoadUsers()" --}}
-                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                <div class="min-w-[500px] flex flex-wrap items-stretch justify-start gap-4">
+                    {{-- Name Filter --}}
+                    <div class="flex-1 flex flex-col items-stretch justify-start gap-0.5">
+                        <label for="nameFilter" class="block ml-3 font-medium text-gray-300 dark:text-gray-300">
+                            Tên
+                        </label>
+                        <input type="text" id="nameFilter" placeholder="Tìm theo tên..."
+                            {{-- onkeyup="debounceLoadUsers()" --}}
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                    </div>
+    
+                    {{-- Email Filter --}}
+                    <div class="flex-1 flex flex-col items-stretch justify-start gap-0.5">
+                        <label for="emailFilter" class="block ml-3 font-medium text-gray-300 dark:text-gray-300">
+                            Email
+                        </label>
+                        <input type="text" id="emailFilter" placeholder="Tìm theo email..."
+                            {{-- onkeyup="debounceLoadUsers()" --}}
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                    </div>
                 </div>
 
-                {{-- Email Filter --}}
-                <div class="flex-1 min-w-40 max-w-80 flex flex-col items-stretch justify-start gap-0.5">
-                    <label for="emailFilter" class="block ml-3 font-medium text-gray-300 dark:text-gray-300">
-                        Email
-                    </label>
-                    <input type="text" id="emailFilter" placeholder="Tìm theo email..."
-                        {{-- onkeyup="debounceLoadUsers()" --}}
-                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                </div>
 
                 {{-- Created From Date --}}
                 <div class="flex flex-col items-stretch justify-start gap-0.5">
@@ -136,8 +139,7 @@
     let selectedUserIds = new Set();
 
     document.addEventListener('DOMContentLoaded', async function() {
-        await loadRoles();
-        await loadUsers();
+        await Promise.all([loadRoles(), loadUsers()]);
 
         // Ngăn chặn hành động mặc định của form khi nhấn enter ở các input
         const filterInputs = ['nameFilter', 'emailFilter', 'createdFrom', 'createdTo', 'roleFilter'];
@@ -435,7 +437,7 @@
                         <span class="text-gray-600 dark:text-gray-300">${user.id}</span>
                     </td>
                     <td class="px-4 py-3 align-center whitespace-normal break-words">
-                        <img src="${user.path_avatar ?? ''}" alt="Avatar" class="m-auto w-10 aspect-square object-cover rounded-full">
+                        <img src="${user.avatar_path ?? ''}" alt="Avatar" class="m-auto w-10 aspect-square object-cover rounded-full">
                     </td>
                     <td class="${getCellClass('fullname')} text-gray-600 dark:text-gray-300">
                         ${user.fullname || '-'}

@@ -120,3 +120,23 @@ Giới hạn validation: **10485760 KB = 10GB**
 - Tăng `max_execution_time` và `max_input_time`
 - Tăng timeout của web server
 
+## 8. Upload bất đồng bộ cho video bài học
+
+Phiên bản mới bổ sung cơ chế upload nền dành riêng cho video bài học dung lượng lớn (>1GB). Thay vì giữ người dùng trên cùng trang trong nhiều giờ, frontend có thể làm việc với các API riêng cho `lesson-video-uploads`:
+
+- `POST /api/lesson-video-uploads/sessions`: tạo phiên upload, backend trả về `upload_id`, `chunk_size`, `total_chunks`. Frontend có thể lưu `upload_id` trong IndexedDB để resume sau khi reload.
+- `POST /api/lesson-video-uploads/{upload_id}/chunks`: gửi từng chunk (mặc định 50MB). Chunk được ghi tạm tại `storage/app/lesson-video-uploads/<uuid>/000001.part`, đảm bảo nối tiếp sau này.
+- `POST /api/lesson-video-uploads/{upload_id}/complete`: khi đã gửi đủ chunk, gọi API này để đẩy Job `ProcessLessonVideoUpload` vào queue, ghép chunk -> `public/lesson/videos/*.mp4` rồi cập nhật `lessons.video_path`.
+- `GET /api/lesson-video-uploads/{upload_id}`: polling tiến độ (đang upload, đang ghép, đã xong, lỗi).
+- `DELETE /api/lesson-video-uploads/{upload_id}`: hủy phiên và dọn dữ liệu tạm.
+
+### Yêu cầu chạy queue worker
+
+Job ghép chunk chỉ chạy khi có worker:
+
+```bash
+php artisan queue:work
+```
+
+Triển khai production nên sử dụng Supervisor/PM2 để đảm bảo worker luôn chạy (xem thêm `config/queue.php`). Nếu worker dừng, file vẫn nằm trong thư mục tạm và có thể resume sau khi worker hoạt động lại.
+

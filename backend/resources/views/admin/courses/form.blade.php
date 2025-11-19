@@ -504,9 +504,9 @@
             // Load thumbnail
             const thumbnailEl = document.getElementById('thumbnailPreview');
             const placeholderEl = document.getElementById('thumbnailPlaceholder');
-            if (courseData.thumbnail) {
-                existingThumbnail = courseData.thumbnail;
-                thumbnailEl.src = courseData.thumbnail;
+            if (courseData.thumbnail_path) {
+                existingThumbnail = courseData.thumbnail_path;
+                thumbnailEl.src = courseData.thumbnail_path;
                 thumbnailEl.classList.remove('hidden');
                 placeholderEl.classList.add('hidden');
             } else {
@@ -548,7 +548,7 @@
                 >
                     <div class="flex items-center gap-4 flex-1 min-w-0">
                         <div class="flex-shrink-0 rounded-lg bg-gray-200 dark:bg-gray-700 grid place-items-center">
-                            <img src="${orphanedLesson.thumbnail}" alt="" class="w-[70px] aspect-video object-cover rounded-lg">
+                            <img src="${orphanedLesson.thumbnail_path}" alt="" class="w-[70px] aspect-video object-cover rounded-lg">
                         </div>
                         <div class="flex-1 min-w-0">
                             <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(orphanedLesson.title ?? 'Không có tên')}</h4>
@@ -598,7 +598,7 @@
                 >
                     <div class="flex items-center gap-4 flex-1 min-w-0">
                         <div class="flex-shrink-0 rounded-lg bg-gray-200 dark:bg-gray-700 grid place-items-center">
-                            <img src="${parentedLesson.thumbnail}" alt="" class="w-[70px] aspect-video object-cover rounded-lg">
+                            <img src="${parentedLesson.thumbnail_path}" alt="" class="w-[70px] aspect-video object-cover rounded-lg">
                         </div>
                         <div class="flex-1 min-w-0">
                             <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(parentedLesson.title ?? 'Không có tên')}</h4>
@@ -700,7 +700,7 @@
             id,
             fullname: raw.fullname || raw.name || '',
             email: raw.email || '',
-            avatar: raw.path_avatar || raw.avatar || raw.avatar_url || '',
+            avatar_path: raw.avatar_path || raw.avatar || raw.avatar_url || '',
             phone: raw.phone || raw.phone_number || ''
         };
     }
@@ -737,7 +737,7 @@
                     >
                     <div class="flex items-center gap-3 flex-1 min-w-0">
                         <div class="h-9 w-9 overflow-hidden flex-shrink-0 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300 grid place-items-center text-sm font-semibold uppercase">
-                            <img src="${student.path_avatar}" alt="" class="w-full h-full object-cover">
+                            <img src="${student.avatar_path}" alt="" class="w-full h-full object-cover">
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(student.fullname || student.email || 'Không có tên')}</p>
@@ -781,7 +781,7 @@
                     >
                     <div class="flex items-center gap-3 flex-1 min-w-0">
                         <div class="h-9 w-9 overflow-hidden flex-shrink-0 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300 grid place-items-center text-sm font-semibold uppercase">
-                            <img src="${student.path_avatar}" alt="" class="w-full h-full object-cover">
+                            <img src="${student.avatar_path}" alt="" class="w-full h-full object-cover">
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(student.fullname || student.email || 'Không có tên')}</p>

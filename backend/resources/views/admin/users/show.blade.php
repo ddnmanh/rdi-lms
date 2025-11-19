@@ -214,7 +214,7 @@
 
         // Set avatar preview
         const avatarEl = document.getElementById('userAvatar');
-        avatarEl.src = userData.path_avatar || '';  
+        avatarEl.src = userData.avatar_path || '';  
     } 
 
     function renderCourses() {

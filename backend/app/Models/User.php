@@ -20,7 +20,7 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'fullname',
         'birthday',
-        'path_avatar',
+        'avatar_path',
     ];
 
     protected $hidden = [
@@ -90,7 +90,7 @@ class User extends Authenticatable implements JWTSubject
         return [
             'email'       => $this->email,
             'fullname'    => $this->fullname,
-            'path_avatar' => $this->path_avatar,
+            'avatar_path' => $this->avatar_path,
             'roles'       => $roles,
         ];
     }

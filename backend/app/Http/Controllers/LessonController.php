@@ -287,19 +287,18 @@ class LessonController extends Controller
             // Sử dụng $request->hasFile() để kiểm tra file thực sự, tránh trường hợp chuỗi "null"
             if ($request->hasFile('video_file')) {
                 try {
-
-                    // Xóa video cũ
-                    if ($lesson->video_path) {
-                        $oldPath = str_replace('/storage/', '', $lesson->video_path);
-                        Storage::disk('public')->delete($oldPath);
-                    }
-
                     $videoFile = $request->file('video_file');
                     $extension = $videoFile->getClientOriginalExtension();
                     $slugTitle = $this->createSlug($lesson->title);
                     $customFileName = 'lesson_' . $lesson->id . '_' . $slugTitle . '_' . time() . '.' . $extension;
                     $storedPath = $videoFile->storeAs('lesson/videos', $customFileName, 'public');
                     $publicUrl = Storage::url($storedPath); // ví dụ: /storage/lesson/videos/lesson_1_<slug title>_1697059200.mp4
+
+                    // Xóa video cũ sau khi upload thành công
+                    if ($lesson->video_path && $this->isLocalStorageFile($lesson->video_path)) {
+                        $oldPath = str_replace('/storage/', '', $lesson->video_path);
+                        Storage::disk('public')->delete($oldPath);
+                    }
 
                     // Cập nhật video path vào bài học đã tạo
                     $lesson->update(['video_path' => $publicUrl]);
@@ -308,13 +307,18 @@ class LessonController extends Controller
                 }
             } else {
                 if (isset($body['video_path']) && $body['video_path'] != $lesson->video_path) {
-                    // Xóa video cũ nếu có
-                    if ($lesson->video_path) {
-                        $oldPath = str_replace('/storage/', '', $lesson->video_path);
+                    // Lưu video path cũ để xóa sau
+                    $oldVideoPath = $lesson->video_path;
+                    
+                    // Cập nhật video path mới
+                    $lesson->update(['video_path' => $body['video_path']]);
+                    
+                    // Xóa video cũ nếu là file local storage (không phải URL bên ngoài hoặc background upload)
+                    // Chỉ xóa sau khi cập nhật thành công
+                    if ($oldVideoPath && $this->isLocalStorageFile($oldVideoPath)) {
+                        $oldPath = str_replace('/storage/', '', $oldVideoPath);
                         Storage::disk('public')->delete($oldPath);
                     }
-                    
-                    $lesson->update(['video_path' => $body['video_path']]);
                 }
             }
 
@@ -378,6 +382,30 @@ class LessonController extends Controller
                 'message' => 'Lỗi khi xóa bài học: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Kiểm tra xem path có phải là file local storage không
+     * Không xóa nếu là URL external hoặc placeholder background-upload
+     */
+    private function isLocalStorageFile($path)
+    {
+        if (empty($path)) {
+            return false;
+        }
+
+        // Không xóa nếu là URL bên ngoài (http://, https://)
+        if (preg_match('/^https?:\/\//', $path)) {
+            return false;
+        }
+
+        // Không xóa nếu là placeholder background upload
+        if (strpos($path, 'background-upload://') === 0) {
+            return false;
+        }
+
+        // Chỉ xóa file local storage (bắt đầu bằng /storage/)
+        return strpos($path, '/storage/') === 0;
     }
 }
 

@@ -242,9 +242,8 @@
     let sortOrder = 'asc';
     let selectedLessonIds = new Set();
 
-    document.addEventListener('DOMContentLoaded', async function() {
-        await loadCourses();
-        await loadLessons();
+    document.addEventListener('DOMContentLoaded', async function() { 
+        await Promise.all([loadCourses(), loadLessons()]);
 
         // Ngăn chặn hành động mặc định của form khi nhấn enter ở các input
         const filterInputs = ['searchFilter', 'courseFilter', 'durationMin', 'durationMax'];

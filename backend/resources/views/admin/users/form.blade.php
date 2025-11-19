@@ -28,7 +28,7 @@
     {{-- Form Card --}}
     <form id="userForm" onsubmit="saveUser(event)" class="w-full max-w-[1400px] mx-auto p-4 md:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
         <input type="hidden" id="userId" value="{{ $mode === 'edit' ? ($userId ?? '') : '' }}">
-        <input type="hidden" id="path_avatar" value="">
+        <input type="hidden" id="avatar_path" value="">
 
         <div class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -221,16 +221,16 @@
                 document.getElementById('email').value = user.email || '';
                 document.getElementById('fullname').value = user.fullname || '';
                 document.getElementById('birthday').value = user.birthday ? user.birthday.split('T')[0] : '';
-                document.getElementById('path_avatar').value = user.path_avatar || '';
+                document.getElementById('avatar_path').value = user.avatar_path || '';
 
                 // Set avatar preview
                 const avatarEl = document.getElementById('avatarPreview');
                 const placeholderEl = document.getElementById('avatarPlaceholder');
-                if (user.path_avatar) {
-                    avatarEl.src = user.path_avatar;
+                if (user.avatar_path) {
+                    avatarEl.src = user.avatar_path;
                     avatarEl.classList.remove('hidden');
                     placeholderEl.classList.add('hidden');
-                    existingThumbnail = user.path_avatar;
+                    existingThumbnail = user.avatar_path;
                 } else {
                     const name = user.fullname || user.email || 'User';
                     avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=3b82f6&color=fff&size=128`;
@@ -378,7 +378,7 @@
         const email = document.getElementById('email').value;
         const fullname = document.getElementById('fullname').value;
         const birthday = document.getElementById('birthday').value || null;
-        const pathAvatar = document.getElementById('path_avatar').value || null;
+        const avatarPath = document.getElementById('avatar_path').value || null;
         const password = document.getElementById('password').value;
         const fileInput = document.getElementById('avatar');
         const avatarFile = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
@@ -411,7 +411,7 @@
                 if (fullname) fd.append('fullname', fullname);
                 if (birthday) fd.append('birthday', birthday);
                 if (existingThumbnail) fd.append('existingThumbnail', existingThumbnail);
-                if (pathAvatar) fd.append('path_avatar', pathAvatar);
+                if (avatarPath) fd.append('avatar_path', avatarPath);
                 if (password) fd.append('password', password);
                 roleIds.forEach(id => fd.append('role_ids[]', id));
                 if (avatarFile) fd.append('avatar', avatarFile);
@@ -436,7 +436,7 @@
                     email,
                     fullname,
                     birthday,
-                    path_avatar: pathAvatar,
+                    avatar_path: avatarPath,
                 };
                 if (password) payload.password = password;
                 payload.role_ids = roleIds;

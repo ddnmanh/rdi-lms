@@ -311,7 +311,7 @@
                         <details class="group">
                             <summary class="list-none flex items-center gap-2.5 cursor-pointer select-none rounded-xl p-1.5 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20 transition-all duration-300 hover:scale-105">
                                 <div class="group-hover:scale-110 transition-transform duration-300">
-                                    <img src="{{ optional(request()->user())->path_avatar }}" alt="Avatar" class="w-9 aspect-square rounded-full object-cover">
+                                    <img src="{{ optional(request()->user())->avatar_path }}" alt="Avatar" class="w-9 aspect-square rounded-full object-cover">
                                 </div>
                                 <i class="fas fa-caret-down text-xs text-gray-500 dark:text-gray-400 group-open:rotate-180 transition-transform duration-300"></i>
                             </summary>

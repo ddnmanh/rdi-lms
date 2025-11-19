@@ -279,7 +279,7 @@
                 <div class="group flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 p-4 hover:bg-gray-100 dark:hover:bg-gray-800">
                     <div class="flex items-center gap-4 flex-1 min-w-0">
                         <div class="flex-shrink-0 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 grid place-items-center">
-                            <img src="${user.path_avatar}" alt="" class="w-[50px] aspect-square object-cover">
+                            <img src="${user.avatar_path}" alt="" class="w-[50px] aspect-square object-cover">
                         </div>
                         <div class="flex-1 min-w-0">
                             <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(user.fullname || user.email || 'Không có tên')}</h4>

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
+use App\Http\Controllers\LessonVideoUploadController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StudentController;
@@ -237,6 +238,35 @@ Route::middleware('auth:api')->group(function () {
             'group' => 'Bài học',
             'name' => 'Xóa Bài học',
             'description' => 'Cho phép xóa bài học, không thể xóa bài học đang thuộc về một khóa học'
+        ]);
+    });
+
+    // Lesson video uploads - upload bất đồng bộ
+    Route::middleware('check.permission')->prefix('lesson-video-uploads')->group(function () {
+        routeWithPermission('post', '/sessions', [LessonVideoUploadController::class, 'createSession'], [
+            'group' => 'Upload video bài học',
+            'name' => 'Khởi tạo phiên upload video',
+            'description' => 'Tạo phiên upload chunk cho video bài học dung lượng lớn'
+        ]);
+        routeWithPermission('post', '/{IdLessonVideoUpload}/chunks', [LessonVideoUploadController::class, 'uploadChunk'], [
+            'group' => 'Upload video bài học',
+            'name' => 'Upload chunk video',
+            'description' => 'Gửi từng chunk video lên máy chủ (có thể resume)'
+        ])->middleware('throttle:upload-chunks'); // không giới hạn rate limit
+        routeWithPermission('post', '/{IdLessonVideoUpload}/complete', [LessonVideoUploadController::class, 'complete'], [
+            'group' => 'Upload video bài học',
+            'name' => 'Hoàn tất upload video',
+            'description' => 'Gửi yêu cầu ghép các chunk và cập nhật bài học'
+        ]);
+        routeWithPermission('get', '/{IdLessonVideoUpload}', [LessonVideoUploadController::class, 'show'], [
+            'group' => 'Upload video bài học',
+            'name' => 'Theo dõi trạng thái upload video',
+            'description' => 'Lấy tiến độ, trạng thái xử lý video bất đồng bộ'
+        ]);
+        routeWithPermission('delete', '/{IdLessonVideoUpload}', [LessonVideoUploadController::class, 'cancel'], [
+            'group' => 'Upload video bài học',
+            'name' => 'Hủy upload video',
+            'description' => 'Hủy phiên upload và xóa dữ liệu tạm thời'
         ]);
     });
 

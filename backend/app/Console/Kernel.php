@@ -15,7 +15,17 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        // Xóa các file chunk video cũ mỗi 2 phút
+        $schedule->command('video:cleanup-chunks --hours=24')
+            ->everyThreeMinutes()
+            ->withoutOverlapping()
+            ->runInBackground();
+
+        // // Xóa các file chunk video cũ mỗi 180 phút (3 giờ)
+        // $schedule->command('video:cleanup-chunks --hours=24')
+        //     ->everyThreeHours()
+        //     ->withoutOverlapping()
+        //     ->runInBackground();
     }
 
     /**

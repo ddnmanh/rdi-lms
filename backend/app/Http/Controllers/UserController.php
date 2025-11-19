@@ -131,7 +131,7 @@ class UserController extends Controller
             'password' => 'required|string|min:6',
             'fullname' => 'nullable|string|max:150',
             'birthday' => 'nullable|date',
-            'path_avatar' => 'nullable|string',
+            'avatar_path' => 'nullable|string',
             'role_ids' => 'nullable|array',
             'role_ids.*' => 'exists:roles,id',
         ]);
@@ -149,7 +149,7 @@ class UserController extends Controller
             'password' => $request->password,
             'fullname' => $request->fullname,
             'birthday' => $request->birthday,
-            'path_avatar' => $request->path_avatar,
+            'avatar_path' => $request->avatar_path,
         ]);
 
         // Gán roles
@@ -202,7 +202,7 @@ class UserController extends Controller
             'password' => 'nullable|string|min:6',
             'fullname' => 'nullable|string|max:150',
             'birthday' => 'nullable|date',
-            'path_avatar' => 'nullable|string',
+            'avatar_path' => 'nullable|string',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'role_ids' => 'nullable|array',
             'role_ids.*' => 'exists:roles,id',
@@ -222,16 +222,16 @@ class UserController extends Controller
             'birthday' => $request->birthday,
         ];
 
-        // Cập nhật path_avatar nếu client gửi URL
-        if ($request->has('path_avatar')) {
-            $updateData['path_avatar'] = $request->path_avatar;
+        // Cập nhật avatar_path nếu client gửi URL
+        if ($request->has('avatar_path')) {
+            $updateData['avatar_path'] = $request->avatar_path;
         }
 
         // Xử lý upload file avatar nếu có
         if ($request->hasFile('avatar')) {
             $storedPath = $request->file('avatar')->store('avatars', 'public');
             $publicUrl = Storage::url($storedPath); // ví dụ: /storage/avatars/xxx.jpg
-            $updateData['path_avatar'] = $publicUrl;
+            $updateData['avatar_path'] = $publicUrl;
         }
 
         if ($request->has('password')) {

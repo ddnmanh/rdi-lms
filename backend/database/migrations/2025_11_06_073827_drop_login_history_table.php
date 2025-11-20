@@ -25,19 +25,16 @@ class DropLoginHistoryTable extends Migration
     {
         Schema::create('login_history', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->char('token_sha256', 64);
-            $table->dateTime('expires_at');
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->char('token_sha256', 64)->nullable();
+            $table->dateTime('expires_at')->nullable();
             $table->string('ip_address', 50)->nullable();
             $table->text('user_agent')->nullable();
-            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('created_at')->nullable()->useCurrent();
             
             $table->index(['user_id', 'created_at'], 'idx_lh_user');
             $table->index('token_sha256', 'idx_lh_token');
-            $table->foreign('user_id', 'fk_lh_user')
-                ->references('id')
-                ->on('users')
-                ->onDelete('cascade');
+            // Không tạo ràng buộc khóa ngoại ở DB
             
             $table->engine = 'InnoDB';
             $table->charset = 'utf8mb4';

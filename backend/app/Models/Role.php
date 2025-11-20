@@ -55,5 +55,15 @@ class Role extends Model
         $otherLevel = $otherRole instanceof Role ? $otherRole->level : $otherRole;
         return $this->level > $otherLevel;
     }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function deleter()
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
+    }
 }
 

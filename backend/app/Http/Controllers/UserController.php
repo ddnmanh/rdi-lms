@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -131,7 +131,7 @@ class UserController extends Controller
             'password' => 'required|string|min:6',
             'fullname' => 'nullable|string|max:150',
             'birthday' => 'nullable|date',
-            'path_avatar' => 'nullable|string',
+            'avatar_path' => 'nullable|string',
             'role_ids' => 'nullable|array',
             'role_ids.*' => 'exists:roles,id',
         ]);
@@ -149,7 +149,7 @@ class UserController extends Controller
             'password' => $request->password,
             'fullname' => $request->fullname,
             'birthday' => $request->birthday,
-            'path_avatar' => $request->path_avatar,
+            'avatar_path' => $request->avatar_path,
         ]);
 
         // Gán roles
@@ -169,6 +169,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $authUser = $request->user();
         $user = User::find($id);
 
         if (!$user) {
@@ -178,12 +179,31 @@ class UserController extends Controller
             ], 404);
         }
 
+        // Kiểm tra quyền: chỉ cho phép cập nhật chính mình hoặc user có level cao hơn
+        if ($authUser->id != $id) {
+            // Lấy level thấp nhất (quyền cao nhất) của auth user
+            $authUserMinLevel = $authUser->roles()->min('level');
+
+            // Lấy level thấp nhất (quyền cao nhất) của user bị cập nhật
+            $targetUserMinLevel = $user->roles()->min('level');
+
+            // Chỉ cho phép nếu level của auth user < level của user bị cập nhật
+            // (level thấp hơn = quyền cao hơn)
+            if ($authUserMinLevel === null || $targetUserMinLevel === null || $authUserMinLevel >= $targetUserMinLevel) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Bạn không có quyền cập nhật người dùng này'
+                ], 403);
+            }
+        }
+
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|unique:users,email,' . $id,
             'password' => 'nullable|string|min:6',
             'fullname' => 'nullable|string|max:150',
             'birthday' => 'nullable|date',
-            'path_avatar' => 'nullable|string',
+            'avatar_path' => 'nullable|string',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'role_ids' => 'nullable|array',
             'role_ids.*' => 'exists:roles,id',
         ]);
@@ -200,8 +220,19 @@ class UserController extends Controller
             'email' => $request->email,
             'fullname' => $request->fullname,
             'birthday' => $request->birthday,
-            'path_avatar' => $request->path_avatar,
         ];
+
+        // Cập nhật avatar_path nếu client gửi URL
+        if ($request->has('avatar_path')) {
+            $updateData['avatar_path'] = $request->avatar_path;
+        }
+
+        // Xử lý upload file avatar nếu có
+        if ($request->hasFile('avatar')) {
+            $storedPath = $request->file('avatar')->store('avatars', 'public');
+            $publicUrl = Storage::url($storedPath); // ví dụ: /storage/avatars/xxx.jpg
+            $updateData['avatar_path'] = $publicUrl;
+        }
 
         if ($request->has('password')) {
             $updateData['password'] = $request->password;
@@ -224,18 +255,56 @@ class UserController extends Controller
     /**
      * Xóa người dùng (soft delete)
      */
-    public function destroy($id)
+    public function destroyUsers(Request $request)
     {
-        $user = User::find($id);
+        $authUser = $request->user();
 
-        if (!$user) {
+        if (!$authUser) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy người dùng'
-            ], 404);
+                'message' => 'Không được phép truy cập'
+            ], 401);
         }
 
-        $user->delete();
+        $validator = Validator::make($request->all(), [
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'exists:users,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation errors',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $users = User::with('roles')->whereIn('id', $request->user_ids)->get();
+
+        // dd($users->toArray());
+
+        // Lấy level thấp nhất (quyền cao nhất) của user yêu cầu xóa
+        $authUserMinLevel = $authUser?->roles()->min('level');
+
+        $userWillDelete = [];
+
+        foreach ($users as $user) {
+            $targetUserMinLevel = $user->roles->min('level');
+
+            // Level thấp hơn = quyền cao hơn, chỉ cho phép khi authUser < targetUser
+            if ($authUserMinLevel === null || $targetUserMinLevel === null || $authUserMinLevel >= $targetUserMinLevel) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Bạn không có quyền xóa người dùng: ' . ($user->email ?? $user->id)
+                ], 403);
+            }
+
+            $userWillDelete[] = $user->id;
+        }
+
+        foreach ($userWillDelete as $user) {
+            $user->delete();
+        }
 
         return response()->json([
             'success' => true,

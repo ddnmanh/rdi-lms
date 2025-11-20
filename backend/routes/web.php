@@ -31,6 +31,7 @@ Route::prefix('admin')->middleware('auth.cookie')->group(function () {
     Route::get('/roles', [AdminController::class, 'roles'])->name('admin.roles.list');
     Route::get('/roles/create', [AdminController::class, 'createRole'])->name('admin.roles.create');
     Route::get('/roles/{id}/edit', [AdminController::class, 'editRole'])->name('admin.roles.edit');
+    Route::get('/roles/{id}/show', [AdminController::class, 'showRole'])->name('admin.roles.show');
     Route::get('/courses', [AdminController::class, 'courses'])->name('admin.courses.list');
     Route::get('/courses/create', [AdminController::class, 'createCourse'])->name('admin.courses.create');
     Route::get('/courses/{id}', [AdminController::class, 'showCourse'])->name('admin.courses.show');
@@ -41,5 +42,8 @@ Route::prefix('admin')->middleware('auth.cookie')->group(function () {
     Route::get('/lessons/create', [AdminController::class, 'createLesson'])->name('admin.lessons.create');
     Route::get('/lessons/{id}', [AdminController::class, 'showLesson'])->name('admin.lessons.show');
     Route::get('/lessons/{id}/edit', [AdminController::class, 'editLesson'])->name('admin.lessons.edit');
-    Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
+    Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports.index');
+    Route::get('/reports/students', [AdminController::class, 'reportsStudents'])->name('admin.reports.students');
+    Route::get('/reports/courses', [AdminController::class, 'reportsCourses'])->name('admin.reports.courses');
+    Route::get('/reports/activities', [AdminController::class, 'reportsActivities'])->name('admin.reports.activities');
 });

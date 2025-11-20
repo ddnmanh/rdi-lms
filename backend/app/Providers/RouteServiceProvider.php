@@ -57,7 +57,12 @@ class RouteServiceProvider extends ServiceProvider
     protected function configureRateLimiting()
     {
         RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(60)->by(optional($request->user())->id ?: $request->ip());
+            return Limit::perMinute(1000)->by(optional($request->user())->id ?: $request->ip());
+        });
+
+        // Rate limiter đặc biệt cho upload chunk - không giới hạn
+        RateLimiter::for('upload-chunks', function (Request $request) {
+            return Limit::none();
         });
     }
 }

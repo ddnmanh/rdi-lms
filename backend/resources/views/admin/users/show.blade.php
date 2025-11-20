@@ -4,231 +4,221 @@
 @section('description', 'Xem thông tin chi tiết của người dùng')
 
 @section('content')
-<div class="min-h-full flex flex-col gap-4 2xl:gap-6">
-    {{-- Top Bar / Breadcrumbs + Actions (Flat) --}}
-    <div class="sticky top-0 z-20">
-        <div class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-3 sm:px-4 py-2">
-            <div class="flex items-center justify-between gap-3">
-                <div class="flex items-center gap-2">
-                    <a href="{{ route('admin.users.list') }}"
-                       class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">
-                        <svg class="h-4 w-4 -ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                        </svg>
-                        <span>Quay lại</span>
-                    </a>
-                </div>
-                <div class="flex items-center gap-2">
-                    <a id="editButton" href="#"
-                       class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-3.5 py-2 text-sm font-semibold text-white hover:bg-amber-600 focus:outline-none">
-                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 3.487a2.25 2.25 0 113.182 3.182L7.5 19.313 3 21l1.687-4.5L16.862 3.487z"/>
-                        </svg>
-                        <span>Chỉnh sửa</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="w-full h-full flex flex-col overflow-hidden"> 
 
     {{-- Loading State (Flat Skeleton) --}}
-    <div id="loadingState" class="flex-1 p-6 sm:p-8">
-        <div class="mx-auto max-w-6xl">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-6 bg-white dark:bg-gray-800">
-                    <div class="mx-auto flex flex-col items-center gap-4">
-                        <div class="h-28 w-28 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
-                        <div class="h-4 w-40 rounded bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
-                        <div class="h-3 w-52 rounded bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
-                    </div>
-                    <div class="mt-6 grid grid-cols-2 gap-3">
-                        <div class="h-14 rounded-lg bg-gray-100 dark:bg-gray-900 animate-pulse"></div>
-                        <div class="h-14 rounded-lg bg-gray-100 dark:bg-gray-900 animate-pulse"></div>
+    <div id="loadingState" class="flex-1 overflow-auto p-6 sm:p-8">
+        <div class="w-fit mx-auto mt-[20dvh]">
+            <div id="SPINNER_LOADING">
+                <div id="SPINNER_LOADING_CONTAINER">
+                    <div id="SPINNER_LOADING_CONTAINER_LDS_ROLLER">
+                        <div></div><div></div><div></div><div></div>
+                        <div></div><div></div><div></div><div></div>
                     </div>
                 </div>
-                <div class="lg:col-span-2 grid gap-6">
-                    <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-6 bg-white dark:bg-gray-800 h-40 animate-pulse"></div>
-                    <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-6 bg-white dark:bg-gray-800 h-40 animate-pulse"></div>
+                <div id="SPINNER_LOADING_ICON">
+                    <i class="fas fa-graduation-cap"></i>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- User Detail Card (Flat) --}}
-    <div id="userDetailCard" class="hidden flex-1 w-full max-w-6xl mx-auto flex-col">
-        {{-- Personal Information --}}
-        <div class="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex items-center gap-3">
-                <div class="h-8 w-8 rounded bg-blue-600 grid place-items-center">
-                    <svg class="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A9 9 0 1118.88 17.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                </div>
-                <h3 class="text-base font-bold text-gray-900 dark:text-gray-100">Thông tin cá nhân</h3>
+    {{-- User Detail Card (Tabs) --}}
+    <div id="userDetailCard" class="hidden w-full max-w-[1400px] h-full mx-auto min-h-0"> {{-- cho phép co giãn & cuộn --}}
+        <div class="h-full flex flex-col items-stretch justify-start">
+            {{-- Tabs header --}}
+            <div class="relative bg-transparent">
+                <button type="button"
+                    class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-5 py-2.5 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-900/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                    data-tab-target="TAB_USER_INFO">
+                    <i class="fa-regular fa-bookmark"></i>
+                    <span>Thông tin người dùng</span>
+                </button>
+                <button type="button"
+                        class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-5 py-2.5 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-900/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                        data-tab-target="TAB_COURSES">
+                    <i class="fa-regular fa-clipboard"></i>
+                    <span>Khóa học</span>
+                    <span id="lessonsTabCount" class="hidden rounded-full bg-gray-200 dark:bg-gray-800 px-2 py-0.5 text-xs font-semibold text-gray-600 dark:text-gray-300"></span>
+                </button>
             </div>
 
-            <div class="p-6 flex flex-col xl:flex-row items-start justify-start gap-5">
-                {{-- Avatar / Summary --}}
-                <div class="w-[300px] mx-auto lg:col-span-1">
-                    <div class="relative mb-4">
-                        <img id="userAvatar" src="" alt="Avatar"
-                            class="w-full object-cover border-4 border-white/70"
-                            onerror="this.src='https://ui-avatars.com/api/?name=' + encodeURIComponent(document.getElementById('userFullname').textContent || 'User') + '&background=3b82f6&color=fff&size=128'">
+            {{-- Content area --}}
+            <div class="flex-1 min-h-0 h-full bg-white dark:bg-gray-900 rounded-b-xl overflow-hidden">
+                {{-- user Information --}}
+                <div class="tab-panel max-h-full overflow-y-auto" data-tab-content="TAB_USER_INFO">
+                    <div class="px-6 py-4 flex items-center justify-between gap-3 rounded-t-none rounded-b-none">
+                        <div class="flex items-center gap-3"></div>
+                        <a id="editButton" href="#"
+                           class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
+                            <i class="fa-solid fa-pen"></i>
+                            <span>Chỉnh sửa</span>
+                        </a>
                     </div>
-                </div>
-                <div class="w-full flex-1 grid grid-cols-1 md:grid-cols-2 gap-5">
-                    @php
-                        $infoField = function($label, $id, $hint = null) {
-                            $hintHtml = $hint ? '<p class="text-[11px] leading-4 text-gray-500 dark:text-gray-400">'.$hint.'</p>' : '';
-                            return <<<HTML
-                            <div class="space-y-2">
-                                <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">{$label}</label>
-                                <div class="px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40">
-                                    <p id="{$id}" class="text-sm font-semibold text-gray-900 dark:text-gray-100 break-all">-</p>
-                                    {$hintHtml}
+
+                    <div class="space-y-6 p-6">
+                        {{-- Personal Information Section --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {{-- Avatar Section --}}
+                            <div class="col-span-1 row-span-5">
+                                <label class="block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-2">Ảnh đại diện</label>
+                                <div class="flex items-center gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900/40">
+                                    <div class="rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
+                                        <img id="userAvatar" src="" alt="Avatar" class="w-[300px] aspect-square object-cover">
+                                    </div>
+                                    <div class="flex-1">
+                                        {{-- <div class="text-sm text-gray-600 dark:text-gray-300">Ảnh đại diện của người dùng</div> --}}
+                                    </div>
                                 </div>
                             </div>
-                            HTML;
-                        };
-                    @endphp
 
-                    {!! $infoField('ID', 'userId') !!}
-                    {!! $infoField('Email', 'userEmailDetail') !!}
-                    {!! $infoField('Họ và tên', 'userFullnameDetail') !!}
-                    {!! $infoField('Ngày sinh', 'userBirthday') !!}
-                    {!! $infoField('Vai trò', 'userRoles') !!}
-                    {!! $infoField('Ngày tạo', 'userCreatedAt') !!}
-                </div>
-            </div>
-        </div>
+                            @php
+                                $infoField = function($label, $id) {
+                                    return <<<HTML
+                                    <div>
+                                        <label class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">{$label}</label>
+                                        <div class="px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                                            <p class="{$id} text-sm text-gray-900 dark:text-gray-100 break-all">-</p>
+                                        </div>
+                                    </div>
+                                    HTML;
+                                };
+                            @endphp
 
-        {{-- Courses --}}
-        <div class="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800 mt-6">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex items-center gap-3">
-                <div class="h-8 w-8 rounded bg-green-600 grid place-items-center">
-                    <svg class="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422A12.083 12.083 0 0112 21c-4.418 0-8.268-2.388-10.16-5.422L12 14z"/>
-                    </svg>
+                            
+                            {!! $infoField('ID người dùng', 'userId') !!}
+                            {!! $infoField('Email', 'userEmail') !!}
+                            {!! $infoField('Họ và tên', 'userFullname') !!}
+                            {!! $infoField('Vai trò', 'userRoles') !!}
+                            {!! $infoField('Ngày tạo', 'userCreatedAt') !!}
+                        </div>
+                    </div> 
                 </div>
-                <h3 class="text-base font-bold text-gray-900 dark:text-gray-100">Khóa học</h3>
-            </div>
-            <div class="p-6">
-                <div id="coursesList" class="space-y-2">
-                    <div class="w-full flex justify-center py-8">
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Đang tải...</p>
+
+                {{-- Courses --}}
+                <div class="tab-panel hidden h-full flex flex-col items-stretch justify-start" data-tab-content="TAB_COURSES">
+                    <div class="px-6 py-4 flex items-center justify-between gap-3 rounded-t-none">
+                        <div class="flex items-center gap-3"></div>
+                        <a id="manageCoursesButton" href="#"
+                            class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
+                            <i class="fa-solid fa-pen"></i>
+                            <span>Quản lý khóa học</span>
+                        </a>
                     </div>
-                </div>
+                    <div class="flex-1 min-h-0 p-6 pt-0">
+                        <div id="coursesList" class="space-y-2 h-full overflow-y-auto">
+
+                        </div>
+                    </div>
+                </div> 
             </div>
         </div>
     </div>
 
-    {{-- Error State --}}
-    <div id="errorState" class="hidden flex-1 items-center justify-center min-h-[520px]">
-        <div class="flex flex-col items-center text-center max-w-md px-6">
-            <div class="relative mb-6">
-                <div class="h-20 w-20 rounded-full bg-red-600 grid place-items-center">
-                    <svg class="h-10 w-10 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01"/>
-                    </svg>
-                </div>
-            </div>
-            <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">Không thể tải thông tin</h3>
-            <p id="errorMessage" class="text-sm text-gray-600 dark:text-gray-400 mb-6">-</p>
-            <a href="{{ route('admin.users.list') }}"
-               class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700">
-                <svg class="h-4 w-4 -ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                </svg>
-                <span>Quay lại danh sách</span>
-            </a>
-        </div>
-    </div>
 </div>
 
-{{-- Toast --}}
-<div id="toast" class="pointer-events-none fixed bottom-5 left-1/2 -translate-x-1/2 hidden">
-    <div class="rounded bg-gray-900 text-white px-4 py-2 text-sm">Đã sao chép vào clipboard</div>
-</div>
+<script>
+    function setupTabs() {
+        const tabButtons = document.querySelectorAll('.tab-trigger');
+        const firstTab = tabButtons[0]?.dataset.tabTarget;
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => activateTab(button.dataset.tabTarget));
+        });
+        if (firstTab) {
+            activateTab(firstTab);
+        }
+    }
 
-{{-- Scripts --}}
+    function activateTab(target) {
+        const tabButtons = document.querySelectorAll('.tab-trigger');
+        const tabPanels = document.querySelectorAll('.tab-panel');
+        tabButtons.forEach(button => {
+            const isActive = button.dataset.tabTarget === target;
+            button.classList.toggle('bg-white', isActive);
+            button.classList.toggle('dark:bg-gray-900', isActive);
+            button.classList.toggle('border-gray-200', isActive);
+            button.classList.toggle('dark:border-gray-700', isActive);
+            button.classList.toggle('border-transparent', !isActive);
+            button.classList.toggle('border-b-0', isActive);
+            button.classList.toggle('text-gray-900', isActive);
+            button.classList.toggle('dark:text-gray-100', isActive);
+            button.classList.toggle('text-gray-500', !isActive);
+            button.classList.toggle('dark:text-gray-400', !isActive);
+            button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+        tabPanels.forEach(panel => {
+            const isActive = panel.dataset.tabContent === target;
+            panel.classList.toggle('hidden', !isActive);
+        });
+    }    
+</script>
+
 <script>
     const userId = {{ $userId }};
+    let userData = null;
 
     document.addEventListener('DOMContentLoaded', async () => {
-        await loadUserData();
+        setupTabs();
+        userData = await loadUserData();
+        if (userData != null) {
+            renderUserInfo();
+            renderCourses();
+        }
     });
 
     async function loadUserData() {
         try {
             const data = await apiRequest(`/users/${userId}`);
             if (data?.success) {
-                displayUserData(data.data);
+                return data.data;
             } else {
-                showError(data?.message || 'Không thể tải thông tin người dùng');
+                showNotificationModel_Global(data?.message || 'Không thể tải thông tin người dùng', 'error');
+                return null;
             }
         } catch (error) {
-            showError(error.message || 'Đã xảy ra lỗi khi tải thông tin');
+            showNotificationModel_Global(error.message || 'Đã xảy ra lỗi khi tải thông tin', 'error');
+            return null;
         }
     }
 
     function toggleStates({ loading = false, detail = false, error = false }) {
         document.getElementById('loadingState').classList.toggle('hidden', !loading);
         document.getElementById('userDetailCard').classList.toggle('hidden', !detail);
-        document.getElementById('errorState').classList.toggle('hidden', !error);
+        // document.getElementById('errorState').classList.toggle('hidden', !error);
     }
 
-    function displayUserData(user) {
+    function renderUserInfo() {
         toggleStates({ loading: false, detail: true, error: false });
-        document.getElementById('editButton').href = `/admin/users/${user.id}/edit`;
-        setText('userId', user.id);
-        setText('userEmail', user.email);
-        setText('userEmailDetail', user.email);
-        setText('userFullname', user.fullname || 'Chưa có tên');
-        setText('userFullnameDetail', user.fullname || 'Chưa có tên');
-        setText('userRoles', user.roles.map(r => r.name).join(', ') || 'Chưa có vai trò');
+        document.getElementById('editButton').href = `/admin/users/${userData.id}/edit`;
+        setValueById('userId', userData.id);
+        setValueById('userEmail', userData.email);
+        setValueById('userEmailDetail', userData.email);
+        setValueById('userFullname', userData.fullname || 'Chưa có tên');
+        setValueById('userFullnameDetail', userData.fullname || 'Chưa có tên');
+        setValueById('userRoles', userData.roles.map(r => r.name).join(', ') || 'Chưa có vai trò');
+        setValueById('userBirthday', formatDate_Global(userData.birthday));
+        setValueById('userCreatedAt', formatDate_Global(userData.created_at));
 
-        const status = (user.status || '').toString().toLowerCase();
-        const badge = document.getElementById('userStatusBadge');
-        if (badge) {
-            const map = {
-                active: ['bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300', 'Active', 'bg-emerald-500'],
-                pending: ['bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300', 'Pending', 'bg-amber-500'],
-                banned: ['bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300', 'Banned', 'bg-rose-500'],
-            };
-            const [cls, label, dot] = map[status] || map['active'];
-            badge.className = `inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-full ${cls}`;
-            badge.innerHTML = `<span class="inline-block h-1.5 w-1.5 rounded-full ${dot}"></span><span>${label}</span>`;
-        }
-
-        const avatarEl = document.getElementById('userAvatar');
-        if (user.path_avatar) {
-            avatarEl.src = user.path_avatar;
-        } else {
-            const name = user.fullname || user.email || 'User';
-            avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=3b82f6&color=fff&size=128`;
-        }
-
-        setDate('userBirthday', user.birthday, { dateOnly: true });
-        setDate('userCreatedAt', user.created_at);
-
-        // const roles = Array.isArray(user.roles) ? user.roles : [];
-        // const rolesList = document.getElementById('rolesList');
-        // if (!roles.length) {
-        //     rolesList.innerHTML = `<p class="text-sm text-gray-500 dark:text-gray-400 italic">Người dùng chưa có vai trò nào</p>`;
-        // } else {
-        //     rolesList.innerHTML = roles.map(r => `
-        //         <span class="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">
-        //             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        //                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c1.657 0 3-1.79 3-4s-1.343-4-3-4-3 1.79-3 4 1.343 4 3 4zM5.5 21a6.5 6.5 0 0113 0"/>
-        //             </svg>
-        //             ${escapeHtml(r.name ?? 'Role')}
-        //         </span>
-        //     `).join('');
+        // const status = (userData.status || '').toString().toLowerCase();
+        // const badge = document.getElementById('userStatusBadge');
+        // if (badge) {
+        //     const map = {
+        //         active: ['bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300', 'Active', 'bg-emerald-500'],
+        //         pending: ['bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300', 'Pending', 'bg-amber-500'],
+        //         banned: ['bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300', 'Banned', 'bg-rose-500'],
+        //     };
+        //     const [cls, label, dot] = map[status] || map['active'];
+        //     badge.className = `inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-full ${cls}`;
+        //     badge.innerHTML = `<span class="inline-block h-1.5 w-1.5 rounded-full ${dot}"></span><span>${label}</span>`;
         // }
 
-        const courses = Array.isArray(user.courses) ? user.courses : [];
+        // Set avatar preview
+        const avatarEl = document.getElementById('userAvatar');
+        avatarEl.src = userData.avatar_path || '';  
+    } 
+
+    function renderCourses() {
+        const courses = Array.isArray(userData.courses) ? userData.courses : [];
         const coursesList = document.getElementById('coursesList');
         if (!courses.length) {
             coursesList.innerHTML = `<p class="text-sm text-gray-500 dark:text-gray-400 italic">Người dùng chưa tham gia khóa học nào</p>`;
@@ -242,13 +232,13 @@
                             </svg>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml(c.title ?? 'Không có tên')}</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">ID: ${escapeHtml(String(c.id ?? '-'))}</p>
+                            <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(c.title ?? 'Không có tên')}</h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">ID: ${escapeHtml_Global(String(c.id ?? '-'))}</p>
                         </div>
                     </div>
                     ${c.description ? `
                         <div class="hidden md:block ml-4 max-w-xs">
-                            <span class="text-xs text-gray-500 dark:text-gray-400 truncate block">${escapeHtml(String(c.description)).slice(0, 80)}${String(c.description).length > 80 ? '…' : ''}</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 truncate block">${escapeHtml_Global(String(c.description)).slice(0, 80)}${String(c.description).length > 80 ? '…' : ''}</span>
                         </div>` : ''
                     }
                 </div>
@@ -256,42 +246,12 @@
         }
     }
 
-    function showError(message) {
-        toggleStates({ loading: false, detail: false, error: true });
-        setText('errorMessage', message || 'Đã xảy ra lỗi');
-    }
+    function setValueById(id, value) {
+        const el = document.getElementsByClassName(id);
+        for (let i=0; i<el.length; i++) {
+            if (el[i]) el[i].textContent = value != null && value !== '' ? value : '-';
+        }
+    } 
 
-    function setText(id, value) {
-        const el = document.getElementById(id);
-        if (el) el.textContent = value != null && value !== '' ? value : '-';
-    }
-
-    function setDate(id, raw, opts = {}) {
-        const el = document.getElementById(id);
-        if (!el) return;
-        if (!raw) { el.textContent = '-'; return; }
-        const dt = new Date(raw);
-        if (Number.isNaN(dt.getTime())) { el.textContent = '-'; return; }
-        el.textContent = opts.dateOnly
-            ? dt.toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' })
-            : dt.toLocaleString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-    }
-
-    function escapeHtml(str) {
-        return String(str)
-            .replaceAll('&', '&amp;')
-            .replaceAll('<', '&lt;')
-            .replaceAll('>', '&gt;')
-            .replaceAll('"', '&quot;')
-            .replaceAll("'", '&#039;');
-    }
-
-    function showToast() {
-        const t = document.getElementById('toast');
-        if (!t) return;
-        t.classList.remove('hidden');
-        clearTimeout(t._hide);
-        t._hide = setTimeout(() => t.classList.add('hidden'), 1600);
-    }
 </script>
 @endsection

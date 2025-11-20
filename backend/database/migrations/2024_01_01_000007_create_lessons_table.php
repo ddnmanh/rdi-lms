@@ -15,20 +15,17 @@ class CreateLessonsTable extends Migration
     {
         Schema::create('lessons', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('course_id');
-            $table->string('title', 255)->default('Bài học');
+            $table->unsignedBigInteger('course_id')->nullable();
+            $table->string('title', 255)->nullable()->default('Bài học');
             $table->string('description', 255)->nullable();
-            $table->unsignedInteger('duration')->comment('Giây');
-            $table->text('video_url');
-            $table->unsignedSmallInteger('display_order')->default(0);
+            $table->unsignedInteger('duration')->nullable()->comment('Giây');
+            $table->text('video_url')->nullable();
+            $table->unsignedSmallInteger('display_order')->nullable()->default(0);
             $table->timestamps();
             $table->softDeletes();
             
             $table->index(['course_id', 'display_order'], 'idx_lessons_course_order');
-            $table->foreign('course_id', 'fk_lesson_course')
-                ->references('id')
-                ->on('courses')
-                ->onDelete('cascade');
+            // Không tạo ràng buộc khóa ngoại ở DB
             
             $table->engine = 'InnoDB';
             $table->charset = 'utf8mb4';

@@ -224,7 +224,7 @@ Content-Type: application/json
   "title": "Giới thiệu Laravel",
   "description": "Bài học đầu tiên",
   "duration": 3600,
-  "video_url": "https://example.com/video.mp4",
+  "video_path": "https://example.com/video.mp4",
   "display_order": 1
 }
 ```

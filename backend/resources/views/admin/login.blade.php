@@ -1,273 +1,204 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" class="h-full">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Đăng nhập - Admin</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .login-container {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 40px;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .login-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .login-header h1 {
-            color: #333;
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-
-        .login-header p {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
+        html,
+        body,
+        main {
+            overflow-x: hidden;
+            max-width: 100%;
             font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
+            color: #314158;
+            font-family: 'UTM Avo', sans-serif;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .alert {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-
-        .alert-error {
-            background-color: #fee;
-            color: #c33;
-            border: 1px solid #fcc;
-        }
-
-        .alert-success {
-            background-color: #efe;
-            color: #3c3;
-            border: 1px solid #cfc;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .loading.active {
-            display: block;
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        @media (min-width: 1536px) {
+            html,
+            body,
+            main {
+                font-size: 18px;
+            }
         }
     </style>
-</head>
-<body>
-    <div class="login-container">
-        <div class="login-header">
-            <h1>Đăng nhập</h1>
-            <p>Hệ thống quản lý học trực tuyến</p>
-        </div>
-
-        <div id="alertContainer"></div>
-
-        <form id="loginForm" onsubmit="handleLogin(event)">
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input 
-                    type="email" 
-                    id="email" 
-                    name="email" 
-                    required 
-                    autocomplete="email"
-                    placeholder="Nhập email của bạn"
-                >
-            </div>
-
-            <div class="form-group">
-                <label for="password">Mật khẩu</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
-                    required 
-                    autocomplete="current-password"
-                    placeholder="Nhập mật khẩu của bạn"
-                >
-            </div>
-
-            <button type="submit" class="btn btn-primary" id="submitBtn">
-                Đăng nhập
-            </button>
-
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-            </div>
-        </form>
-    </div>
 
     <script>
-        function showAlert(message, type = 'error') {
-            const alertContainer = document.getElementById('alertContainer');
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.textContent = message;
-            alertContainer.innerHTML = '';
-            alertContainer.appendChild(alert);
-
-            // Tự động ẩn sau 5 giây
-            setTimeout(() => {
-                alert.remove();
-            }, 5000);
-        }
-
-        async function handleLogin(event) {
-            event.preventDefault();
-            
-            const submitBtn = document.getElementById('submitBtn');
-            const loading = document.getElementById('loading');
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            // Disable button và hiển thị loading
-            submitBtn.disabled = true;
-            loading.classList.add('active');
-
-            try {
-                const response = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brandBlue: '#2563eb',
+                        brandGreen: '#10b981'
                     },
-                    credentials: 'include', // Quan trọng: gửi cookie
-                    body: JSON.stringify({
-                        email: email,
-                        password: password
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showAlert('Đăng nhập thành công! Đang chuyển hướng...', 'success');
-                    
-                    // Chuyển hướng sau 1 giây
-                    setTimeout(() => {
-                        window.location.href = '/admin';
-                    }, 1000);
-                } else {
-                    showAlert(data.message || 'Đăng nhập thất bại');
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                showAlert('Có lỗi xảy ra. Vui lòng thử lại sau.');
-            } finally {
-                submitBtn.disabled = false;
-                loading.classList.remove('active');
-            }
-        }
-
-        // Kiểm tra nếu đã đăng nhập, redirect về admin
-        document.addEventListener('DOMContentLoaded', async function() {
-            try {
-                const response = await fetch('/api/auth/me', {
-                    credentials: 'include'
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success) {
-                        window.location.href = '/admin';
+                    keyframes: {
+                        spinfast: {
+                            to: { transform: "rotate(360deg)" }
+                        }
+                    },
+                    animation: {
+                        spinfast: "spinfast .8s linear infinite"
                     }
                 }
-            } catch (error) {
-                // Không đăng nhập, tiếp tục hiển thị form
             }
+        };
+    </script>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-8
+    bg-[radial-gradient(circle_at_10%_20%,rgba(37,99,235,0.25),transparent_40%),radial-gradient(circle_at_90%_0%,rgba(16,185,129,0.35),transparent_55%),linear-gradient(135deg,#f0f9ff,#ecfdf5)]
+    dark:bg-[#0f172a]
+">
+
+    <div class="w-full max-w-[450px] relative flex flex-col items-stretch justify-center gap-4"> 
+
+        <!-- Login Card -->
+        <div class="bg-white dark:bg-gray-800 border border-blue-500/30 dark:border-blue-500/40
+            rounded-3xl shadow-[0_30px_60px_rgba(15,23,42,0.15)]
+            pt-8 pb-8 px-8 flex flex-col items-stretch justify-start
+        ">
+
+            <h3 class="mb-4 w-full text-center text-blue-700 dark:text-blue-400 font-bold text-lg">Học Tập Online</h3>
+
+            <div class="mb-4 flex flex-col items-center justify-start">
+                <h1 class="text-2xl font-extrabold text-center text-blue-700 dark:text-blue-400">
+                    Chào mừng quản trị viên!
+                </h1>
+                <p class="text-center text-gray-500 dark:text-gray-300 text-sm">
+                    Đăng nhập để theo dõi và quản lý hệ thống LMS của bạn.
+                </p>
+            </div>
+
+            <form id="loginForm" class="space-y-4">
+
+                <!-- Email -->
+                <div class="flex flex-col gap-1">
+                    <label class="text-[13px] ml-4 font-semibold text-gray-700 dark:text-gray-200">
+                        Email công việc
+                    </label>
+                    <input
+                        type="email"
+                        id="email"
+                        required
+                        placeholder="ten.ban@tencongty.com"
+                        class="px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    >
+                </div>
+
+                <!-- Password -->
+                <div class="flex flex-col gap-1">
+                    <label class="text-[13px] ml-4 font-semibold text-gray-700 dark:text-gray-200">
+                        Mật khẩu
+                    </label>
+                    <input
+                        type="password"
+                        id="password"
+                        required
+                        placeholder="Nhập mật khẩu của bạn"
+                        class="px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    >
+                </div>
+
+                <!-- Button -->
+                <button id="submitBtn" type="submit"
+                    class="w-full inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-blue-600 to-green-500 hover:from-blue-700 hover:to-green-600 disabled:opacity-60 text-white font-bold px-4 py-3 transition-all shadow-lg"
+                >
+                    <span id="btnSubmitText">Đăng nhập</span>
+                    <div id="loading" class="hidden flex items-center justify-center gap-2 text-sm text-white mt-3">
+                        <div class="w-4 h-4 border-2 border-gray-300 border-t-brandBlue rounded-full animate-spinfast"></div>
+                        <span>Đang xác thực...</span>
+                    </div>
+                </button>
+
+            </form>
+
+            <div class="mt-6 text-center text-[12px] text-gray-400 dark:text-gray-500">
+                © <span id="currentYear"></span> LMS. Hỗ trợ:
+                <a class="underline" href="mailto:support@lms.vn">support@lms.vn</a>
+            </div>
+        </div>
+
+        <!-- Alert -->
+        <div id="alertContainer" class="space-y-2"></div>
+
+    </div>
+
+    <!-- SCRIPT -->
+    <script>
+        const alertContainer = document.getElementById('alertContainer');
+        const loginForm = document.getElementById('loginForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const btnSubmitText = document.getElementById('btnSubmitText');
+
+        function showAlert(msg, type = "error") {
+            const classes = type === "error"
+                ? "bg-red-100 border border-red-300 text-red-700"
+                : "bg-green-100 border border-green-300 text-green-700";
+
+            alertContainer.innerHTML = `
+                <div class="p-3 rounded-xl text-sm ${classes}">
+                    ${msg}
+                </div>
+            `;
+
+            setTimeout(() => alertContainer.innerHTML = "", 5000);
+        }
+
+        function toggleLoading(isLoading) {
+            submitBtn.disabled = isLoading;
+            loading.classList.toggle("hidden", !isLoading);
+            btnSubmitText.classList.toggle("hidden", isLoading);
+        }
+
+        loginForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            toggleLoading(true);
+
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
+
+            if (!email || !password) {
+                showAlert("Vui lòng nhập đầy đủ thông tin.");
+                toggleLoading(false);
+                return;
+            }
+
+            try {
+                const res = await fetch("/api/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({ email, password }),
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    showAlert("Đăng nhập thành công! Đang chuyển hướng...", "success"); 
+                    setTimeout(() => {
+                        window.location.href = "/admin/";
+                    }, 600);
+                } else {
+                    showAlert(data.message || "Đăng nhập thất bại. Vui lòng thử lại.");
+                }
+            } catch (err) {
+                showAlert("Không thể kết nối tới máy chủ.");
+            }
+
+            toggleLoading(false);
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("currentYear").textContent = new Date().getFullYear();
         });
     </script>
 </body>
 </html>
-

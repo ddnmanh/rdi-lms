@@ -7,7 +7,7 @@
 @section('content')
 <div class="h-full flex flex-col items-stretch justify-start gap-4 2xl:gap-6">
     {{-- Top Bar / Breadcrumbs + Actions (Flat) --}}
-    <div class="sticky top-0 z-20">
+    {{-- <div class="sticky top-0 z-20">
         <div class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-3 sm:px-4 py-2">
             <div class="flex items-center justify-between gap-3">
                 <div class="flex items-center gap-2">
@@ -23,77 +23,134 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     {{-- Form Card --}}
-    <form id="userForm" onsubmit="saveUser(event)" class="w-full max-w-6xl mx-auto bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+    <form id="userForm" onsubmit="saveUser(event)" class="w-full max-w-[1400px] mx-auto p-4 md:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
         <input type="hidden" id="userId" value="{{ $mode === 'edit' ? ($userId ?? '') : '' }}">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="flex flex-col gap-0.5">
-                <label for="email" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1 ml-3">Email *</label>
-                <input type="email" id="email" required
-                    class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700/50 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 outline-none">
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-3">Email sẽ được sử dụng để đăng nhập</p>
-            </div>
+        <input type="hidden" id="avatar_path" value="">
 
-            <div class="flex flex-col gap-0.5">
-                <label for="password" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1 ml-3">
-                    Password {{ $mode === 'create' ? '*' : '' }}
-                </label>
-                <input type="password" id="password" {{ $mode === 'create' ? 'required' : '' }}
-                    placeholder="{{ $mode === 'edit' ? 'Để trống nếu không đổi mật khẩu' : '' }}"
-                    class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700/50 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 outline-none">
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-3">
-                    {{ $mode === 'create' ? 'Mật khẩu tối thiểu 8 ký tự' : 'Chỉ điền nếu muốn thay đổi mật khẩu' }}
-                </p>
-            </div>
+        <div class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {{-- Avatar Section with Drag & Drop --}}
+                <div class="md:col-span-2">
+                    <label class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Ảnh đại diện</label>
+                    <div
+                        id="avatarDropZone"
+                        class="flex items-center gap-4 p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg"
+                    >
+                        <div class="w-[150px] aspect-square rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
+                            <img id="avatarPreview" alt="avatar preview" class="h-full w-full object-cover hidden">
+                            <svg id="avatarPlaceholder" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-8 w-8 text-gray-400">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-3.33 0-10 1.67-10 5v1h20v-1c0-3.33-6.67-5-10-5z" />
+                            </svg>
+                        </div>
 
-            <div class="flex flex-col gap-0.5">
-                <label for="fullname" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1 ml-3">Họ và tên</label>
-                <input type="text" id="fullname"
-                    class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700/50 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 outline-none">
-            </div>
-
-            <div class="flex flex-col gap-0.5">
-                <label for="birthday" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1 ml-3">Ngày sinh</label>
-                <input type="date" id="birthday"
-                    class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700/50 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 outline-none">
-            </div>
-
-            <div class="flex flex-col gap-0.5">
-                <label for="path_avatar" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1 ml-3">Avatar URL</label>
-                <input type="text" id="path_avatar"
-                    placeholder="https://example.com/avatar.jpg"
-                    class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700/50 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 outline-none">
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-3">URL ảnh đại diện của người dùng</p>
-            </div>
-
-            <div class="flex flex-col gap-0.5">
-                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1 ml-3 mb-2">Vai trò *</label>
-                <div id="rolesCheckboxes" class="flex flex-row flex-wrap gap-1">
-                    <div class="flex items-center justify-center py-8">
-                        <div class="flex flex-col items-center justify-center">
-                            <div class="h-12 w-12 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center mb-3">
-                                <i class="fas fa-spinner fa-spin text-xl text-gray-400 dark:text-gray-500"></i>
+                        <div class="flex-1">
+                            <div class="text-sm text-gray-600 dark:text-gray-300">Kéo & thả ảnh vào đây, hoặc</div>
+                            <div class="mt-2 flex items-center gap-3">
+                                <label for="avatar" class="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 text-sm">
+                                    Chọn ảnh
+                                </label>
+                                <button
+                                    id="btnClearNewAvatar"
+                                    type="button"
+                                    class="hidden px-3 py-2 rounded-md border border-red-300 text-red-600 hover:bg-red-50 dark:border-red-600 dark:hover:bg-gray-700 text-sm"
+                                >
+                                    Xóa ảnh mới
+                                </button>
+                                <input
+                                    id="avatar"
+                                    type="file"
+                                    accept="image/*"
+                                    class="hidden"
+                                />
                             </div>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Đang tải vai trò...</p>
+                            <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">Hỗ trợ PNG, JPG, WEBP, GIF — Tối đa 2MB</div>
                         </div>
                     </div>
                 </div>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-3">Chọn ít nhất một vai trò cho người dùng</p>
-            </div>
-        </div>
 
-        <div class="flex items-center justify-end gap-3 mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <a href="{{ route('admin.users.list') }}"
-                class="px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300">
-                Hủy
-            </a>
-            <button type="submit"
-                class="px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all duration-300 flex items-center gap-2">
-                <i class="fas fa-save"></i>
-                <span>Lưu</span>
-            </button>
+                {{-- Fullname --}}
+                <div class="">
+                    <label for="fullname" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Họ tên</label>
+                    <input
+                        type="text"
+                        id="fullname"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none"
+                        placeholder="Nhập họ tên"
+                    />
+                </div>
+
+                {{-- Email --}}
+                <div>
+                    <label for="email" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Email *</label>
+                    <input
+                        type="email"
+                        id="email"
+                        required
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none"
+                        placeholder="Nhập email"
+                    />
+                </div>
+
+                {{-- Password --}}
+                <div>
+                    <label for="password" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">
+                        Password {{ $mode === 'create' ? '*' : '' }}
+                    </label>
+                    <input
+                        type="password"
+                        id="password"
+                        {{ $mode === 'create' ? 'required' : '' }}
+                        placeholder="{{ $mode === 'edit' ? 'Để trống nếu không đổi mật khẩu' : 'Nhập mật khẩu' }}"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none"
+                    />
+                </div>
+
+                {{-- Birthday --}}
+                <div>
+                    <label for="birthday" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Ngày sinh</label>
+                    <input
+                        type="date"
+                        id="birthday"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none"
+                    />
+                </div>
+
+                {{-- Roles --}}
+                <div class="md:col-span-2">
+                    <label class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Vai trò *</label>
+                    <div id="rolesCheckboxes" class="flex flex-row flex-wrap gap-1">
+                        <div class="flex items-center justify-center py-8 w-full">
+                            <div class="flex flex-col items-center justify-center">
+                                <div class="h-12 w-12 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center mb-3">
+                                    <i class="fas fa-spinner fa-spin text-xl text-gray-400 dark:text-gray-500"></i>
+                                </div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Đang tải vai trò...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Chọn ít nhất một vai trò cho người dùng</p>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3">
+                <button
+                    type="button"
+                    onclick="handleBack()"
+                    class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
+                >
+                    Hủy
+                </button>
+                <button
+                    type="submit"
+                    id="submitBtn"
+                    class="px-4 py-2 rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                >
+                    {{ $mode === 'create' ? 'Tạo' : 'Cập nhật' }}
+                </button>
+            </div>
         </div>
     </form>
 
@@ -103,13 +160,21 @@
     let rolesList = [];
     const mode = '{{ $mode }}';
     const userId = @if($mode === 'edit' && isset($userId)) {{ $userId }} @else null @endif;
+    let existingThumbnail = null;
+    let thumbnailPreview = null;
+    let isDragActive = false;
 
     document.addEventListener('DOMContentLoaded', async function() {
         await loadRoles();
         if (mode === 'edit' && userId) {
             await loadUserData(userId);
         }
+        initAvatarPreviewForm();
     });
+
+    function handleBack() {
+        window.history.back();
+    }
 
     async function loadRoles() {
         try {
@@ -119,7 +184,7 @@
                 renderRolesCheckboxes();
             }
         } catch (error) {
-            // showAlert('Không thể tải danh sách vai trò: ' + error.message, 'error');
+            showNotificationModel_Global('Không thể tải danh sách vai trò: ' + error.message, 'error');
         }
     }
 
@@ -127,7 +192,7 @@
         const container = document.getElementById('rolesCheckboxes');
         if (rolesList.length === 0) {
             container.innerHTML = `
-                <div class="flex items-center justify-center py-8">
+                <div class="flex items-center justify-center py-8 w-full">
                     <p class="text-sm text-gray-600 dark:text-gray-400">Không có vai trò nào</p>
                 </div>
             `;
@@ -156,71 +221,244 @@
                 document.getElementById('email').value = user.email || '';
                 document.getElementById('fullname').value = user.fullname || '';
                 document.getElementById('birthday').value = user.birthday ? user.birthday.split('T')[0] : '';
-                document.getElementById('path_avatar').value = user.path_avatar || '';
+                document.getElementById('avatar_path').value = user.avatar_path || '';
+
+                // Set avatar preview
+                const avatarEl = document.getElementById('avatarPreview');
+                const placeholderEl = document.getElementById('avatarPlaceholder');
+                if (user.avatar_path) {
+                    avatarEl.src = user.avatar_path;
+                    avatarEl.classList.remove('hidden');
+                    placeholderEl.classList.add('hidden');
+                    existingThumbnail = user.avatar_path;
+                } else {
+                    const name = user.fullname || user.email || 'User';
+                    avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=3b82f6&color=fff&size=128`;
+                    avatarEl.classList.remove('hidden');
+                    placeholderEl.classList.add('hidden');
+                }
 
                 const userRoleIds = (user.roles || []).map(r => r.id);
                 renderRolesCheckboxes(userRoleIds);
             }
         } catch (error) {
-            // showAlert('Không thể tải thông tin người dùng: ' + error.message, 'error');
+            showNotificationModel_Global('Không thể tải thông tin người dùng: ' + error.message, 'error');
             setTimeout(() => {
                 window.location.href = '{{ route('admin.users.list') }}';
             }, 2000);
         }
     }
 
+    function handleThumbnailFile(file) {
+        const MAX_SIZE = 2 * 1024 * 1024; // 2MB
+        const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+        if (thumbnailPreview) {
+            try {
+                URL.revokeObjectURL(thumbnailPreview);
+            } catch (e) {
+                // noop
+            }
+        }
+
+        if (!file) {
+            const avatarEl = document.getElementById('avatarPreview');
+            const placeholderEl = document.getElementById('avatarPlaceholder');
+            const clearBtn = document.getElementById('btnClearNewAvatar');
+            const input = document.getElementById('avatar');
+
+            if (existingThumbnail) {
+                avatarEl.src = existingThumbnail;
+                avatarEl.classList.remove('hidden');
+                placeholderEl.classList.add('hidden');
+            } else {
+                avatarEl.classList.add('hidden');
+                placeholderEl.classList.remove('hidden');
+            }
+            clearBtn.classList.add('hidden');
+            if (input) input.value = '';
+            thumbnailPreview = null;
+            return;
+        }
+
+        if (!ALLOWED_TYPES.includes(file.type)) {
+            showNotificationModel_Global('Định dạng không hỗ trợ. Hãy chọn ảnh PNG, JPG, WEBP hoặc GIF.', 'error');
+            return;
+        }
+
+        if (file.size > MAX_SIZE) {
+            showNotificationModel_Global('Ảnh quá lớn. Kích thước tối đa 2MB.', 'error');
+            return;
+        }
+
+        const previewUrl = URL.createObjectURL(file);
+        thumbnailPreview = previewUrl;
+
+        const avatarEl = document.getElementById('avatarPreview');
+        const placeholderEl = document.getElementById('avatarPlaceholder');
+        const clearBtn = document.getElementById('btnClearNewAvatar');
+
+        avatarEl.src = previewUrl;
+        avatarEl.classList.remove('hidden');
+        placeholderEl.classList.add('hidden');
+        clearBtn.classList.remove('hidden');
+    }
+
+    function initAvatarPreviewForm() {
+        const dropZone = document.getElementById('avatarDropZone');
+        const input = document.getElementById('avatar');
+        const clearBtn = document.getElementById('btnClearNewAvatar');
+        const avatarEl = document.getElementById('avatarPreview');
+        const placeholderEl = document.getElementById('avatarPlaceholder');
+
+        // Default preview for create mode
+        if (!existingThumbnail && mode === 'create') {
+            avatarEl.classList.add('hidden');
+            placeholderEl.classList.remove('hidden');
+        }
+
+        // Drag and drop handlers
+        if (dropZone) {
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                isDragActive = true;
+                dropZone.classList.remove('border-gray-300', 'dark:border-gray-600');
+                dropZone.classList.add('border-blue-500', 'bg-blue-50', 'dark:bg-gray-700');
+            });
+
+            dropZone.addEventListener('dragleave', () => {
+                isDragActive = false;
+                dropZone.classList.remove('border-blue-500', 'bg-blue-50', 'dark:bg-gray-700');
+                dropZone.classList.add('border-gray-300', 'dark:border-gray-600');
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                isDragActive = false;
+                dropZone.classList.remove('border-blue-500', 'bg-blue-50', 'dark:bg-gray-700');
+                dropZone.classList.add('border-gray-300', 'dark:border-gray-600');
+
+                const file = e.dataTransfer.files && e.dataTransfer.files[0] ? e.dataTransfer.files[0] : null;
+                if (file) {
+                    handleThumbnailFile(file);
+                    if (input) input.files = e.dataTransfer.files;
+                }
+            });
+        }
+
+        // File input change handler
+        if (input) {
+            input.addEventListener('change', (e) => {
+                const file = e.target.files && e.target.files[0] ? e.target.files[0] : null;
+                if (file) {
+                    handleThumbnailFile(file);
+                }
+            });
+        }
+
+        // Clear button handler
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                handleThumbnailFile(null);
+            });
+        }
+    }
+
     async function saveUser(event) {
         event.preventDefault();
         const userIdValue = document.getElementById('userId').value;
-        const formData = {
-            email: document.getElementById('email').value,
-            fullname: document.getElementById('fullname').value,
-            birthday: document.getElementById('birthday').value || null,
-            path_avatar: document.getElementById('path_avatar').value || null,
-        };
+        const submitBtn = document.getElementById('submitBtn');
 
-        const password = document.getElementById('password').value;
-        if (password) {
-            formData.password = password;
+        // Disable submit button
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Đang xử lý...';
         }
+
+        const email = document.getElementById('email').value;
+        const fullname = document.getElementById('fullname').value;
+        const birthday = document.getElementById('birthday').value || null;
+        const avatarPath = document.getElementById('avatar_path').value || null;
+        const password = document.getElementById('password').value;
+        const fileInput = document.getElementById('avatar');
+        const avatarFile = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
 
         const roleCheckboxes = document.querySelectorAll('input[name="role_ids[]"]:checked');
-        console.log(roleCheckboxes);
-
         if (roleCheckboxes.length === 0) {
-            // showAlert('Vui lòng chọn ít nhất một vai trò', 'error');
+            showNotificationModel_Global('Vui lòng chọn ít nhất một vai trò', 'error');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = mode === 'create' ? 'Tạo' : 'Cập nhật';
+            }
             return;
         }
-        formData.role_ids = Array.from(roleCheckboxes).map(cb => parseInt(cb.value));
+        const roleIds = Array.from(roleCheckboxes).map(cb => parseInt(cb.value));
+
+        const isEdit = Boolean(userIdValue);
+        const url = isEdit ? `/users/${userIdValue}` : '/users';
+        const method = isEdit ? 'PUT' : 'POST';
 
         try {
             let data;
-            if (userIdValue) {
-                // Edit mode
-                data = await apiRequest(`/users/${userIdValue}`, {
-                    method: 'PUT',
-                    body: JSON.stringify(formData)
-                });
-            } else {
-                // Create mode
-                if (!password) {
-                    // showAlert('Password là bắt buộc khi tạo mới', 'error');
-                    return;
+            if (avatarFile || existingThumbnail) {
+                // Use multipart/form-data when file is selected or existing thumbnail
+                const fd = new FormData();
+                // Laravel/Symfony không parse multipart cho PUT/PATCH -> dùng POST + _method
+                if (isEdit) {
+                    fd.append('_method', 'PUT');
                 }
-                data = await apiRequest('/users', {
+                fd.append('email', email);
+                if (fullname) fd.append('fullname', fullname);
+                if (birthday) fd.append('birthday', birthday);
+                if (existingThumbnail) fd.append('existingThumbnail', existingThumbnail);
+                if (avatarPath) fd.append('avatar_path', avatarPath);
+                if (password) fd.append('password', password);
+                roleIds.forEach(id => fd.append('role_ids[]', id));
+                if (avatarFile) fd.append('avatar', avatarFile);
+
+                const response = await fetch(`/api${url}`, {
                     method: 'POST',
-                    body: JSON.stringify(formData)
+                    body: fd,
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json'
+                        // DO NOT set Content-Type here; browser will set with boundary
+                    }
+                });
+                const json = await response.json();
+                if (!response.ok) {
+                    throw new Error(json.message || 'Có lỗi xảy ra');
+                }
+                data = json;
+            } else {
+                // Fallback to JSON request when no file selected
+                const payload = {
+                    email,
+                    fullname,
+                    birthday,
+                    avatar_path: avatarPath,
+                };
+                if (password) payload.password = password;
+                payload.role_ids = roleIds;
+
+                data = await apiRequest(url, {
+                    method,
+                    body: JSON.stringify(payload)
                 });
             }
 
             if (data.success) {
-                // showAlert(data.message || 'Lưu thành công', 'success');
+                showNotificationModel_Global(isEdit ? 'Cập nhật thông tin người dùng thành công' : 'Tạo người dùng thành công');
                 setTimeout(() => {
-                    window.location.href = '{{ route('admin.users.list') }}';
-                }, 1000);
+                    handleBack();
+                }, 1500);
             }
         } catch (error) {
-            // showAlert(error.message, 'error');
+            showNotificationModel_Global(error.message || 'Thao tác thất bại', 'error');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = mode === 'create' ? 'Tạo' : 'Cập nhật';
+            }
         }
     }
 </script>

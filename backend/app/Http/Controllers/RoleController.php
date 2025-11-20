@@ -2,10 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\roles\DestroyRequest;
+use App\Http\Requests\roles\GetAllRequest;
+use App\Http\Requests\roles\StoreRequest;
+use App\Http\Requests\roles\UpdateRequest;
 use App\Models\Role;
 use App\Models\Permission;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Js;
+use Nette\Utils\Json;
 
 class RoleController extends Controller
 {
@@ -23,235 +30,257 @@ class RoleController extends Controller
      * - per_page: Số lượng mỗi trang - mặc định: 15
      * - page: Số trang
      */
-    public function index(Request $request)
+    public function index(GetAllRequest $request): JsonResponse
     {
-        $query = Role::with('users', 'permissions');
+        try {
+            $body = $request->validated();
 
-        // Tìm kiếm
-        if ($request->has('search') && $request->search) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
-            });
+            $query = Role::with('users', 'permissions');
+
+            // Tìm kiếm
+            if (isset($body['search']) && $body['search']) {
+                $search = $body['search'];
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                });
+            }
+
+            // Lọc theo level (từ)
+            if (isset($body['level_from']) && $body['level_from']) {
+                $query->where('level', '>=', $body['level_from']);
+            }
+
+            // Lọc theo level (đến)
+            if (isset($body['level_to']) && $body['level_to']) {
+                $query->where('level', '<=', $body['level_to']);
+            }
+
+            // Lọc theo user_id
+            if (isset($body['user_id']) && $body['user_id']) {
+                $query->whereHas('users', function ($q) use ($body) {
+                    $q->where('users.id', $body['user_id']);
+                });
+            }
+
+            // Lọc theo permission_id
+            if (isset($body['permission_id']) && $body['permission_id']) {
+                $query->whereHas('permissions', function ($q) use ($body) {
+                    $q->where('permissions.id', $body['permission_id']);
+                });
+            }
+
+            // Sắp xếp
+            $sortBy = $body['sort_by'] ?? 'level';
+            $orderBy = $body['order_by'] ?? 'asc';
+
+            // Validate sort_by
+            $allowedSortBy = ['id', 'name', 'level', 'created_at', 'updated_at'];
+            if (!in_array($sortBy, $allowedSortBy)) {
+                $sortBy = 'level';
+            }
+
+            // Validate order_by
+            $orderBy = strtolower($orderBy);
+            if (!in_array($orderBy, ['asc', 'desc'])) {
+                $orderBy = 'asc';
+            }
+
+            $query->orderBy($sortBy, $orderBy);
+
+            $perPage = $body['per_page'] ?? 15;
+            $perPage = min(max(1, (int)$perPage), 100); // Giới hạn từ 1-100
+
+            $roles = $query->paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'data' => $roles
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Đã xảy ra lỗi khi lấy danh sách roles',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        // Lọc theo level (từ)
-        if ($request->has('level_from') && $request->level_from) {
-            $query->where('level', '>=', $request->level_from);
-        }
-
-        // Lọc theo level (đến)
-        if ($request->has('level_to') && $request->level_to) {
-            $query->where('level', '<=', $request->level_to);
-        }
-
-        // Lọc theo user_id
-        if ($request->has('user_id') && $request->user_id) {
-            $query->whereHas('users', function ($q) use ($request) {
-                $q->where('users.id', $request->user_id);
-            });
-        }
-
-        // Lọc theo permission_id
-        if ($request->has('permission_id') && $request->permission_id) {
-            $query->whereHas('permissions', function ($q) use ($request) {
-                $q->where('permissions.id', $request->permission_id);
-            });
-        }
-
-        // Sắp xếp
-        $sortBy = $request->get('sort_by', 'level');
-        $orderBy = $request->get('order_by', 'asc');
-
-        // Validate sort_by
-        $allowedSortBy = ['id', 'name', 'level', 'created_at', 'updated_at'];
-        if (!in_array($sortBy, $allowedSortBy)) {
-            $sortBy = 'level';
-        }
-
-        // Validate order_by
-        $orderBy = strtolower($orderBy);
-        if (!in_array($orderBy, ['asc', 'desc'])) {
-            $orderBy = 'asc';
-        }
-
-        $query->orderBy($sortBy, $orderBy);
-
-        $perPage = $request->get('per_page', 15);
-        $perPage = min(max(1, (int)$perPage), 100); // Giới hạn từ 1-100
-
-        $roles = $query->paginate($perPage);
-
-        return response()->json([
-            'success' => true,
-            'data' => $roles
-        ]);
     }
 
     /**
      * Chi tiết role
      */
-    public function show($id)
+    public function show($id): JsonResponse
     {
-        $role = Role::with('users', 'permissions')->find($id);
+        try {
+            $role = Role::with('users', 'permissions')->find($id);
 
-        if (!$role) {
+            if (!$role) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Không tìm thấy role'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $role
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy role'
-            ], 404);
+                'message' => 'Đã xảy ra lỗi khi lấy chi tiết role',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        return response()->json([
-            'success' => true,
-            'data' => $role
-        ]);
     }
 
     /**
      * Tạo role mới
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:50|unique:roles,name',
-            'description' => 'nullable|string|max:255',
-            'level' => 'required|integer|min:1|max:255',
-            'permission_ids' => 'nullable|array',
-            'permission_ids.*' => 'exists:permissions,id',
-        ]);
+        try {
+            $body = $request->validated();
 
-        if ($validator->fails()) {
+            $role = Role::create([
+                'name' => $body['name'] ?? '',
+                'description' => $body['description'] ?? null,
+                'level' => $body['level'] ?? 255,
+            ]);
+
+            // Gán permissions
+            if (isset($body['permission_ids'])) {
+                $role->permissions()->sync($body['permission_ids']);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Tạo role thành công',
+                'data' => $role->load('permissions')
+            ], 201);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
+                'message' => 'Đã xảy ra lỗi khi tạo role',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $role = Role::create([
-            'name' => $request->name,
-            'description' => $request->description,
-            'level' => $request->level,
-        ]);
-
-        // Gán permissions
-        if ($request->has('permission_ids')) {
-            $role->permissions()->sync($request->permission_ids);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Tạo role thành công',
-            'data' => $role->load('permissions')
-        ], 201);
     }
 
     /**
      * Cập nhật role
      */
-    public function update(Request $request, $id)
+    public function update(UpdateRequest $request, $id):JsonResponse
     {
-        $role = Role::find($id);
+        try {
 
-        if (!$role) {
+            $body = $request->validated();
+
+            $role = Role::find($id);
+
+            if (!$role) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Không tìm thấy role'
+                ], 404);
+            } 
+
+            $role->update([
+                'name' => $body['name'] ?? $role->name,
+                'description' => $body['description'] ?? $role->description,
+                'level' => $body['level'] ?? $role->level,
+            ]);
+
+            // Cập nhật permissions
+            if (isset($body['permission_ids'])) {
+                $role->permissions()->sync($body['permission_ids'] ?? []);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cập nhật role thành công',
+                'data' => $role->load('permissions')
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy role'
-            ], 404);
+                'message' => 'Đã xảy ra lỗi khi cập nhật role',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:50|unique:roles,name,' . $id,
-            'description' => 'nullable|string|max:255',
-            'level' => 'required|integer|min:1|max:255',
-            'permission_ids' => 'nullable|array',
-            'permission_ids.*' => 'exists:permissions,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $role->update([
-            'name' => $request->name,
-            'description' => $request->description,
-            'level' => $request->level,
-        ]);
-
-        // Cập nhật permissions
-        if ($request->has('permission_ids')) {
-            $role->permissions()->sync($request->permission_ids);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Cập nhật role thành công',
-            'data' => $role->load('permissions')
-        ]);
     }
 
     /**
      * Xóa role (soft delete)
      */
-    public function destroy($id)
+    public function destroy(DestroyRequest $request): JsonResponse
     {
-        $role = Role::find($id);
+        try {
 
-        if (!$role) {
+            $body = $request->validated();
+
+            $roles = Role::whereIn('id', $body['role_ids'])->get();
+
+            if (!$roles) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Không tìm thấy role'
+                ], 404);
+            }
+
+            foreach ($roles as $role) {
+                if ($role->name !== 'ROOT') { // Không xóa role ROOT
+                    $role->delete();
+                }
+            } 
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Xóa roles thành công'
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy role'
-            ], 404);
+                'message' => 'Đã xảy ra lỗi khi xóa roles',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $role->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Xóa role thành công'
-        ]);
     }
 
     /**
      * Gán permissions cho role
      */
-    public function assignPermissions(Request $request, $id)
-    {
-        $role = Role::find($id);
+    // public function assignPermissions(Request $request, $id)
+    // {
+    //     $role = Role::find($id);
 
-        if (!$role) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Không tìm thấy role'
-            ], 404);
-        }
+    //     if (!$role) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Không tìm thấy role'
+    //         ], 404);
+    //     }
 
-        $validator = Validator::make($request->all(), [
-            'permission_ids' => 'required|array',
-            'permission_ids.*' => 'exists:permissions,id',
-        ]);
+    //     $validator = Validator::make($request->all(), [
+    //         'permission_ids' => 'required|array',
+    //         'permission_ids.*' => 'exists:permissions,id',
+    //     ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
-        }
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Validation errors',
+    //             'errors' => $validator->errors()
+    //         ], 422);
+    //     }
 
-        $role->permissions()->sync($request->permission_ids);
+    //     $role->permissions()->sync($request->permission_ids);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Gán permissions thành công',
-            'data' => $role->load('permissions')
-        ]);
-    }
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Gán permissions thành công',
+    //         'data' => $role->load('permissions')
+    //     ]);
+    // }
 }
 

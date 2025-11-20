@@ -5,47 +5,6 @@
 @section('description', 'Quản lý tất cả bài học trong hệ thống')
 
 @section('content')
-<style>
-    /* Custom scrollbar overlay - đè lên header, không chiếm chỗ */
-    .table-scroll-container {
-        scrollbar-width: thin;
-        scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
-    }
-
-    /* Webkit browsers (Chrome, Safari, Edge) */
-    .table-scroll-container::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-    }
-
-    .table-scroll-container::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .table-scroll-container::-webkit-scrollbar-thumb {
-        background-color: rgba(156, 163, 175, 0.5);
-        border-radius: 4px;
-        border: 2px solid transparent;
-        background-clip: padding-box;
-    }
-
-    .table-scroll-container::-webkit-scrollbar-thumb:hover {
-        background-color: rgba(156, 163, 175, 0.7);
-    }
-
-    /* Dark mode */
-    .dark .table-scroll-container {
-        scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
-    }
-
-    .dark .table-scroll-container::-webkit-scrollbar-thumb {
-        background-color: rgba(75, 85, 99, 0.5);
-    }
-
-    .dark .table-scroll-container::-webkit-scrollbar-thumb:hover {
-        background-color: rgba(75, 85, 99, 0.7);
-    }
-</style>
 <div class="h-full flex flex-col items-stretch justify-start gap-2.5 2xl:gap-4">
     <div class="flex flex-col items-stretch justify-start gap-2.5">
         {{-- Actions Bar --}}
@@ -57,6 +16,14 @@
                     <span>Thêm bài học</span>
                 </a>
             </div>
+            <button
+                id="btnDeleteBulk"
+                onclick="openBulkDeleteModal()"
+                disabled
+                class="group px-4 py-2.5 bg-red-600 text-white rounded-xl transition-all duration-300 font-medium flex items-center justify-center gap-2 hover:bg-red-700 opacity-50 cursor-not-allowed">
+                <i class="fas fa-trash"></i>
+                <span>Xóa <span id="selectedCount"></span> bài học</span>
+            </button>
         </div>
 
         {{-- Filter Section --}}
@@ -64,7 +31,7 @@
             <div class="flex flex-col lg:flex-row justify-start flex-wrap gap-4 flex-1">
                 {{-- Course Filter --}}
                 <div class="min-w-32 flex flex-col items-stretch justify-start gap-0.5">
-                    <label for="courseFilter" class="block text-sm font-medium text-gray-300 dark:text-gray-300 ml-2">
+                    <label for="courseFilter" class="block ml-3 text-sm font-medium text-gray-300 dark:text-gray-300 ml-2">
                         Khóa học
                     </label>
                     <select id="courseFilter"
@@ -75,7 +42,7 @@
 
                 {{-- Search Filter --}}
                 <div class="flex-1 min-w-40 max-w-80 flex flex-col items-stretch justify-start gap-0.5">
-                    <label for="searchFilter" class="block text-sm font-medium text-gray-300 dark:text-gray-300">
+                    <label for="searchFilter" class="block ml-3 text-sm font-medium text-gray-300 dark:text-gray-300">
                         Tìm kiếm
                     </label>
                     <input type="text" id="searchFilter" placeholder="Tìm theo tiêu đề, mô tả..."
@@ -84,7 +51,7 @@
 
                 {{-- Duration Range Filter --}}
                 <div class="flex flex-col items-stretch justify-start gap-0.5">
-                    <label for="durationMin" class="block text-sm font-medium text-gray-300 dark:text-gray-300">
+                    <label for="durationMin" class="block ml-3 text-sm font-medium text-gray-300 dark:text-gray-300">
                         Thời lượng từ (giây)
                     </label>
                     <div class="flex items-center gap-1">
@@ -117,20 +84,17 @@
 
         <div class="table-scroll-container w-full overflow-x-hidden h-full overflow-y-auto">
             <div id="lessonsTable">
-                <div class="pt-40 flex flex-col items-center justify-center gap-2">
+                <div class="w-fit mx-auto mt-[20dvh]">
                     <div id="SPINNER_LOADING">
-                        <div id="SPINNER_LOADING_LDS_ROLLER">
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                            <div></div>
+                        <div id="SPINNER_LOADING_CONTAINER">
+                            <div id="SPINNER_LOADING_CONTAINER_LDS_ROLLER">
+                                <div></div> <div></div> <div></div> <div></div> <div></div> <div></div> <div></div> <div></div>
+                            </div>
+                        </div>
+                        <div id="SPINNER_LOADING_ICON">
+                            <i class="fas fa-graduation-cap"></i>
                         </div>
                     </div>
-                    <div class="text-sm text-[#9ca3af80] dark:text-[#9ca3af80]">Đang tải dữ liệu...</div>
                 </div>
             </div>
         </div>
@@ -155,7 +119,7 @@
                 </div>
 
                 {{-- Custom Pagination --}}
-                <div id="pagination" class="flex items-center justify-end gap-1 text-sm 2xl:text-base"></div>
+                <div id="pagination" class="flex items-center justify-end gap-1 text-sm  "></div>
             </div>
         </div>
     </div>
@@ -165,7 +129,7 @@
 {{-- Delete Confirmation Modal --}}
 <div id="deleteModal" class="fixed inset-0 z-[100] overflow-y-auto overflow-x-hidden" style="display: none;">
     {{-- Backdrop --}}
-    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="closeDeleteModal()"></div>
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="closeOneDeleteModal()"></div>
 
     {{-- Modal Container --}}
     <div class="relative flex min-h-full items-center justify-center p-4 z-10">
@@ -211,11 +175,11 @@
 
             {{-- Modal Footer --}}
             <div class="flex items-center justify-end gap-3">
-                <button type="button" onclick="closeDeleteModal()"
+                <button type="button" onclick="closeOneDeleteModal()"
                     class="px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300">
                     Hủy
                 </button>
-                <button type="button" onclick="confirmDelete()"
+                <button type="button" onclick="confirmOneDelete()"
                     class="px-4 py-2.5 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-all duration-300 flex items-center gap-2">
                     <i class="fas fa-trash"></i>
                     <span>Xác nhận xóa</span>
@@ -274,12 +238,12 @@
     let currentPage = 1;
     let coursesList = [];
     let deleteLessonId = null;
-    let sortBy = 'display_order';
+    let sortBy = 'course_id';
     let sortOrder = 'asc';
+    let selectedLessonIds = new Set();
 
-    document.addEventListener('DOMContentLoaded', async function() {
-        await loadCourses();
-        await loadLessons();
+    document.addEventListener('DOMContentLoaded', async function() { 
+        await Promise.all([loadCourses(), loadLessons()]);
 
         // Ngăn chặn hành động mặc định của form khi nhấn enter ở các input
         const filterInputs = ['searchFilter', 'courseFilter', 'durationMin', 'durationMax'];
@@ -387,20 +351,17 @@
     function renderTableLoading() {
         const tableContainer = document.getElementById('lessonsTable');
         tableContainer.innerHTML = `
-            <div class="pt-40 flex flex-col items-center justify-center gap-2">
+            <div class="w-fit mx-auto mt-[20dvh]">
                 <div id="SPINNER_LOADING">
-                    <div id="SPINNER_LOADING_LDS_ROLLER">
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
+                    <div id="SPINNER_LOADING_CONTAINER">
+                        <div id="SPINNER_LOADING_CONTAINER_LDS_ROLLER">
+                            <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                        </div>
+                    </div>
+                    <div id="SPINNER_LOADING_ICON">
+                        <i class="fas fa-graduation-cap"></i>
                     </div>
                 </div>
-                <div class="text-sm text-[#9ca3af80] dark:text-[#9ca3af80]">Đang tải dữ liệu...</div>
             </div>
         `;
     }
@@ -409,6 +370,8 @@
         renderTableLoading();
 
         currentPage = page;
+        // Clear selected lessons when changing page or filters
+        selectedLessonIds.clear();
         const search = document.getElementById('searchFilter').value;
         const courseId = document.getElementById('courseFilter').value;
         const durationMin = document.getElementById('durationMin').value;
@@ -449,21 +412,29 @@
             tableContainer.innerHTML = `
                 <table class="w-full table-fixed border-separate border-spacing-0 text-sm">
                     <colgroup>
-                        <col class="w-[7%]">
-                        <col class="w-[20%]">
-                        <col class="w-[25%]">
-                        <col class="w-[13%]">
-                        <col class="w-[10%]">
-                        <col class="w-[25%]">
+                        <col class="w-[40px] 2xl:w-[60px]">
+                        <col class="w-[70px] 2xl:w-[100px]">
+                        <col class="w-[120px] 2xl:w-[140px]">
+                        <col class="">
+                        <col class="">
+                        <col class="">
+                        <col class="w-[120px] 2xl:w-[140px]">
+                        <col class="w-[80px] 2xl:w-[100px]">
+                        <col class="w-[110px] 2xl:w-[140px]">
                     </colgroup>
                     <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
                         <tr>
+                            <th class="px-4 py-3 text-center sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm">
+                                <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                            </th>
                             <th onclick="handleSort('id')" class="${getHeaderClass('id')}">
                                 ID${getSortIcon('id')}
                             </th>
+                            <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Thumbnail</th>
                             <th onclick="handleSort('title')" class="${getHeaderClass('title')}">
                                 Tiêu đề${getSortIcon('title')}
                             </th>
+                            <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Mô tảc</th>
                             <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Khóa học</th>
                             <th onclick="handleSort('duration')" class="${getHeaderClass('duration')}">
                                 Thời lượng${getSortIcon('duration')}
@@ -476,7 +447,7 @@
                     </thead>
                     <tbody class="[&>tr:not(:first-child)>td]:border-t [&>tr:not(:first-child)>td]:border-gray-200 dark:[&>tr:not(:first-child)>td]:border-gray-700">
                         <tr>
-                            <td colspan="6" class="pt-40 text-center">
+                            <td colspan="9" class="pt-40 text-center">
                                 <div class="flex flex-col items-center justify-center">
                                     <div class="h-20 w-20 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center mb-4 shadow-lg">
                                         <i class="fas fa-inbox text-3xl text-gray-400 dark:text-gray-500"></i>
@@ -495,21 +466,29 @@
         let html = `
             <table class="w-full table-fixed border-separate border-spacing-0 text-sm">
                 <colgroup>
-                    <col class="w-[7%]">
-                    <col class="w-[20%]">
-                    <col class="w-[25%]">
-                    <col class="w-[13%]">
-                    <col class="w-[10%]">
-                    <col class="w-[25%]">
+                    <col class="w-[40px] 2xl:w-[60px]">
+                    <col class="w-[70px] 2xl:w-[100px]">
+                    <col class="w-[120px] 2xl:w-[140px]">
+                    <col class="">
+                    <col class="">
+                    <col class="">
+                    <col class="w-[120px] 2xl:w-[140px]">
+                    <col class="w-[80px] 2xl:w-[100px]">
+                    <col class="w-[110px] 2xl:w-[140px]">
                 </colgroup>
                 <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
                     <tr>
+                        <th class="px-4 py-3 text-center sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm">
+                            <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        </th>
                         <th onclick="handleSort('id')" class="${getHeaderClass('id')}">
                             ID${getSortIcon('id')}
                         </th>
+                        <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Thumbnail</th>
                         <th onclick="handleSort('title')" class="${getHeaderClass('title')}">
                             Tiêu đề${getSortIcon('title')}
                         </th>
+                        <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Mô tả</th>
                         <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Khóa học</th>
                         <th onclick="handleSort('duration')" class="${getHeaderClass('duration')}">
                             Thời lượng${getSortIcon('duration')}
@@ -529,13 +508,27 @@
             const durationSeconds = lesson.duration % 60;
             const durationFormatted = `${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`;
 
+            const isChecked = selectedLessonIds.has(lesson.id);
             html += `
                 <tr class="border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td class="px-4 py-3 text-center">
+                        <input type="checkbox"
+                            class="lesson-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                            value="${lesson.id}"
+                            ${isChecked ? 'checked' : ''}
+                            onchange="toggleLessonSelection(${lesson.id}, this.checked)">
+                    </td>
                     <td class="${getCellClass('id')} text-center">
                         <span class="text-gray-600 dark:text-gray-300">${lesson.id}</span>
                     </td>
+                    <td class="px-4 py-3 text-gray-600 dark:text-gray-300">
+                        <img src="${lesson.thumbnail_path}" alt="${lesson.title?.slice(0, 10) ?? 'Thumbnail'}" class="w-[60px] 2xl:w-[70px] aspect-video m-auto object-cover rounded-lg">
+                    </td>
                     <td class="${getCellClass('title')} text-gray-600 dark:text-gray-300">
                         ${lesson.title || '-'}
+                    </td>
+                    <td class="px-4 py-3 text-gray-600 dark:text-gray-300">
+                        ${lesson.description || '-'}
                     </td>
                     <td class="px-4 py-3 text-gray-600 dark:text-gray-300">
                         ${courseName}
@@ -547,20 +540,22 @@
                         ${lesson.display_order || 0}
                     </td>
                     <td class="px-4 py-3 align-top">
-                        <div class="flex flex-wrap items-center justify-end gap-2">
+                        <div class="flex flex-nowrap items-center justify-end gap-2 overflow-x-auto">
                             <a href="/admin/lessons/${lesson.id}"
-                                class="group/action inline-flex items-center justify-center w-8 h-8 rounded-md border border-blue-500 hover:border-blue-600 text-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300"
+                                class="inline-flex shrink-0 size-7 2xl:size-8 items-center justify-center rounded-md border border-blue-500 hover:border-blue-600 text-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300"
                                 title="Xem chi tiết">
                                 <i class="fas fa-eye text-sm 2xl:text-sm"></i>
                             </a>
                             <a href="/admin/lessons/${lesson.id}/edit"
-                                class="group/action inline-flex items-center justify-center w-8 h-8 rounded-md border border-amber-500 hover:border-amber-600 text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-300"
+                                class="inline-flex shrink-0 size-7 2xl:size-8 items-center justify-center rounded-md border border-amber-500 hover:border-amber-600 text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-300"
                                 title="Chỉnh sửa">
                                 <i class="fa-solid fa-pen text-sm 2xl:text-sm"></i>
                             </a>
-                            <button onclick="openDeleteModal(${lesson.id}, '${(lesson.title || '').replace(/'/g, "\\'")}', '${(courseName || '').replace(/'/g, "\\'")}')"
-                                class="group/action inline-flex items-center justify-center w-8 h-8 rounded-md border border-red-500 hover:border-red-600 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300"
-                                title="Xóa">
+                            <button onclick="openSingleDeleteModal(${lesson.id}, '${(lesson.title || '').replace(/'/g, "\\'")}', '${(courseName || '').replace(/'/g, "\\'")}')"
+                                ${lesson.course_id !== null ? 'disabled' : ''}
+                                class="inline-flex shrink-0 size-7 2xl:size-8 items-center justify-center rounded-md transition-all duration-300 ${lesson.course_id !== null ? 'border border-gray-200 dark:border-gray-500 text-gray-200 dark:text-gray-500 cursor-not-allowed' : 'border border-red-500 hover:border-red-600 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'}"
+                                title="Xóa"
+                            >
                                 <i class="fas fa-trash text-sm 2xl:text-sm"></i>
                             </button>
                         </div>
@@ -571,6 +566,8 @@
 
         html += '</tbody></table>';
         tableContainer.innerHTML = html;
+        updateSelectAllCheckbox();
+        toggleBulkDeleteBtn();
     }
 
     function renderPaginationInfo(paginationData = {}) {
@@ -663,112 +660,109 @@
         pagination.innerHTML = html;
     }
 
-
-    function openDeleteModal(id, lessonTitle, courseName) {
-        deleteLessonId = id;
-
-        document.getElementById('deleteModalTitle').textContent = 'Xác nhận xóa bài học';
-        document.getElementById('deleteModalMessage').textContent = 'Bạn có chắc chắn muốn xóa bài học này không?';
-        document.getElementById('deleteLessonTitle').textContent = lessonTitle || '-';
-        document.getElementById('deleteLessonCourse').textContent = courseName || '-';
-
-        document.getElementById('deleteModal').style.display = 'block';
-        document.body.style.overflow = 'hidden';
+    function toggleLessonSelection(lessonId, checked) {
+        if (checked) {
+            selectedLessonIds.add(lessonId);
+        } else {
+            selectedLessonIds.delete(lessonId);
+        }
+        updateSelectAllCheckbox();
+        toggleBulkDeleteBtn();
     }
 
-    function closeDeleteModal() {
-        document.getElementById('deleteModal').style.display = 'none';
-        document.body.style.overflow = '';
-        deleteLessonId = null;
+    function toggleSelectAll(checked) {
+        const checkboxes = document.querySelectorAll('.lesson-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = checked;
+            const lessonId = parseInt(checkbox.value);
+            if (checked) {
+                selectedLessonIds.add(lessonId);
+            } else {
+                selectedLessonIds.delete(lessonId);
+            }
+        });
+        toggleBulkDeleteBtn();
     }
 
-    async function confirmDelete() {
-        if (!deleteLessonId) return;
+    function updateSelectAllCheckbox() {
+        const selectAllCheckbox = document.getElementById('selectAll');
+        if (!selectAllCheckbox) return;
 
+        const checkboxes = document.querySelectorAll('.lesson-checkbox');
+        const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+
+        if (checkboxes.length === 0) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        } else if (checkedCount === checkboxes.length) {
+            selectAllCheckbox.checked = true;
+            selectAllCheckbox.indeterminate = false;
+        } else if (checkedCount > 0) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = true;
+        } else {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        }
+    }
+
+    function toggleBulkDeleteBtn() {
+        const btnDeleteBulk = document.getElementById('btnDeleteBulk');
+        const selectedCount = document.getElementById('selectedCount');
+
+        if (selectedLessonIds.size > 0) {
+            btnDeleteBulk.disabled = false;
+            btnDeleteBulk.style.opacity = '1';
+            btnDeleteBulk.style.cursor = 'pointer';
+            selectedCount.textContent = selectedLessonIds.size;
+        } else {
+            btnDeleteBulk.disabled = true;
+            btnDeleteBulk.style.opacity = '0.5';
+            btnDeleteBulk.style.cursor = 'not-allowed';
+            selectedCount.textContent = '0';
+        }
+    }
+
+    // Xử lý khi xóa một mục
+    async function openSingleDeleteModal(lessonId, lessonTitle, courseName) {
+        openSingleDeleteModalGeneric_Global({
+            objectName: OBJECTNAMEMODAL.LESSON,
+            idDelete: lessonId,
+            nameValue: lessonTitle || '-',
+            descValue: courseName || '',
+            actionFuncCallback: () => handleDeleteLessons([lessonId]),
+            successFuncCallback: () => loadLessons(currentPage),
+            failFuncCallback: () => {}
+        });
+    }
+
+    // Xử lý khi xóa nhiều mục cùng lúc
+    async function openBulkDeleteModal() {
+        openBulkDeleteModalGeneric_Global({
+            arrayIds: Array.from(selectedLessonIds),
+            objectName: OBJECTNAMEMODAL.LESSON,
+            actionFuncCallback: () => handleDeleteLessons(Array.from(selectedLessonIds)),
+            successFuncCallback: () => loadLessons(currentPage),
+            failFuncCallback: () => {}
+        });
+    }
+
+    async function handleDeleteLessons(arrayIds = []) {
         try {
-            const data = await apiRequest(`/lessons/${deleteLessonId}`, {
-                method: 'DELETE'
+            const data = await apiRequest(`/lessons/`, {
+                method: 'DELETE',
+                body: JSON.stringify({
+                    lesson_ids: [...arrayIds]
+                })
             });
-
             if (data.success) {
-                closeDeleteModal();
-                showNotificationModel(data.message || 'Xóa thành công');
-                loadLessons(currentPage);
+                return true;
+            } else {
+                return false;
             }
         } catch (error) {
-            showNotificationModel(error.message, 'error');
+            return false;
         }
     }
-
-    // Alert Modal Functions
-    function showNotificationModel(message, type = 'success') {
-        const alertModal = document.getElementById('alertModal');
-        const alertIcon = document.getElementById('alertIcon');
-        const alertIconClass = document.getElementById('alertIconClass');
-        const alertTitle = document.getElementById('alertTitle');
-        const alertMessage = document.getElementById('alertMessage');
-        const alertButton = document.getElementById('alertButton');
-
-        // Set message
-        alertMessage.textContent = message;
-
-        // Set type-specific styles
-        switch (type) {
-            case 'success':
-                alertIcon.className = 'flex h-12 w-12 items-center justify-center rounded-xl bg-green-100 dark:bg-green-900/20';
-                alertIconClass.className = 'fas fa-check-circle text-xl text-green-600 dark:text-green-400';
-                alertTitle.textContent = 'Thành công';
-                alertButton.className = 'px-4 py-2.5 text-sm font-semibold text-white bg-green-600 rounded-xl hover:bg-green-700 transition-all duration-300 flex items-center gap-2';
-                break;
-            case 'error':
-                alertIcon.className = 'flex h-12 w-12 items-center justify-center rounded-xl bg-red-100 dark:bg-red-900/20';
-                alertIconClass.className = 'fas fa-exclamation-circle text-xl text-red-600 dark:text-red-400';
-                alertTitle.textContent = 'Lỗi';
-                alertButton.className = 'px-4 py-2.5 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-all duration-300 flex items-center gap-2';
-                break;
-            case 'warning':
-                alertIcon.className = 'flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/20';
-                alertIconClass.className = 'fas fa-exclamation-triangle text-xl text-amber-600 dark:text-amber-400';
-                alertTitle.textContent = 'Cảnh báo';
-                alertButton.className = 'px-4 py-2.5 text-sm font-semibold text-white bg-amber-600 rounded-xl hover:bg-amber-700 transition-all duration-300 flex items-center gap-2';
-                break;
-            case 'info':
-                alertIcon.className = 'flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/20';
-                alertIconClass.className = 'fas fa-info-circle text-xl text-blue-600 dark:text-blue-400';
-                alertTitle.textContent = 'Thông tin';
-                alertButton.className = 'px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all duration-300 flex items-center gap-2';
-                break;
-            default:
-                alertIcon.className = 'flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-700';
-                alertIconClass.className = 'fas fa-bell text-xl text-gray-600 dark:text-gray-400';
-                alertTitle.textContent = 'Thông báo';
-                alertButton.className = 'px-4 py-2.5 text-sm font-semibold text-white bg-gray-600 rounded-xl hover:bg-gray-700 transition-all duration-300 flex items-center gap-2';
-        }
-
-        // Show modal
-        alertModal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeAlertModal() {
-        const alertModal = document.getElementById('alertModal');
-        alertModal.style.display = 'none';
-        document.body.style.overflow = '';
-    }
-
-    // Close modals on Escape key
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            const deleteModal = document.getElementById('deleteModal');
-            const alertModal = document.getElementById('alertModal');
-
-            if (deleteModal && deleteModal.style.display !== 'none') {
-                closeDeleteModal();
-            }
-            if (alertModal && alertModal.style.display !== 'none') {
-                closeAlertModal();
-            }
-        }
-    });
 </script>
 @endsection

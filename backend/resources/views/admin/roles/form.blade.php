@@ -43,20 +43,26 @@
             </div>
 
             <!-- Permissions (TỰ CO GIÃN) -->
-            <div class="flex-1 flex flex-col gap-0.5 min-h-0">
-                <label class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Permissions</label>
-
-                <!-- Search box -->
-                <div class="mb-3 flex-shrink-0">
-                    <input
-                        type="text"
-                        id="permissionSearch"
-                        placeholder="Tìm kiếm theo tên hoặc mô tả..."
-                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none"
-                    >
-                </div>
+            <div class="flex-1 flex flex-col gap-0.5 min-h-0"> 
 
                 <!-- Container co giãn theo chiều cao -->
+                <div class="py-5 flex flex-col gap-2">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="hidden">
+                            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Danh sách permissions</h2>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Hiển thị chi tiết từng API/đường dẫn đã được gán
+                            </p>
+                        </div>
+                        <div class="relative w-full max-w-[350px]">
+                            <input type="text" id="permissionSearch" placeholder="Tìm theo tên, mô tả ..."
+                                class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
+                            <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="flex-1 min-h-0 rounded-lg relative table-scroll-container">
                     <div id="permissionsCheckboxes" class="flex-1 h-full overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800">
                         <div class="w-fit mx-auto mt-[20dvh]">
@@ -228,27 +234,27 @@
         // Tạo table HTML
         let html = `
             <div class="overflow-x-auto h-full">
-                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <table class="w-full table-fixed border-separate border-spacing-0">
                     <colgroup>
-                        <col class="w-[50px]">
-                        <col class="w-[50px]">
-                        <col class="w-auto">
-                        <col class="w-auto">
-                        <col class="w-[100px]">
-                        <col class="w-[270px]">
+                        <col class="w-[40px]">
+                        <col class="w-[60px]">
+                        <col class="">
+                        <col class="">
+                        <col class="w-[80px]">
+                        <col class="">
                     </colgroup>
-                    <thead class="text-xs uppercase sticky top-0 z-10 text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500 bg-blue-600 dark:bg-gray-700">
+                    <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
                         <tr>
-                            <th scope="col" class="px-4 py-3">
+                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">
                                 <input type="checkbox" id="selectAllPermissions"
                                     class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                                     onchange="toggleAllPermissions(this.checked)">
                             </th>
-                            <th scope="col" class="px-4 py-3">ID</th>
-                            <th scope="col" class="px-4 py-3">Tên</th>
-                            <th scope="col" class="px-4 py-3">Mô tả</th>
-                            <th scope="col" class="px-4 py-3">Method</th>
-                            <th scope="col" class="px-4 py-3">Path</th>
+                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">ID</th>
+                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Tên</th>
+                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Mô tả</th>
+                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Method</th>
+                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Path</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -261,7 +267,7 @@
             // Group header row
             html += `
                 <tr class="${color.bg} ${color.borderLeft}">
-                    <td colspan="7" class="px-4 py-2.5">
+                    <td colspan="6" class="px-4 py-2.5">
                         <div class="flex items-center gap-2">
                             <span class="inline-block w-2 h-2 rounded-full ${color.badge}"></span>
                             <span class="text-sm font-semibold ${color.text}">${groupName}</span>

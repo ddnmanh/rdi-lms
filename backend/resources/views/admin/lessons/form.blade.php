@@ -81,7 +81,7 @@
                                     <i id="videoIconPlaceholder" class="fa-solid fa-video text-[20px] text-gray-400 dark:text-gray-400"></i>
                                 </div>
                             </div>
-    
+
                             <div class="flex-1">
                                 <div id="videoDirectUploadHint" class="text-sm text-gray-600 dark:text-gray-300">Kéo & thả video vào đây, hoặc</div>
                                 <div class="mt-2 flex items-center gap-3">
@@ -112,7 +112,7 @@
                                 </div>
                                 <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">Hỗ trợ MP4, AVI, MOV, WEBM — Tối đa 10GB</div>
                                 <div id="videoFileName" class="mt-2 text-sm text-gray-700 dark:text-gray-300 hidden"></div>
-    
+
                             </div>
                         </div>
 
@@ -122,7 +122,7 @@
                                     <p class="text-sm font-semibold text-blue-700 dark:text-blue-200">Tải video lên máy chủ</p>
                                     {{-- <p id="backgroundUploadFileInfo" class="text-xs text-gray-600 dark:text-gray-300 mt-1">Chưa chọn video</p> --}}
                                 </div>
-                                {{-- <span id="backgroundUploadStatusBadge" class="px-2 py-1 text-xs rounded-full bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-100 whitespace-nowrap">Chưa khởi tạo</span> --}}
+                                <span id="backgroundUploadStatusBadge" class="px-2 py-1 text-xs rounded-full bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-100 whitespace-nowrap">Chưa khởi tạo</span>
                             </div>
                             <div class="mt-3">
                                 <div class="w-full h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
@@ -132,8 +132,8 @@
                                     <span id="backgroundUploadProgressText">0%</span>
                                     <span id="backgroundUploadChunkText">0 / 0 chunks</span>
                                 </div>
-                            </div> 
-                            <p class="mt-3 text-xs text-blue-700 dark:text-blue-200">Sau khi upload xong, nhấn "Lưu" để bắt đầu ghép video và cập nhật bài học. Bạn có thể tiếp tục làm việc khác trong khi hệ thống xử lý.</p>
+                            </div>
+                            <p class="mt-3 text-xs text-blue-700 dark:text-blue-200">Vui lòng đợi cho đến khi quá trình tải video hoàn tất trước khi nhấn lưu. Trong lúc đó bạn có thể điền các thông tin khác.</p>
                         </div>
 
                     </div>
@@ -217,27 +217,27 @@
     // ========================================
     // KHAI BÁO BIẾN TOÀN CỤC
     // ========================================
-    
+
     // Mode: CREATE hoặc EDIT
     const mode = '{{ $mode }}';
     const lessonId = @if($mode === 'EDIT' && isset($lessonId)) {{ $lessonId }} @else null @endif;
-    
+
     // Dữ liệu bài học (dùng cho mode EDIT)
     let lessonData = null;
-    
+
     // Quản lý thumbnail
     let thumbnailPreview = null; // URL preview của thumbnail
-    
+
     // Quản lý video
     let videoFile = null; // File video được chọn
     let existingVideoSource = null; // Đường dẫn video hiện tại (cho mode EDIT)
     let existingVideoIsExternal = false; // Kiểm tra video có phải URL bên ngoài không
     let videoPreviewObjectUrl = null; // Object URL cho video preview
-    
+
     // Trạng thái drag & drop
     let isThumbnailDragActive = false;
     let isVideoDragActive = false;
-    
+
     // Cấu hình upload video
     const VIDEO_UPLOAD_MODE = {
         DIRECT: 'direct',      // Upload trực tiếp (không dùng)
@@ -245,7 +245,16 @@
     };
     const MAX_BACKGROUND_VIDEO_SIZE = 10 * 1024 * 1024 * 1024; // 10GB
     const DEFAULT_BACKGROUND_CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
-    
+    const MAX_PARALLEL_CHUNKS = 6; // Ngưỡng trên để tránh bão hòa kết nối
+    const MIN_PARALLEL_CHUNKS = 2; // Đảm bảo vẫn có song song ngay cả trên máy yếu
+    // const CONCURRENT_CHUNKS = (() => {
+    //     const hardwareThreads = Number(navigator?.hardwareConcurrency) || 4;
+    //     const suggested = Math.max(MIN_PARALLEL_CHUNKS, Math.floor(hardwareThreads / 2));
+    //     return Math.min(MAX_PARALLEL_CHUNKS, suggested);
+    // })(); // Tự động chọn số chunk upload đồng thời dựa trên thiết bị
+    const CONCURRENT_CHUNKS = 10;
+    const MAX_RETRY_PER_CHUNK = 3; // Số lần retry tối đa cho mỗi chunk
+
     // Trạng thái upload nền
     let backgroundUploadState = {
         uploadId: null,              // ID phiên upload
@@ -259,7 +268,9 @@
         mimeType: '',                // Loại file
         cancelRequested: false,      // Yêu cầu hủy upload
         lastError: null,             // Lỗi gần nhất
-        pollingIntervalId: null      // ID của interval polling status
+        pollingIntervalId: null,     // ID của interval polling status
+        uploadingChunks: new Set(),  // Set các chunk đang upload
+        failedChunks: new Map()      // Map chunk index -> số lần retry
     };
 
     // ========================================
@@ -281,7 +292,7 @@
     // ========================================
     // XỬ LÝ LOAD VÀ RENDER DỮ LIỆU BÀI HỌC
     // ========================================
-    
+
     /**
      * Load thông tin bài học từ API
      * @param {number} id - ID của bài học
@@ -347,7 +358,7 @@
     // ========================================
     // XỬ LÝ THUMBNAIL
     // ========================================
-    
+
     /**
      * Xử lý khi người dùng chọn/xóa file thumbnail
      * @param {File|null} file - File ảnh hoặc null để xóa
@@ -475,7 +486,7 @@
     // ========================================
     // XỬ LÝ VIDEO FILE
     // ========================================
-    
+
     /**
      * Xử lý khi người dùng chọn/xóa file video
      * @param {File|null} file - File video hoặc null để xóa
@@ -532,7 +543,7 @@
     // ========================================
     // XỬ LÝ VIDEO PREVIEW
     // ========================================
-    
+
     /**
      * Chuyển đổi URL YouTube thành URL embed
      * @param {string} url - URL YouTube
@@ -611,7 +622,7 @@
     // ========================================
     // QUẢN LÝ TRẠNG THÁI BACKGROUND UPLOAD
     // ========================================
-    
+
     /**
      * Reset trạng thái upload nền về ban đầu
      * @param {Object} options - Tùy chọn: keepFile (giữ thông tin file), silent (không update UI)
@@ -635,7 +646,9 @@
             mimeType: options.keepFile ? backgroundUploadState.mimeType : '',
             cancelRequested: false,
             lastError: null,
-            pollingIntervalId: null
+            pollingIntervalId: null,
+            uploadingChunks: new Set(),
+            failedChunks: new Map()
         };
         if (!options.silent) {
             updateBackgroundUploadUI();
@@ -663,6 +676,7 @@
         const clearBtn = document.getElementById('btnClearNewVideo');
         const clearBtnText = document.getElementById('btnClearVideoText');
         const retryBtn = document.getElementById('btnRetryBackgroundUpload');
+        const statusBadge = document.getElementById('backgroundUploadStatusBadge');
 
         // Kiểm tra elements tồn tại
         if (!progressBar || !progressText || !chunkText) {
@@ -699,9 +713,9 @@
             cancelled: { text: 'Đã hủy', className: 'px-2 py-1 text-xs rounded-full bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-200' }
         };
 
-        // const badge = badgeStyles[status] || badgeStyles.idle;
-        // statusBadge.textContent = badge.text;
-        // statusBadge.className = badge.className;
+        const badge = badgeStyles[status] || badgeStyles.idle;
+        statusBadge.textContent = badge.text;
+        statusBadge.className = badge.className;
 
         // Cập nhật text và hiển thị button Clear/Cancel
         if (clearBtn && clearBtnText) {
@@ -728,7 +742,7 @@
     // ========================================
     // BACKGROUND UPLOAD WORKFLOW
     // ========================================
-    
+
     /**
      * Bắt đầu quy trình upload video nền
      * Các bước: tạo session -> upload chunks -> hoàn tất
@@ -736,7 +750,7 @@
      */
     async function startBackgroundUploadFlow(file) {
         if (!file) return;
-        
+
         // Hủy upload cũ nếu có
         if (backgroundUploadState.uploadId) {
             await cancelBackgroundUpload(true);
@@ -776,46 +790,119 @@
 
             backgroundUploadState.status = 'uploaded';
             updateBackgroundUploadUI();
-            showNotificationModel_Global('Upload video nền hoàn tất. Nhấn "Lưu" để hệ thống bắt đầu xử lý.', 'success');
+            // showNotificationModel_Global('Upload video nền hoàn tất. Nhấn "Lưu" để hệ thống bắt đầu xử lý.', 'success');
         } catch (error) {
             console.error('Background upload error:', error);
             backgroundUploadState.lastError = error.message;
             backgroundUploadState.status = backgroundUploadState.cancelRequested ? 'cancelled' : 'failed';
             updateBackgroundUploadUI();
             if (!backgroundUploadState.cancelRequested) {
-                showNotificationModel_Global(error.message || 'Upload video nền thất bại.', 'error');
+                showNotificationModel_Global(error.message || 'Upload video thất bại.', 'error');
             }
         }
     }
 
     /**
-     * Upload tất cả các chunks của video
-     * Mỗi chunk được upload tuần tự, có thể tiếp tục từ chunk đã upload nếu bị gián đoạn
+     * Upload tất cả các chunks của video song song
+     * Upload đồng thời CONCURRENT_CHUNKS chunks, với retry mechanism
      */
     async function uploadBackgroundChunks() {
-        const { file, chunkSize, totalChunks } = backgroundUploadState;
+        const { file, chunkSize, totalChunks, uploadedChunks } = backgroundUploadState;
         if (!file || !chunkSize) return;
 
-        // Upload từng chunk
+        // Tạo danh sách các chunk cần upload (bỏ qua chunk đã upload)
+        const chunksToUpload = [];
         for (let chunkIndex = 1; chunkIndex <= totalChunks; chunkIndex++) {
-            // Kiểm tra xem có yêu cầu hủy không
-            if (backgroundUploadState.cancelRequested) {
-                throw new Error('Upload đã bị hủy.');
+            if (chunkIndex > uploadedChunks) {
+                chunksToUpload.push(chunkIndex);
             }
-            // Bỏ qua chunk đã upload
-            if (chunkIndex <= backgroundUploadState.uploadedChunks) {
-                continue;
-            }
-            // Cắt chunk từ file
-            const start = (chunkIndex - 1) * chunkSize;
-            const end = Math.min(file.size, start + chunkSize);
-            const chunkBlob = file.slice(start, end);
-            // Upload chunk
-            await uploadSingleChunkRequest(chunkIndex, chunkBlob);
-            // Cập nhật progress
-            backgroundUploadState.uploadedChunks = chunkIndex;
-            updateBackgroundUploadUI();
         }
+
+        // Upload song song với concurrency limit
+        const uploadPromises = [];
+        let currentIndex = 0;
+
+        const uploadNextChunk = async () => {
+            while (currentIndex < chunksToUpload.length) {
+                // Kiểm tra yêu cầu hủy
+                if (backgroundUploadState.cancelRequested) {
+                    throw new Error('Upload đã bị hủy.');
+                }
+
+                const chunkIndex = chunksToUpload[currentIndex];
+                currentIndex++;
+
+                // Đánh dấu chunk đang upload
+                backgroundUploadState.uploadingChunks.add(chunkIndex);
+
+                try {
+                    // Cắt chunk từ file
+                    const start = (chunkIndex - 1) * chunkSize;
+                    const end = Math.min(file.size, start + chunkSize);
+                    const chunkBlob = file.slice(start, end);
+
+                    // Upload chunk với retry
+                    await uploadSingleChunkWithRetry(chunkIndex, chunkBlob);
+
+                    // Xóa khỏi danh sách đang upload
+                    backgroundUploadState.uploadingChunks.delete(chunkIndex);
+
+                    // Cập nhật số chunk đã upload
+                    backgroundUploadState.uploadedChunks++;
+                    updateBackgroundUploadUI();
+                } catch (error) {
+                    // Xóa khỏi danh sách đang upload
+                    backgroundUploadState.uploadingChunks.delete(chunkIndex);
+
+                    // Nếu đã retry quá giới hạn, throw error
+                    const retryCount = backgroundUploadState.failedChunks.get(chunkIndex) || 0;
+                    if (retryCount >= MAX_RETRY_PER_CHUNK) {
+                        throw new Error(`Chunk ${chunkIndex} thất bại sau ${MAX_RETRY_PER_CHUNK} lần thử.`);
+                    }
+                    throw error;
+                }
+            }
+        };
+
+        // Tạo pool các worker upload song song
+        for (let i = 0; i < CONCURRENT_CHUNKS; i++) {
+            uploadPromises.push(uploadNextChunk());
+        }
+
+        // Chờ tất cả chunks upload xong
+        await Promise.all(uploadPromises);
+    }
+
+    /**
+     * Upload một chunk với retry mechanism
+     * @param {number} chunkIndex - Số thứ tự chunk (bắt đầu từ 1)
+     * @param {Blob} chunkBlob - Dữ liệu chunk
+     */
+    async function uploadSingleChunkWithRetry(chunkIndex, chunkBlob) {
+        let lastError = null;
+        const retryCount = backgroundUploadState.failedChunks.get(chunkIndex) || 0;
+
+        for (let attempt = 0; attempt <= MAX_RETRY_PER_CHUNK - retryCount; attempt++) {
+            try {
+                await uploadSingleChunkRequest(chunkIndex, chunkBlob);
+                // Xóa khỏi danh sách failed nếu thành công
+                backgroundUploadState.failedChunks.delete(chunkIndex);
+                return;
+            } catch (error) {
+                lastError = error;
+                console.warn(`Chunk ${chunkIndex} thất bại (lần thử ${attempt + 1}):`, error);
+
+                // Cập nhật số lần retry
+                backgroundUploadState.failedChunks.set(chunkIndex, retryCount + attempt + 1);
+
+                // Đợi một chút trước khi retry (exponential backoff)
+                if (attempt < MAX_RETRY_PER_CHUNK - retryCount) {
+                    await new Promise(resolve => setTimeout(resolve, Math.min(1000 * Math.pow(2, attempt), 5000)));
+                }
+            }
+        }
+
+        throw lastError || new Error(`Chunk ${chunkIndex} upload thất bại.`);
     }
 
     /**
@@ -853,19 +940,26 @@
         }
 
         try {
-            // Đánh dấu yêu cầu hủy
+            // Đánh dấu yêu cầu hủy TRƯỚC KHI gọi API
             backgroundUploadState.cancelRequested = true;
+            
+            // Đợi một chút để các chunk đang upload có thời gian kiểm tra flag
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
             // Gọi API hủy upload
             await apiRequest(`/lesson-video-uploads/${backgroundUploadState.uploadId}`, {
                 method: 'DELETE'
             });
+            
+            // Đợi thêm chút nữa để đảm bảo các chunk đã dừng
+            await new Promise(resolve => setTimeout(resolve, 200));
         } catch (error) {
             console.error('Cancel upload error:', error);
         } finally {
             // Reset state
             resetBackgroundUploadState({ silent: false });
             if (!silent) {
-                showNotificationModel_Global('Đã hủy upload nền.', 'info');
+                showNotificationModel_Global('Đã hủy upload video thành công.', 'info');
             }
         }
     }
@@ -1139,10 +1233,31 @@
             clearBtn.addEventListener('click', async () => {
                 // Nếu đang upload, hủy upload
                 if (['creating_session', 'uploading'].includes(backgroundUploadState.status)) {
-                    await cancelBackgroundUpload();
+
+                    openSingleDeleteModalGeneric_Global({
+                        objectName: OBJECTNAMEMODAL.VIDEO,
+                        title: 'Hủy upload video',
+                        message: 'Video đang được upload. Bạn có chắc muốn hủy upload và xóa video đã chọn không?',
+                        nameValue: backgroundUploadState.fileName || 'Video hiện tại',
+                        descValue: formatBytes(backgroundUploadState.fileSize || 0) + ' - ' + backgroundUploadState.mimeType,
+                        confirmText: 'Hủy upload',
+                        cancelText: 'Đóng',
+                        actionFuncCallback: async () => {
+                            try {
+                                await cancelBackgroundUpload();
+                                // Xóa video đã chọn sau khi hủy upload
+                                handleVideoFile(null);
+                                return true; // Trả về true để báo thành công
+                            } catch (error) {
+                                console.error('Error canceling upload:', error);
+                                return false; // Trả về false nếu có lỗi
+                            }
+                        }
+                    })
+                } else {
+                    // Xóa video đã chọn
+                    handleVideoFile(null);
                 }
-                // Xóa video đã chọn
-                handleVideoFile(null);
             });
         }
 
@@ -1158,14 +1273,14 @@
     // ========================================
     // LƯU BÀI HỌC
     // ========================================
-    
+
     /**
      * Xử lý submit form lưu bài học
      * Kiểm tra validation, upload thumbnail/video, gọi API lưu
      */
     async function saveLesson(event) {
         event.preventDefault();
-        
+
         // Lấy dữ liệu từ form
         const lessonIdValue = document.getElementById('lessonId').value;
         const title = document.getElementById('title').value.trim();
@@ -1271,7 +1386,7 @@
     // ========================================
     // ĐIỀU HƯỚNG VÀ EVENT HANDLERS
     // ========================================
-    
+
     /**
      * Quay lại trang danh sách bài học
      */

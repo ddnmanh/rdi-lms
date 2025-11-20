@@ -5,7 +5,7 @@
 @section('description', 'Xem thông tin chi tiết và phân quyền của một vai trò')
 
 @section('content')
-<div class="h-full flex flex-col items-stretch justify-start gap-4 2xl:gap-6">
+<div class="flex flex-col items-stretch justify-start gap-4 2xl:gap-6">
     <input type="hidden" id="roleId" value="{{ $roleId ?? '' }}">
 
     {{-- Header Card --}}
@@ -50,16 +50,16 @@
                 Quay lại
             </a>
             <a id="roleEditButton" href="#"
-                class="flex-1 lg:flex-none px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all duration-300 text-center disabled:opacity-60 disabled:cursor-not-allowed">
+                class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
                 <i class="fas fa-pen me-2"></i>
                 Chỉnh sửa
             </a>
         </div>
     </div>
 
-    <div class="w-full max-w-[1400px] mx-auto grid grid-cols-1 xl:grid-cols-3 gap-4 2xl:gap-6">
+    <div class="w-full max-w-[1400px] mx-auto grid grid-cols-1 xl:grid-cols-4 gap-4 2xl:gap-6">
         {{-- Tổng quan --}}
-        <div class="col-span-1 flex flex-col gap-4">
+        <div class="col-span-1 flex flex-col gap-4 hidden">
             <div
                 class="p-5 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col gap-4">
                 <div class="flex items-center justify-between">
@@ -118,25 +118,26 @@
         </div>
 
         {{-- Permissions --}}
-        <div class="col-span-1 xl:col-span-2 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col min-h-[480px]">
-            <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex flex-col gap-2">
+        <div class="w-full h-[600px] col-span-1 xl:col-span-2 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col">
+            <div class="px-6 py-5 flex flex-col gap-2">
                 <div class="flex items-center justify-between gap-3">
                     <div>
                         <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Danh sách permissions</h2>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Hiển thị chi tiết từng API/đường dẫn đã được gán
                         </p>
                     </div>
-                    <div class="relative w-full max-w-xs">
+                    <div class="relative w-full max-w-[250px]">
                         <input type="text" id="permissionSearchInput" placeholder="Tìm theo tên, mô tả hoặc group..."
-                            class="w-full pl-10 pr-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
                         <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </span>
                     </div>
                 </div>
             </div>
-            <div class="flex-1 table-scroll-container relative">
-                <div id="permissionsTableContainer" class="h-full overflow-y-auto">
+
+            <div class="flex-1 p-4 pt-0 min-h-0 rounded-lg relative table-scroll-container">
+                <div id="permissionsTableContainer" class="flex-1 h-full overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800">
                     <div class="w-fit mx-auto mt-[20dvh]">
                         <div id="SPINNER_LOADING">
                             <div id="SPINNER_LOADING_CONTAINER">
@@ -159,12 +160,58 @@
                 </div>
             </div>
         </div>
+
+        {{-- Users List --}}
+        <div class="w-full h-[600px] col-span-2 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col">
+            <div class="px-6 py-5 flex flex-col gap-2">
+                <div class="flex items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Danh sách người dùng</h2>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Người dùng được gán vai trò này
+                        </p>
+                    </div>
+                    <div class="relative w-full max-w-[250px]">
+                        <input type="text" id="userSearchInput" placeholder="Tìm theo tên, email..."
+                            class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
+                        <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-1 p-4 pt-0 min-h-0 rounded-lg relative table-scroll-container">
+                <div id="usersTableContainer" class="flex-1 h-full overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800">
+                    <div class="w-fit mx-auto mt-[20dvh]">
+                        <div id="SPINNER_LOADING">
+                            <div id="SPINNER_LOADING_CONTAINER">
+                                <div id="SPINNER_LOADING_CONTAINER_LDS_ROLLER">
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                </div>
+                            </div>
+                            <div id="SPINNER_LOADING_ICON">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
 <script>
     const roleId = {{ $roleId }};
     let rolePermissions = [];
+    let roleUsers = [];
 
     document.addEventListener('DOMContentLoaded', async function () {
         if (!roleId) {
@@ -176,10 +223,17 @@
 
         await loadRoleDetail(roleId);
 
-        const searchInput = document.getElementById('permissionSearchInput');
-        if (searchInput) {
-            searchInput.addEventListener('input', function (event) {
+        const permissionSearchInput = document.getElementById('permissionSearchInput');
+        if (permissionSearchInput) {
+            permissionSearchInput.addEventListener('input', function (event) {
                 renderPermissionsTable(rolePermissions, (event.target.value || '').trim().toLowerCase());
+            });
+        }
+
+        const userSearchInput = document.getElementById('userSearchInput');
+        if (userSearchInput) {
+            userSearchInput.addEventListener('input', function (event) {
+                renderUsersTable(roleUsers, (event.target.value || '').trim().toLowerCase());
             });
         }
     });
@@ -193,10 +247,12 @@
 
             const role = response.data || {};
             rolePermissions = role.permissions || [];
+            roleUsers = role.users || [];
 
             renderRoleInfo(role);
-            renderRoleUsers(role.users || []);
+            renderRoleUsers(roleUsers);
             renderPermissionsTable(rolePermissions);
+            renderUsersTable(roleUsers);
         } catch (error) {
             showNotificationModel_Global(error.message, 'error', handleBackToList);
         }
@@ -302,22 +358,22 @@
         });
 
         let html = `
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <div class="overflow-x-auto h-full">
+                <table class="w-full table-fixed border-separate border-spacing-0">
                     <colgroup>
+                        <col class="w-[40px]">
+                        <col class="">
+                        <col class="">
                         <col class="w-[80px]">
-                        <col class="w-auto">
-                        <col class="w-auto">
-                        <col class="w-[120px]">
-                        <col class="w-[280px]">
+                        <col class="w-[150px]">
                     </colgroup>
-                    <thead class="text-xs uppercase sticky top-0 z-10 text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500 bg-blue-600 dark:bg-gray-700">
+                    <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
                         <tr>
-                            <th scope="col" class="px-4 py-3">ID</th>
-                            <th scope="col" class="px-4 py-3">Tên</th>
-                            <th scope="col" class="px-4 py-3">Mô tả</th>
-                            <th scope="col" class="px-4 py-3">Method</th>
-                            <th scope="col" class="px-4 py-3">Path</th>
+                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">ID</th>
+                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Tên</th>
+                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Mô tả</th>
+                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Method</th>
+                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Path</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -417,6 +473,100 @@
         }
         const index = Math.abs(hash) % colors.length;
         return colors[index];
+    }
+
+    function renderUsersTable(users = [], filterText = '') {
+        const container = document.getElementById('usersTableContainer');
+
+        if (!users.length) {
+            container.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full py-12 text-center">
+                    <div class="h-16 w-16 rounded-2xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-4">
+                        <i class="fas fa-users text-2xl text-gray-400 dark:text-gray-500"></i>
+                    </div>
+                    <p class="text-base font-semibold text-gray-700 dark:text-gray-300 mb-1">Chưa có người dùng nào</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Vai trò này chưa được gán cho người dùng nào</p>
+                </div>
+            `;
+            return;
+        }
+
+        const normalizedFilter = (filterText || '').trim().toLowerCase();
+        const filteredUsers = normalizedFilter
+            ? users.filter(user => {
+                const name = (user.name || user.full_name || '').toLowerCase();
+                const email = (user.email || '').toLowerCase();
+                return name.includes(normalizedFilter) || email.includes(normalizedFilter);
+            })
+            : users;
+
+        if (!filteredUsers.length) {
+            container.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full py-12 text-center">
+                    <div class="h-16 w-16 rounded-2xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-4">
+                        <i class="fas fa-search text-2xl text-gray-400 dark:text-gray-500"></i>
+                    </div>
+                    <p class="text-base font-semibold text-gray-700 dark:text-gray-300 mb-1">Không tìm thấy người dùng</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Thử từ khóa khác hoặc xóa bộ lọc</p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = `
+            <div class="overflow-x-auto h-full">
+                <table class="w-full table-fixed border-separate border-spacing-0">
+                    <colgroup>
+                        <col class="w-[40px] 2xl:w-[80px]">
+                        <col class="w-[80px] 2xl:w-[110px]">
+                        <col class="w-auto">
+                        <col class="w-auto">
+                        <col class="w-[180px]">
+                    </colgroup>
+                    <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
+                        <tr>
+                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">ID</th>
+                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Avatar</th>
+                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Tên</th>
+                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Email</th>
+                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Ngày tạo</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+        `;
+
+        filteredUsers.forEach(user => {
+            const userName = user.name || user.full_name || '-';
+            const userEmail = user.email || '-';
+            const createdAt = formatDate_Global(user.created_at);
+            html += `
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors">
+                    <td class="px-4 py-3">
+                        <span class="text-gray-700 dark:text-gray-300">${user.id}</span>
+                    </td>
+                    <td class="px-4 py-3 align-center whitespace-normal break-words">
+                        <img src="${user.avatar_path ?? ''}" alt="" class="m-auto w-10 aspect-square object-cover rounded-full border border-gray-300 dark:border-gray-600">
+                    </td>
+                    <td class="px-4 py-3">
+                        ${user.fullname || '-'}
+                    </td>
+                    <td class="px-4 py-3">
+                        <span class="text-gray-600 dark:text-gray-400">${userEmail}</span>
+                    </td>
+                    <td class="px-4 py-3">
+                        <span class="text-xs text-gray-500 dark:text-gray-400">${createdAt}</span>
+                    </td>
+                </tr>
+            `;
+        });
+
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        container.innerHTML = html;
     }
 
     function formatDate_Global(dateString) {

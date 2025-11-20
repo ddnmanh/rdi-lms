@@ -559,7 +559,7 @@
             idDelete: roleId,
             nameValue: roleName || '-',
             descValue: roleDescription || '',
-            deleteFuncCallback: () => handleDeleteRoles([roleId]),
+            actionFuncCallback: () => handleDeleteRoles([roleId]),
             successFuncCallback: () => loadRoles(currentPage),
             failFuncCallback: () => {}
         });
@@ -570,7 +570,7 @@
         openBulkDeleteModalGeneric_Global({
             arrayIds: Array.from(selectedRoleIds),
             objectName: OBJECTNAMEMODAL.ROLE,
-            deleteFuncCallback: () => handleDeleteRoles(Array.from(selectedRoleIds)),
+            actionFuncCallback: () => handleDeleteRoles(Array.from(selectedRoleIds)),
             successFuncCallback: () => loadRoles(currentPage),
             failFuncCallback: () => {}
         });

@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="{{ mix('css/app.css') }}" />
     <link rel="stylesheet" href="{{ mix('css/layout.css') }}" />
     <link rel="stylesheet" href="{{ mix('css/loading.css') }}" />
+    <link rel="stylesheet" href="{{ mix('css/loading-in-btn.css') }}" />
     <link rel="stylesheet" href="{{ mix('css/table.css') }}" />
 
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
@@ -425,7 +426,7 @@
             openLogoutModalGeneric_Global({ 
                 title: 'Xác nhận đăng xuất',
                 message: 'Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?',
-                deleteFuncCallback: () => handleLogout(),
+                actionFuncCallback: () => handleLogout(),
                 successFuncCallback: () => handleGotoLoginPage(),
                 failFuncCallback: () => {}
             });

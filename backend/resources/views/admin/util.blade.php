@@ -162,13 +162,14 @@
 
             {{-- Modal Footer --}}
             <div class="flex items-center justify-end gap-3">
-                <button type="button" onclick="closeDeleteModalGeneric_Global()"
+                <button type="button" id="DELETE_MODAL_CANCEL_BTN" onclick="closeDeleteModalGeneric_Global()"
                     class="px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300">
                     Hủy
                 </button>
-                <button type="button" id="confirmDeleteBtn"
+                <button type="button" id="DELETE_MODAL_CONFIRM_BTN"
                     class="px-4 py-2.5 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-all duration-300 flex items-center gap-2">
-                    <i class="fas fa-trash"></i>
+                    <i class="fas fa-trash" id="DELETE_MODAL_CONFIRM_BTN_TRASH_ICON"></i>
+                    <span class="LOADING_IN_BTN hidden" id="DELETE_MODAL_CONFIRM_BTN_LOADING_ICON"></span>
                     <span>Xác nhận xóa</span>
                 </button>
             </div>
@@ -182,6 +183,7 @@
         ROLE: 'ROLE',
         COURSE: 'COURSE',
         LESSON: 'LESSON',
+        VIDEO: 'VIDEO',
         OTHER: 'OTHER',
     }
 
@@ -190,7 +192,7 @@
      *
      * Các tham số truyền vào cho phép tuỳ chỉnh đối tượng, id, tên, mô tả, callback xóa và callback sau khi thành công/thất bại.
      *
-     * Khi người dùng xác nhận xóa, sẽ thực thi `deleteFuncCallback`, nếu thành công sẽ đóng modal và hiển thị thông báo thành công,
+     * Khi người dùng xác nhận xóa, sẽ thực thi `actionFuncCallback`, nếu thành công sẽ đóng modal và hiển thị thông báo thành công,
      * ngược lại sẽ hiển thị thông báo lỗi.
      *
      * @param {Object} options
@@ -198,7 +200,7 @@
      * @param {number|null} options.idDelete - ID đối tượng sẽ xóa
      * @param {string} options.nameValue - Tên đối tượng
      * @param {string} options.descValue - Mô tả bổ sung cho đối tượng (email, level, v.v...)
-     * @param {Function} options.deleteFuncCallback - Hàm callback xử lý xóa, trả về true/false
+     * @param {Function} options.actionFuncCallback - Hàm callback xử lý xóa, trả về true/false
      * @param {Function} options.successFuncCallback - Callback khi xóa thành công
      * @param {Function} options.failFuncCallback - Callback khi xóa thất bại
      * @param {string|null} options.title - Tiêu đề modal tuỳ chỉnh
@@ -207,7 +209,7 @@
     function openLogoutModalGeneric_Global({ 
         title = null,
         message = null,
-        deleteFuncCallback = async () => { return false; },
+        actionFuncCallback = async () => { return false; },
         successFuncCallback = async () => { return false; },
         failFuncCallback = async () => { return false; },
     } = {}) { 
@@ -220,11 +222,11 @@
 
         document.getElementById('DELETE_MODAL').style.display = 'block';
         
-        document.getElementById('confirmDeleteBtn').getElementsByTagName('span')[0].textContent = 'Xác nhận đăng xuất';
+        document.getElementById('DELETE_MODAL_CONFIRM_BTN').getElementsByTagName('span')[0].textContent = 'Xác nhận đăng xuất';
 
-        document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+        document.getElementById('DELETE_MODAL_CONFIRM_BTN').addEventListener('click', async () => {
             try {
-                const result = await deleteFuncCallback();
+                const result = await actionFuncCallback();
                 console.log(result);
                 
                 if (result) {
@@ -249,74 +251,115 @@
      *
      * Các tham số truyền vào cho phép tuỳ chỉnh đối tượng, id, tên, mô tả, callback xóa và callback sau khi thành công/thất bại.
      *
-     * Khi người dùng xác nhận xóa, sẽ thực thi `deleteFuncCallback`, nếu thành công sẽ đóng modal và hiển thị thông báo thành công,
+     * Khi người dùng xác nhận xóa, sẽ thực thi `actionFuncCallback`, nếu thành công sẽ đóng modal và hiển thị thông báo thành công,
      * ngược lại sẽ hiển thị thông báo lỗi.
      *
      * @param {Object} options
-     * @param {string} options.objectName - Loại đối tượng (USER, ROLE, COURSE, LESSON, OTHER)
+     * @param {string} options.objectName - Loại đối tượng (USER, ROLE, COURSE, LESSON, VIDEO, OTHER)
      * @param {number|null} options.idDelete - ID đối tượng sẽ xóa
      * @param {string} options.nameValue - Tên đối tượng
      * @param {string} options.descValue - Mô tả bổ sung cho đối tượng (email, level, v.v...)
-     * @param {Function} options.deleteFuncCallback - Hàm callback xử lý xóa, trả về true/false
+     * @param {Function} options.actionFuncCallback - Hàm callback xử lý xóa, trả về true/false
      * @param {Function} options.successFuncCallback - Callback khi xóa thành công
      * @param {Function} options.failFuncCallback - Callback khi xóa thất bại
      * @param {string|null} options.title - Tiêu đề modal tuỳ chỉnh
      * @param {string|null} options.message - Nội dung cảnh báo tuỳ chỉnh
+     * @param {string|null} options.confirmText - Text button xác nhận tuỳ chỉnh
+     * @param {string|null} options.cancelText - Text button hủy tuỳ chỉnh
      */
     function openSingleDeleteModalGeneric_Global({
         objectName = OBJECTNAMEMODAL.OTHER,
         idDelete = null,
         nameValue = '-',
         descValue = '-',
-        deleteFuncCallback = async () => { return false; },
+        actionFuncCallback = async () => { return false; },
         successFuncCallback = async () => { return false; },
         failFuncCallback = async () => { return false; },
         title = null,
-        message = null
+        message = null,
+        confirmText = null,
+        cancelText = null
     } = {}) {
 
-        let objectNameLabel = '';
-        if (objectName === OBJECTNAMEMODAL.USER) {
-            objectNameLabel = 'người dùng';
-        } else if (objectName === OBJECTNAMEMODAL.ROLE) {
-            objectNameLabel = 'vai trò';
-        } else if (objectName === OBJECTNAMEMODAL.COURSE) {
-            objectNameLabel = 'khóa học';
-        } else if (objectName === OBJECTNAMEMODAL.LESSON) {
-            objectNameLabel = 'bài học';
-        } else {
-            objectNameLabel = 'đối tượng';
-        }
+        // Mapping object name to label
+        const objectNameLabels = {
+            [OBJECTNAMEMODAL.USER]: 'người dùng',
+            [OBJECTNAMEMODAL.ROLE]: 'vai trò',
+            [OBJECTNAMEMODAL.COURSE]: 'khóa học',
+            [OBJECTNAMEMODAL.LESSON]: 'bài học',
+            [OBJECTNAMEMODAL.VIDEO]: 'video',
+            [OBJECTNAMEMODAL.OTHER]: 'đối tượng'
+        };
+        const objectNameLabel = objectNameLabels[objectName] || 'đối tượng';
 
-        document.getElementById('deleteModalTitle').textContent = title == null ? `Xác nhận xóa ${objectNameLabel}` : title;
-        document.getElementById('deleteModalMessage').textContent = message == null ? `Bạn có chắc chắn muốn xóa ${objectNameLabel} này không?` : message;
+        // Mapping object name to field labels
+        const fieldLabels = {
+            [OBJECTNAMEMODAL.USER]: { name: 'Tên:', desc: 'Email:' },
+            [OBJECTNAMEMODAL.ROLE]: { name: 'Tên:', desc: 'Level:' },
+            [OBJECTNAMEMODAL.COURSE]: { name: 'Id:', desc: 'Tên:' },
+            [OBJECTNAMEMODAL.LESSON]: { name: 'Tên:', desc: 'Khóa học:' },
+            [OBJECTNAMEMODAL.VIDEO]: { name: 'Tên:', desc: 'Thông tin:' },
+            [OBJECTNAMEMODAL.OTHER]: { name: 'Tên:', desc: 'Mô tả:' }
+        };
+        const labels = fieldLabels[objectName] || fieldLabels[OBJECTNAMEMODAL.OTHER];
 
+        // Set modal content
+        document.getElementById('deleteModalTitle').textContent = title ?? `Xác nhận xóa ${objectNameLabel}`;
+        document.getElementById('deleteModalMessage').textContent = message ?? `Bạn có chắc chắn muốn xóa ${objectNameLabel} này không?`;
+
+        // Toggle info sections
         document.getElementById('bulkDeleteInfo').style.display = 'none';
-
         document.getElementById('singleDeleteInfo').style.display = 'block';
-        if (objectName === OBJECTNAMEMODAL.USER) {
-            document.getElementById('deleteNameLabel').textContent = 'Tên:';
-            document.getElementById('deleteDescLabel').textContent = 'Email:';
-        } else if (objectName === OBJECTNAMEMODAL.ROLE) {
-            document.getElementById('deleteNameLabel').textContent = 'Tên:';
-            document.getElementById('deleteDescLabel').textContent = 'Level:';
-        } else if (objectName === OBJECTNAMEMODAL.COURSE) {
-            document.getElementById('deleteNameLabel').textContent = 'Id:';
-            document.getElementById('deleteDescLabel').textContent = 'Tên:';
-        } else if (objectName === OBJECTNAMEMODAL.LESSON) {
-            document.getElementById('deleteNameLabel').textContent = 'Tên:';
-            document.getElementById('deleteDescLabel').textContent = 'Khóa học:';
-        } else if (objectName === OBJECTNAMEMODAL.OTHER) {
-            document.getElementById('deleteNameLabel').textContent = 'Tên:';
-            document.getElementById('deleteDescLabel').textContent = 'Mô tả:';
-        }
+
+        // Set field labels and values
+        document.getElementById('deleteNameLabel').textContent = labels.name;
+        document.getElementById('deleteDescLabel').textContent = labels.desc;
         document.getElementById('deleteNameValue').textContent = nameValue || '-';
         document.getElementById('deleteDescValue').textContent = descValue || '-';
 
-        document.getElementById('DELETE_MODAL').style.display = 'block';
-        document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+        // Get buttons
+        const confirmBtn = document.getElementById('DELETE_MODAL_CONFIRM_BTN');
+        const cancelBtn = document.getElementById('DELETE_MODAL_CANCEL_BTN');
+        const confirmIcon = document.getElementById('DELETE_MODAL_CONFIRM_BTN_TRASH_ICON');
+        const confirmLoading = document.getElementById('DELETE_MODAL_CONFIRM_BTN_LOADING_ICON');
+
+        // Set button text
+        const confirmBtnSpan = confirmBtn.querySelector('span:last-child');
+        if (confirmBtnSpan) {
+            confirmBtnSpan.textContent = confirmText ?? 'Xác nhận xóa';
+        }
+        if (cancelText) {
+            cancelBtn.textContent = cancelText;
+        }
+
+        // Reset button states
+        confirmBtn.disabled = false;
+        cancelBtn.disabled = false;
+        cancelBtn.classList.remove('hidden', 'opacity-50', 'cursor-not-allowed');
+        confirmIcon.style.display = '';
+        confirmLoading.classList.add('hidden');
+        confirmLoading.classList.remove('inline-block');
+
+        // Clone button to remove all old event listeners (prevent memory leak)
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+        // Add new event listener
+        newConfirmBtn.addEventListener('click', async () => {
+            // Disable buttons
+            newConfirmBtn.disabled = true;
+            cancelBtn.disabled = true;
+            cancelBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            // Show loading
+            const newConfirmIcon = document.getElementById('DELETE_MODAL_CONFIRM_BTN_TRASH_ICON');
+            const newConfirmLoading = document.getElementById('DELETE_MODAL_CONFIRM_BTN_LOADING_ICON');
+            newConfirmIcon.style.display = 'none';
+            newConfirmLoading.classList.remove('hidden');
+            newConfirmLoading.classList.add('inline-block');
+
             try {
-                const result = await deleteFuncCallback();
+                const result = await actionFuncCallback();
                 if (result) {
                     closeDeleteModalGeneric_Global();
                     showNotificationModel_Global(`Xóa thành công ${objectNameLabel} ${nameValue}`, 'success', successFuncCallback);
@@ -326,41 +369,17 @@
                 }
             } catch (error) {
                 closeDeleteModalGeneric_Global();
-                showNotificationModel_Global(error.message, 'error', failFuncCallback);
+                showNotificationModel_Global(error.message || 'Đã xảy ra lỗi', 'error', failFuncCallback);
             }
-        });
+        }, { once: true }); // Use 'once' option to auto-remove listener after first click
+
+        // Show modal and focus confirm button
+        document.getElementById('DELETE_MODAL').style.display = 'block';
         document.body.style.overflow = 'hidden';
+        
+        // Auto focus on confirm button for better UX
+        setTimeout(() => newConfirmBtn.focus(), 100);
     }
-
-    // function openLogoutModel_Global({ 
-    //     deleteFuncCallback = async () => { return false; },
-    //     successFuncCallback = async () => { return false; },
-    //     failFuncCallback = async () => { return false; }
-    // } = {}) {
-    //     document.getElementById('deleteModalTitle').textContent = 'Bạn có chắc chắn muốn đăng xuất?';
-    //     document.getElementById('deleteModalMessage').textContent = 'Bạn sẽ cần đăng nhập lại để truy cập vào hệ thống quản trị. hãy chắc chắn rằng bạn đã lưu lại tất cả công việc của mình trước khi đăng xuất.';
-    //     document.getElementById('bulkDeleteInfo').style.display = 'none';
-    //     // document.getElementById('deleteNameValue').textContent = nameValue || '-';
-    //     // document.getElementById('deleteDescValue').textContent = descValue || '-';
-    //     document.getElementById('DELETE_MODAL').style.display = 'block';
-
-    //     document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
-    //         try {
-    //             const result = await deleteFuncCallback();
-    //             if (result) {
-    //                 closeDeleteModalGeneric_Global();
-    //                 // showNotificationModel_Global(`Xóa thành công ${objectNameLabel} ${nameValue}`, 'success', successFuncCallback);
-    //             } else {
-    //                 closeDeleteModalGeneric_Global();
-    //                 // showNotificationModel_Global(`Có lỗi khi xóa ${objectNameLabel} ${nameValue}`, 'error', failFuncCallback);
-    //             }
-    //         } catch (error) {
-    //             closeDeleteModalGeneric_Global();
-    //             // showNotificationModel_Global(error.message, 'error', failFuncCallback);
-    //         }
-    //     });
-    //     document.body.style.overflow = 'hidden';
-    // }
 
 
     /**
@@ -369,7 +388,7 @@
      * @param {Object} params - Các tham số cho xóa bulk.
      * @param {Array} params.arrayIds - Mảng chứa ID các đối tượng sẽ xóa.
      * @param {string} params.objectName - Loại đối tượng xóa (OBJECTNAMEMODAL.USER, .ROLE, .COURSE, .LESSON, .OTHER,...).
-     * @param {Function} params.deleteFuncCallback - Hàm bất đồng bộ sẽ thực thi để thực hiện xóa, trả về true nếu thành công.
+     * @param {Function} params.actionFuncCallback - Hàm bất đồng bộ sẽ thực thi để thực hiện xóa, trả về true nếu thành công.
      * @param {Function} params.successFuncCallback - Hàm callback gọi sau khi xóa thành công.
      * @param {Function} params.failFuncCallback - Hàm callback gọi sau khi xóa thất bại hoặc lỗi.
      * @param {string|null} params.title - Tiêu đề modal, nếu null sẽ tự động sinh phù hợp.
@@ -378,7 +397,7 @@
     function openBulkDeleteModalGeneric_Global({
         arrayIds = [],
         objectName = OBJECTNAMEMODAL.OTHER,
-        deleteFuncCallback = async () => { return false; },
+        actionFuncCallback = async () => { return false; },
         successFuncCallback = async () => { return false; },
         failFuncCallback = async () => { return false; },
         title = null,
@@ -410,9 +429,23 @@
         `;
 
         document.getElementById('DELETE_MODAL').style.display = 'block';
-        document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+        document.getElementById('DELETE_MODAL_CONFIRM_BTN').addEventListener('click', async () => {
+
+            // Disable nút xác nhận
+            const confirmBtn = document.getElementById('DELETE_MODAL_CONFIRM_BTN');
+            confirmBtn.disabled = true;
+
+            document.getElementById('DELETE_MODAL_CONFIRM_BTN_TRASH_ICON').style.display = 'none';
+            document.getElementById('DELETE_MODAL_CONFIRM_BTN_LOADING_ICON').classList.remove('hidden');
+            document.getElementById('DELETE_MODAL_CONFIRM_BTN_LOADING_ICON').classList.add('inline-block');
+
+            // Disable nút hủy
+            const cancelBtn = document.getElementById('DELETE_MODAL_CANCEL_BTN');
+            cancelBtn.disabled = true;
+            cancelBtn.classList.add('hidden', 'cursor-not-allowed');
+
             try {
-                const result = await deleteFuncCallback();
+                const result = await actionFuncCallback();
                 if (result) {
                     closeDeleteModalGeneric_Global();
                     showNotificationModel_Global(`Xóa thành công ${arrayIds.length} ${objectNameLabel}`, 'success', successFuncCallback);
@@ -428,10 +461,33 @@
         document.body.style.overflow = 'hidden';
     }
 
-    // Close model
+    // Close modal and reset states
     function closeDeleteModalGeneric_Global() {
-        document.getElementById('DELETE_MODAL').style.display = 'none';
+        const modal = document.getElementById('DELETE_MODAL');
+        const confirmBtn = document.getElementById('DELETE_MODAL_CONFIRM_BTN');
+        const cancelBtn = document.getElementById('DELETE_MODAL_CANCEL_BTN');
+        const confirmIcon = document.getElementById('DELETE_MODAL_CONFIRM_BTN_TRASH_ICON');
+        const confirmLoading = document.getElementById('DELETE_MODAL_CONFIRM_BTN_LOADING_ICON');
+
+        // Hide modal
+        modal.style.display = 'none';
         document.body.style.overflow = '';
+
+        // Reset button states
+        if (confirmBtn) {
+            confirmBtn.disabled = false;
+        }
+        if (cancelBtn) {
+            cancelBtn.disabled = false;
+            cancelBtn.classList.remove('hidden', 'opacity-50', 'cursor-not-allowed');
+        }
+        if (confirmIcon) {
+            confirmIcon.style.display = '';
+        }
+        if (confirmLoading) {
+            confirmLoading.classList.add('hidden');
+            confirmLoading.classList.remove('inline-block');
+        }
     }
 
 

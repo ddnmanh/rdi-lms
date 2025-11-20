@@ -641,7 +641,7 @@
             idDelete: userId,
             nameValue: userName || '-',
             descValue: userEmail || '',
-            deleteFuncCallback: () => handleDeleteUsers([userId]),
+            actionFuncCallback: () => handleDeleteUsers([userId]),
             successFuncCallback: () => loadUsers(currentPage),
             failFuncCallback: () => {}
         });
@@ -652,7 +652,7 @@
         openBulkDeleteModalGeneric_Global({
             arrayIds: Array.from(selectedUserIds),
             objectName: OBJECTNAMEMODAL.USER,
-            deleteFuncCallback: () => handleDeleteUsers(Array.from(selectedUserIds)),
+            actionFuncCallback: () => handleDeleteUsers(Array.from(selectedUserIds)),
             successFuncCallback: () => loadUsers(currentPage),
             failFuncCallback: () => {}
         });

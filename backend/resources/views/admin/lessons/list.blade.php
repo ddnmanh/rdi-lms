@@ -730,7 +730,7 @@
             idDelete: lessonId,
             nameValue: lessonTitle || '-',
             descValue: courseName || '',
-            deleteFuncCallback: () => handleDeleteLessons([lessonId]),
+            actionFuncCallback: () => handleDeleteLessons([lessonId]),
             successFuncCallback: () => loadLessons(currentPage),
             failFuncCallback: () => {}
         });
@@ -741,7 +741,7 @@
         openBulkDeleteModalGeneric_Global({
             arrayIds: Array.from(selectedLessonIds),
             objectName: OBJECTNAMEMODAL.LESSON,
-            deleteFuncCallback: () => handleDeleteLessons(Array.from(selectedLessonIds)),
+            actionFuncCallback: () => handleDeleteLessons(Array.from(selectedLessonIds)),
             successFuncCallback: () => loadLessons(currentPage),
             failFuncCallback: () => {}
         });

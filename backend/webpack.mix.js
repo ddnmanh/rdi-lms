@@ -21,6 +21,9 @@ mix.js('resources/js/app.js', 'public/js')
     .postCss('resources/css/loading.css', 'public/css', [
         //
     ])
+    .postCss('resources/css/loading-in-btn.css', 'public/css', [
+        //
+    ])
     .postCss('resources/css/table.css', 'public/css', [
         //
     ]);

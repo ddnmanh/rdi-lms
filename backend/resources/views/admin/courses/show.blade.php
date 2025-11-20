@@ -56,7 +56,7 @@
                     <div class="px-6 py-4 flex items-center justify-between gap-3 rounded-t-none rounded-b-none">
                         <div class="flex items-center gap-3"></div>
                         <a id="editButton" href="#"
-                           class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-3.5 py-2 text-sm font-semibold text-white hover:bg-amber-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm">
+                           class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
                             <i class="fa-solid fa-pen"></i>
                             <span>Chỉnh sửa</span>
                         </a>
@@ -116,7 +116,7 @@
                     <div class="px-6 py-4 flex items-center justify-between gap-3 rounded-t-none">
                         <div class="flex items-center gap-3"></div>
                         <a id="manageLessonsButton" href="#"
-                            class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-3.5 py-2 text-sm font-semibold text-white hover:bg-amber-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm">
+                            class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
                             <i class="fa-solid fa-pen"></i>
                             <span>Quản lý bài học</span>
                         </a>
@@ -133,7 +133,7 @@
                     <div class="px-6 py-4 flex items-center justify-between gap-3 rounded-t-none">
                         <div class="flex items-center gap-3"></div>
                         <a id="manageUsersButton" href="#"
-                            class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-3.5 py-2 text-sm font-semibold text-white hover:bg-amber-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm">
+                            class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
                             <i class="fa-solid fa-pen"></i>
                             <span>Quản lý học viên</span>
                         </a>

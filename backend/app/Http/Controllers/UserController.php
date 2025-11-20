@@ -281,8 +281,6 @@ class UserController extends Controller
 
         $users = User::with('roles')->whereIn('id', $request->user_ids)->get();
 
-        // dd($users->toArray());
-
         // Lấy level thấp nhất (quyền cao nhất) của user yêu cầu xóa
         $authUserMinLevel = $authUser?->roles()->min('level');
 
@@ -299,7 +297,7 @@ class UserController extends Controller
                 ], 403);
             }
 
-            $userWillDelete[] = $user->id;
+            $userWillDelete[] = $user;
         }
 
         foreach ($userWillDelete as $user) {

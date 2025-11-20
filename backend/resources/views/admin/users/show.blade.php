@@ -29,13 +29,13 @@
             {{-- Tabs header --}}
             <div class="relative bg-transparent">
                 <button type="button"
-                    class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-5 py-2.5 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-900/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                    class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-5 py-2.5 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-800/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                     data-tab-target="TAB_USER_INFO">
                     <i class="fa-regular fa-bookmark"></i>
                     <span>Thông tin người dùng</span>
                 </button>
                 <button type="button"
-                        class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-5 py-2.5 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-900/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                        class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-5 py-2.5 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-800/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                         data-tab-target="TAB_COURSES">
                     <i class="fa-regular fa-clipboard"></i>
                     <span>Khóa học</span>
@@ -44,34 +44,34 @@
             </div>
 
             {{-- Content area --}}
-            <div class="flex-1 min-h-0 h-full bg-white dark:bg-gray-900 rounded-b-xl overflow-hidden">
+            <div class="flex-1 min-h-0 h-full bg-white dark:bg-gray-800 rounded-b-xl overflow-hidden">
                 {{-- user Information --}}
-                <div class="tab-panel max-h-full overflow-y-auto" data-tab-content="TAB_USER_INFO">
-                    <div class="px-6 py-4 flex items-center justify-between gap-3 rounded-t-none rounded-b-none">
-                        <div class="flex items-center gap-3"></div>
-                        <a id="editButton" href="#"
-                           class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
-                            <i class="fa-solid fa-pen"></i>
-                            <span>Chỉnh sửa</span>
-                        </a>
-                    </div>
+                <div class="tab-panel h-full max-h-full overflow-y-auto" data-tab-content="TAB_USER_INFO">
+                    
+                    {{-- <div class="w-[70%] max-w-[800px] p-6 mx-auto translate-y-[25%] flex flex-col items-stretch justify-start gap-6 bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden"> --}}
+                    <div class="p-10 pt-20 flex flex-col items-stretch justify-start gap-6 bg-white dark:bg-gray-800 overflow-hidden">
 
-                    <div class="space-y-6 p-6">
-                        {{-- Personal Information Section --}}
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {{-- Avatar Section --}}
-                            <div class="col-span-1 row-span-5">
-                                <label class="block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-2">Ảnh đại diện</label>
-                                <div class="flex items-center gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900/40">
-                                    <div class="rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
-                                        <img id="userAvatar" src="" alt="Avatar" class="w-[300px] aspect-square object-cover">
-                                    </div>
-                                    <div class="flex-1">
-                                        {{-- <div class="text-sm text-gray-600 dark:text-gray-300">Ảnh đại diện của người dùng</div> --}}
-                                    </div>
+                        <div class="flex flex-row items-start justify-between">
+                            <div class="flex flex-row items-center gap-4">
+                                <div class="bg-white dark:bg-gray-800 rounded-full shadow-sm">
+                                    <img id="userAvatar" src="" alt="Avatar" class="w-40 h-40 rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-xl bg-gray-100">
+                                </div>
+                                <div class="flex flex-col items-start justify-center gap-2">
+                                    <span class="userEmail text-xl text-gray-500 dark:text-white text-center">-</span>
+                                    <h2 class="userFullname text-3xl font-bold text-gray-900 dark:text-white text-center">-</h2>
+                                    <span class="userRoles px-4 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 text-sm font-bold border border-blue-100 dark:border-blue-800">-</span>
                                 </div>
                             </div>
+                            <a id="editButton" href="#"
+                                class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
+                                <i class="fa-solid fa-pen"></i>
+                                <span>Chỉnh sửa</span>
+                            </a>
+                        </div>
 
+
+                        {{-- Details Grid --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6"> 
                             @php
                                 $infoField = function($label, $id) {
                                     return <<<HTML
@@ -91,8 +91,11 @@
                             {!! $infoField('Họ và tên', 'userFullname') !!}
                             {!! $infoField('Vai trò', 'userRoles') !!}
                             {!! $infoField('Ngày tạo', 'userCreatedAt') !!}
+                            {!! $infoField('Ngày sinh', 'userBirthday') !!}
+
                         </div>
-                    </div> 
+                    </div>
+
                 </div>
 
                 {{-- Courses --}}
@@ -135,7 +138,7 @@
         tabButtons.forEach(button => {
             const isActive = button.dataset.tabTarget === target;
             button.classList.toggle('bg-white', isActive);
-            button.classList.toggle('dark:bg-gray-900', isActive);
+            button.classList.toggle('dark:bg-gray-800', isActive);
             button.classList.toggle('border-gray-200', isActive);
             button.classList.toggle('dark:border-gray-700', isActive);
             button.classList.toggle('border-transparent', !isActive);
@@ -196,25 +199,24 @@
         setValueById('userFullname', userData.fullname || 'Chưa có tên');
         setValueById('userFullnameDetail', userData.fullname || 'Chưa có tên');
         setValueById('userRoles', userData.roles.map(r => r.name).join(', ') || 'Chưa có vai trò');
-        setValueById('userBirthday', formatDate_Global(userData.birthday));
         setValueById('userCreatedAt', formatDate_Global(userData.created_at));
 
-        // const status = (userData.status || '').toString().toLowerCase();
-        // const badge = document.getElementById('userStatusBadge');
-        // if (badge) {
-        //     const map = {
-        //         active: ['bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300', 'Active', 'bg-emerald-500'],
-        //         pending: ['bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300', 'Pending', 'bg-amber-500'],
-        //         banned: ['bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300', 'Banned', 'bg-rose-500'],
-        //     };
-        //     const [cls, label, dot] = map[status] || map['active'];
-        //     badge.className = `inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-full ${cls}`;
-        //     badge.innerHTML = `<span class="inline-block h-1.5 w-1.5 rounded-full ${dot}"></span><span>${label}</span>`;
-        // }
+        // Format birthday
+        let birthdayStr = 'Chưa cập nhật';
+        if (userData.birthday) {
+            const date = new Date(userData.birthday);
+            if (!isNaN(date.getTime())) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                birthdayStr = `${day}/${month}/${year}`;
+            }
+        }
+        setValueById('userBirthday', birthdayStr);
 
         // Set avatar preview
         const avatarEl = document.getElementById('userAvatar');
-        avatarEl.src = userData.avatar_path || '';  
+        avatarEl.src = userData.avatar_path || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(userData.fullname || 'User') + '&background=random';
     } 
 
     function renderCourses() {

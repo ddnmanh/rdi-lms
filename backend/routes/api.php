@@ -93,6 +93,11 @@ Route::middleware('auth:api')->group(function () {
             'name' => 'Lấy thông tin user hiện tại',
             'description' => 'Cho phép lấy thông tin user hiện tại'
         ]);
+        Route::put('/update-profile', [AuthController::class, 'updateProfile'], [
+            'group' => 'Xác thực',
+            'name' => 'Cập nhật thông tin cá nhân',
+            'description' => 'Cho phép cập nhật thông tin cá nhân (fullname, birthday, avatar)'
+        ]);
     });
 
     // User Management (Admin) - yêu cầu permission

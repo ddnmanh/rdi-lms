@@ -28,20 +28,20 @@
             {{-- Tabs header --}}
             <div class="relative bg-transparent">
                 <button type="button"
-                    class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-5 py-2.5 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-900/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                    class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-5 py-2.5 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-800/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                     data-tab-target="tab-course-info">
                     <i class="fa-regular fa-bookmark"></i>
                     <span>Thông tin khóa học</span>
                 </button>
                 <button type="button"
-                        class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-5 py-2.5 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-900/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                        class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-5 py-2.5 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-800/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                         data-tab-target="tab-lessons">
                     <i class="fa-regular fa-clipboard"></i>
                     <span>Bài học</span>
                     <span id="lessonsTabCount" class="hidden rounded-full bg-gray-200 dark:bg-gray-800 px-2 py-0.5 text-xs font-semibold text-gray-600 dark:text-gray-300"></span>
                 </button>
                 <button type="button"
-                        class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-5 py-2.5 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-900/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                        class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-5 py-2.5 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-800/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                         data-tab-target="tab-users">
                     <i class="fa-regular fa-user"></i>
                     <span>Học viên</span>
@@ -50,7 +50,7 @@
             </div>
 
             {{-- Content area --}}
-            <div class="flex-1 min-h-0 h-full bg-white dark:bg-gray-900 rounded-b-xl overflow-hidden">
+            <div class="flex-1 min-h-0 h-full bg-white dark:bg-gray-800 rounded-b-xl overflow-hidden">
                 {{-- Course Information --}}
                 <div class="tab-panel max-h-full overflow-y-auto" data-tab-content="tab-course-info">
                     <div class="px-6 py-4 flex items-center justify-between gap-3 rounded-t-none rounded-b-none">
@@ -175,7 +175,7 @@
         tabButtons.forEach(button => {
             const isActive = button.dataset.tabTarget === target;
             button.classList.toggle('bg-white', isActive);
-            button.classList.toggle('dark:bg-gray-900', isActive);
+            button.classList.toggle('dark:bg-gray-800', isActive);
             button.classList.toggle('border-gray-200', isActive);
             button.classList.toggle('dark:border-gray-700', isActive);
             button.classList.toggle('border-transparent', !isActive);

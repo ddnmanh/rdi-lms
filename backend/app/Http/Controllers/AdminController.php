@@ -196,5 +196,19 @@ class AdminController extends Controller
     {
         return view('admin.reports.activities');
     }
+
+    /**
+     * Trang xem thông tin cá nhân
+     */
+    public function profile() {
+        return view('admin.profile.show');
+    }
+
+    /**
+     * Trang chỉnh sửa thông tin cá nhân
+     */
+    public function editProfile() {
+        return view('admin.profile.form');
+    }
 }
 

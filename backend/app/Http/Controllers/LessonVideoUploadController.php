@@ -41,7 +41,7 @@ class LessonVideoUploadController extends Controller
             $totalChunks = (int) ceil($data['file_size'] / $chunkSize);
 
             // Tạo thư mục tạm với UUID ngẫu nhiên để lưu các chunk
-            $tempDirectory = 'lesson-video-uploads/' . Str::uuid()->toString();
+            $tempDirectory = 'temp/lessons/videos/' . Str::uuid()->toString();
 
             // Đảm bảo thư mục tạm đã được tạo
             $this->ensureDirectoryExists(storage_path('app/' . $tempDirectory));
@@ -97,7 +97,7 @@ class LessonVideoUploadController extends Controller
     {
         // Không sử dụng session để tránh session locking làm chậm xử lý song song
         // Tất cả xác thực đều dựa vào JWT token trong header
-        
+
         $lessonVideoUpload = LessonVideoUpload::findOrFail($IdLessonVideoUpload);
         $this->authorizeUploadAccess($lessonVideoUpload);
 

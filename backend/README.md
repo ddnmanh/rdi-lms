@@ -441,7 +441,7 @@ grep CRON /var/log/syslog
 
 ```bash
 # Kiểm tra quyền thư mục
-ls -la storage/app/lesson-video-uploads/
+ls -la storage/app/lessons/video-uploads/
 
 # Kiểm tra dung lượng disk
 df -h

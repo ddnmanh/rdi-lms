@@ -745,7 +745,7 @@
                 mime_type: backgroundUploadState.mimeType,
                 chunk_size: DEFAULT_BACKGROUND_CHUNK_SIZE
             };
-            const sessionResponse = await apiRequest('/lesson-video-uploads/sessions', {
+            const sessionResponse = await apiRequest('/lessons/video-uploads/sessions', {
                 method: 'POST',
                 body: JSON.stringify(payload)
             });
@@ -884,7 +884,7 @@
         formData.append('chunk_index', chunkIndex);
         formData.append('chunk', chunkBlob);
 
-        const response = await fetch(`/api/lesson-video-uploads/${backgroundUploadState.uploadId}/chunks`, {
+        const response = await fetch(`/api/lessons/video-uploads/${backgroundUploadState.uploadId}/chunks`, {
             method: 'POST',
             body: formData,
             credentials: 'include'
@@ -918,7 +918,7 @@
             await new Promise(resolve => setTimeout(resolve, 100));
 
             // Gọi API hủy upload
-            await apiRequest(`/lesson-video-uploads/${backgroundUploadState.uploadId}`, {
+            await apiRequest(`/lessons/video-uploads/${backgroundUploadState.uploadId}`, {
                 method: 'DELETE'
             });
 
@@ -946,7 +946,7 @@
         backgroundUploadState.status = 'completing';
         changeVideoUploadUI();
         try {
-            const response = await apiRequest(`/lesson-video-uploads/${backgroundUploadState.uploadId}/complete`, {
+            const response = await apiRequest(`/lessons/video-uploads/${backgroundUploadState.uploadId}/complete`, {
                 method: 'POST',
                 body: JSON.stringify({
                     lesson_id: targetLessonId
@@ -1004,7 +1004,7 @@
         }
 
         try {
-            const response = await apiRequest(`/lesson-video-uploads/${backgroundUploadState.uploadId}`, {
+            const response = await apiRequest(`/lessons/video-uploads/${backgroundUploadState.uploadId}`, {
                 method: 'GET'
             });
             const data = response.data;

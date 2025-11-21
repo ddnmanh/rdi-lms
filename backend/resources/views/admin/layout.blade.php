@@ -137,10 +137,50 @@
                     handleSidebarCollapse('EXPAND');
                 }
             });
+        });    
+
+        // ===== User Menu Dropdown =====
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('user-menu-dropdown');
+            const arrow = document.getElementById('user-menu-arrow');
+
+            if (dropdown.classList.contains('hidden')) {
+                // Open
+                dropdown.classList.remove('hidden');
+                // Small delay to allow transition to work
+                setTimeout(() => {
+                    dropdown.classList.remove('opacity-0', 'scale-95');
+                    dropdown.classList.add('opacity-100', 'scale-100');
+                }, 10);
+                arrow.classList.add('rotate-180');
+            } else {
+                // Close
+                dropdown.classList.remove('opacity-100', 'scale-100');
+                dropdown.classList.add('opacity-0', 'scale-95');
+                arrow.classList.remove('rotate-180');
+                setTimeout(() => {
+                    dropdown.classList.add('hidden');
+                }, 200); // Match duration-200
+            }
+        }
+
+        // Close when clicking outside
+        document.addEventListener('click', function(event) {
+            const container = document.getElementById('user-menu-container');
+            const dropdown = document.getElementById('user-menu-dropdown');
+            const arrow = document.getElementById('user-menu-arrow');
+
+            if (container && !container.contains(event.target)) {
+                if (dropdown && !dropdown.classList.contains('hidden')) {
+                    dropdown.classList.remove('opacity-100', 'scale-100');
+                    dropdown.classList.add('opacity-0', 'scale-95');
+                    if (arrow) arrow.classList.remove('rotate-180');
+                    setTimeout(() => {
+                        dropdown.classList.add('hidden');
+                    }, 200);
+                }
+            }
         });
-
-
-        
 
     </script>
 
@@ -154,7 +194,8 @@
     <!-- Sidebar -->
     <aside id="sidebar" class="shrink-0 w-[180px] 2xl:w-[230px] h-screen bg-white dark:bg-gray-900 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700/60 overflow-hidden transition-all duration-300 z-40 flex flex-col">
         <!-- Sidebar Header -->
-        <div class="h-16 sidebar-item flex items-center px-4 flex-shrink-0">
+        <div class="h-[55px] 2xl:h-[65px] sidebar-item flex flex-col items-center !justify-between flex-shrink-0">
+            <div class="w-full"></div>
             <a href="{{ route('admin.dashboard') }}"
                 class="group flex items-center gap-3 hover:opacity-90 transition-all duration-300">
                 <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
@@ -165,13 +206,18 @@
                     LMS Admin
                 </span>
             </a>
+            <div class="w-full px-3">
+                <hr class="w-full border-t border-gray-200 dark:border-gray-700/60" />
+            </div>
         </div>
 
         <nav class="mt-6 px-3 space-y-1.5 flex-1 overflow-y-auto">
             {{-- Group: Tổng quan --}}
-            <div
-                class="sidebar-group-label px-3 pb-2 pt-3 text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400 font-bold">
-                Tổng quan</div>
+            <div class="px-3 pb-2 pt-3">
+                <div class="sidebar-group-label text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400 font-bold">
+                    Tổng quan
+                </div>
+            </div>
             <a href="{{ route('admin.dashboard') }}"
                 class="sidebar-item group flex items-center gap-3 px-2 py-2 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.dashboard') ? 'active bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20' }}">
                 <div
@@ -184,9 +230,14 @@
             </a>
 
             {{-- Group: Quản lý --}}
-            <div
-                class="sidebar-group-label mt-4 px-3 pb-2 pt-3 text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400 font-bold">
-                Quản lý</div>
+            <div class="px-3 pb-2 pt-3">
+                <div class="sidebar-group-label text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400 font-bold">
+                    Quản lý
+                </div>
+                <div class="sidebar-group-separator w-full">
+                    <hr class="border-gray-200 dark:border-gray-700/60" />
+                </div>
+            </div>
             <a href="{{ route('admin.users.list') }}"
                 class="sidebar-item group flex items-center gap-3 px-2 py-2 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.users.*') ? 'active bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20' }}">
                 <div
@@ -263,6 +314,25 @@
                 </div>
             </details>
 
+            {{-- Group: Cá nhân --}}
+            <div class="px-3 pb-2 pt-3">
+                <div class="sidebar-group-label text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400 font-bold">
+                    Cá nhân
+                </div>
+                <div class="sidebar-group-separator w-full">
+                    <hr class="border-gray-200 dark:border-gray-700/60" />
+                </div>
+            </div>
+            <a href="{{ route('admin.profile.show') }}" class="sidebar-item group flex items-center gap-3 px-2 py-2 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.profile.*') ? 'active bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20' }}">
+                <div
+                    class="h-7 w-7 rounded-lg {{ request()->routeIs('admin.profile.*') ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-900/30' }} flex items-center justify-center transition-all duration-300">
+                    <i
+                        class="fas fa-address-card sidebar-icon {{ request()->routeIs('admin.profile.*') ? 'text-white' : 'text-gray-600 dark:text-gray-400' }} text-sm"></i>
+                </div>
+                <span class="sidebar-text">Hồ sơ</span>
+                {{-- <span class="sidebar-tooltip z-50">Bài học</span> --}}
+            </a>
+
         </nav>
 
         <!-- Sidebar Footer -->
@@ -296,50 +366,76 @@
                 </div>
                 <!-- Actions Section -->
                 <div class="flex items-center gap-2 md:gap-3 flex-shrink-0">
-                    {{-- <button onclick="toggleTheme()"
-                        class="group relative p-2.5 rounded-xl hover:bg-gradient-to-br hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20 transition-all duration-300 hover:scale-110"
-                        title="Chuyển đổi theme">
-                        <i class="fas fa-moon dark:hidden text-lg text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors"></i>
-                        <i class="fas fa-sun hidden dark:inline text-lg text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors"></i>
-                    </button>
-                    <button
-                        class="group relative p-2.5 rounded-xl hover:bg-gradient-to-br hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20 transition-all duration-300 hover:scale-110"
-                        title="Thông báo">
-                        <i class="fas fa-bell text-lg text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors"></i>
-                        <span class="absolute -top-1 -right-1 inline-flex h-5 min-w-[20px] px-1.5 items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-pink-500 text-[10px] font-bold text-white shadow-lg shadow-red-500/40 animate-pulse">3</span>
-                    </button> --}}
-                    <div class="relative">
-                        <details class="group">
-                            <summary class="list-none flex items-center gap-2.5 cursor-pointer select-none rounded-xl p-1.5 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20 transition-all duration-300 hover:scale-105">
-                                <div class="group-hover:scale-110 transition-transform duration-300">
-                                    <img src="{{ optional(request()->user())->avatar_path }}" alt="Avatar" class="w-9 aspect-square rounded-full object-cover">
-                                </div>
-                                <i class="fas fa-caret-down text-xs text-gray-500 dark:text-gray-400 group-open:rotate-180 transition-transform duration-300"></i>
-                            </summary>
-
-                            <div
-                                class="z-[1000] absolute right-0 mt-2 w-64 rounded-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl shadow-2xl shadow-gray-900/10 dark:shadow-gray-900/30 border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
+                    <div class="relative" id="user-menu-container">
+                        <button type="button" onclick="toggleUserMenu()"
+                            class="flex items-center gap-2.5 cursor-pointer select-none rounded-full p-1 pl-1.5 pr-2.5 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                            <div class="relative">
+                                <img src="{{ optional(request()->user())->avatar_path }}"
+                                    alt="Avatar"
+                                    class="w-9 h-9 rounded-full object-cover ring-2 ring-white dark:ring-gray-800 shadow-sm">
                                 <div
-                                    class="px-4 py-3.5 bg-gradient-to-r from-indigo-50/50 to-purple-50/50 dark:from-indigo-900/20 dark:to-purple-900/20 border-b border-gray-200/50 dark:border-gray-700/50">
-                                    <p class="text-xs text-gray-600 dark:text-gray-400 font-medium">Đăng nhập với</p>
-                                    <p class="text-xs font-semibold text-gray-900 dark:text-gray-100 mt-0.5 truncate">{{ optional(request()->user())->email ?? 'user@example.com' }}</p>
-                                </div>
-                                <div class="py-1.5">
-                                    <a href="{{ route('admin.dashboard') }}"
-                                        class="group/item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20 transition-all duration-200">
-                                        <i class="fas fa-tachometer-alt text-indigo-600 dark:text-indigo-400"></i>
-                                        <span class="font-medium">Trang chủ</span>
-                                        <i
-                                            class="fas fa-chevron-right ml-auto text-xs opacity-0 group-hover/item:opacity-100 group-hover/item:translate-x-1 transition-all"></i>
-                                    </a>
-                                    <button type="button" onclick="openVerifyLogoutModal(event)"
-                                        class="w-full text-left flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 dark:hover:from-red-900/20 dark:hover:to-pink-900/20 transition-all duration-200">
-                                        <i class="fas fa-sign-out-alt"></i>
-                                        <span>Đăng xuất</span>
-                                    </button>
+                                    class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full">
                                 </div>
                             </div>
-                        </details>
+                            <div class="hidden md:flex flex-col items-start text-left">
+                                <span
+                                    class="text-sm font-semibold text-gray-700 dark:text-gray-200 leading-none">{{ optional(request()->user())->fullname ?? 'User' }}</span>
+                                <span
+                                    class="text-[10px] font-medium text-gray-500 dark:text-gray-400 leading-none mt-1">{{ optional(request()->user())->roles->first()->name ?? 'Member' }}</span>
+                            </div>
+                            <i class="fas fa-chevron-down text-[10px] text-gray-400 dark:text-gray-500 ml-1 transition-transform duration-300"
+                                id="user-menu-arrow"></i>
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div id="user-menu-dropdown"
+                            class="hidden absolute right-0 mt-2 w-72 origin-top-right rounded-2xl bg-white dark:bg-gray-800 shadow-2xl shadow-gray-900/10 dark:shadow-gray-900/30 ring-1 ring-black ring-opacity-5 focus:outline-none transform transition-all duration-200 opacity-0 scale-95 z-50">
+
+                            <!-- Header -->
+                            <div
+                                class="px-5 py-4 border-b border-gray-100 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/50 rounded-t-2xl">
+                                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Đăng nhập với</p>
+                                <p class="text-sm font-bold text-gray-900 dark:text-white mt-1 truncate">
+                                    {{ optional(request()->user())->email }}</p>
+                            </div>
+
+                            <!-- Menu Items -->
+                            <div class="p-2 space-y-1">
+                                <a href="{{ route('admin.dashboard') }}"
+                                    class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200">
+                                    <div
+                                        class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40 flex items-center justify-center transition-colors">
+                                        <i
+                                            class="fas fa-tachometer-alt text-gray-500 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"></i>
+                                    </div>
+                                    Trang chủ
+                                </a>
+
+                                <a href="{{ route('admin.profile.show') }}"
+                                    class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200">
+                                    <div
+                                        class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40 flex items-center justify-center transition-colors">
+                                        <i
+                                            class="fas fa-user-cog text-gray-500 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"></i>
+                                    </div>
+                                    Hồ sơ cá nhân
+                                </a>
+                            </div>
+
+                            <div class="h-px bg-gray-100 dark:bg-gray-700/50 mx-2"></div>
+
+                            <div class="p-2">
+                                <button type="button" onclick="openVerifyLogoutModal(event)"
+                                    class="w-full group flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200">
+                                    <div
+                                        class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/20 group-hover:bg-red-100 dark:group-hover:bg-red-900/40 flex items-center justify-center transition-colors">
+                                        <i class="fas fa-sign-out-alt text-red-500 dark:text-red-400"></i>
+                                    </div>
+                                    Đăng xuất
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -199,13 +199,14 @@
 
         <div class="flex items-center justify-end gap-3 mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
             <button type="button"
-                id="btnCancel"
+                id="lessonFormCancelButton"
                 class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">
                 <span>Hủy</span>
             </button>
-            <button type="submit"
-                class="px-4 py-2 rounded-md border border-blue-600 hover:border-blue-500 bg-blue-600 hover:bg-blue-500 text-white transition-all duration-300">
-                <span>Cập nhật</span>
+            <button type="submit" id="lessonFormSubmitButton" class="min-w-[100px] px-4 py-2 flex flex-row items-center justify-center gap-2 rounded-md border border-blue-600 hover:border-blue-500 bg-blue-600 hover:bg-blue-500 text-white transition-all duration-300">
+                <i class="fa-solid fa-floppy-disk" id="lessonFormSubmitButton_saveIcon"></i>
+                <span class="LOADING_IN_BTN hidden" id="lessonFormSubmitButton_loadingIcon"></span>
+                <span id="lessonFormSubmitButton_text">Cập nhật</span>
             </button>
         </div>
     </form>
@@ -214,11 +215,6 @@
 
 
 <script>
-    // ========================================
-    // KHAI BÁO BIẾN TOÀN CỤC
-    // ========================================
-
-    // Mode: CREATE hoặc EDIT
     const mode = '{{ $mode }}';
     const lessonId = @if($mode === 'EDIT' && isset($lessonId)) {{ $lessonId }} @else null @endif;
 
@@ -229,7 +225,6 @@
     let thumbnailPreview = null; // URL preview của thumbnail
 
     // Quản lý video
-    let videoFile = null; // File video được chọn
     let existingVideoSource = null; // Đường dẫn video hiện tại (cho mode EDIT)
     let existingVideoIsExternal = false; // Kiểm tra video có phải URL bên ngoài không
     let videoPreviewObjectUrl = null; // Object URL cho video preview
@@ -238,21 +233,15 @@
     let isThumbnailDragActive = false;
     let isVideoDragActive = false;
 
-    // Cấu hình upload video
-    const VIDEO_UPLOAD_MODE = {
-        DIRECT: 'direct',      // Upload trực tiếp (không dùng)
-        BACKGROUND: 'background' // Upload nền (mặc định)
-    };
     const MAX_BACKGROUND_VIDEO_SIZE = 10 * 1024 * 1024 * 1024; // 10GB
     const DEFAULT_BACKGROUND_CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
     const MAX_PARALLEL_CHUNKS = 6; // Ngưỡng trên để tránh bão hòa kết nối
     const MIN_PARALLEL_CHUNKS = 2; // Đảm bảo vẫn có song song ngay cả trên máy yếu
-    // const CONCURRENT_CHUNKS = (() => {
-    //     const hardwareThreads = Number(navigator?.hardwareConcurrency) || 4;
-    //     const suggested = Math.max(MIN_PARALLEL_CHUNKS, Math.floor(hardwareThreads / 2));
-    //     return Math.min(MAX_PARALLEL_CHUNKS, suggested);
-    // })(); // Tự động chọn số chunk upload đồng thời dựa trên thiết bị
-    const CONCURRENT_CHUNKS = 10;
+    const CONCURRENT_CHUNKS = (() => {
+        const hardwareThreads = Number(navigator?.hardwareConcurrency) || 4;
+        const suggested = Math.max(MIN_PARALLEL_CHUNKS, Math.floor(hardwareThreads / 2));
+        return Math.min(MAX_PARALLEL_CHUNKS, suggested);
+    })(); // Tự động chọn số chunk upload đồng thời dựa trên thiết bị
     const MAX_RETRY_PER_CHUNK = 3; // Số lần retry tối đa cho mỗi chunk
 
     // Trạng thái upload nền
@@ -273,6 +262,11 @@
         failedChunks: new Map()      // Map chunk index -> số lần retry
     };
 
+    const videoPreviewContainer = document.getElementById('videoPreviewContainer');
+    const videoFilePreview = document.getElementById('videoFilePreview');
+    const videoUrlPreview = document.getElementById('videoUrlPreview');
+    const videoIconPlaceholder = document.getElementById('videoIconPlaceholder');
+
     // ========================================
     // KHỞI TẠO KHI TRANG TẢI
     // ========================================
@@ -281,13 +275,25 @@
         if (mode === 'EDIT' && lessonId) {
             lessonData = await loadLessonData(lessonId);
             if (lessonData) {
-                await renderLesson(lessonData);
+                await renderLesson();
             }
         }
         // Khởi tạo form thumbnail và video
         initThumbnailPreviewForm();
         initVideoUploadForm();
+        initUI();
     });
+
+
+    // Khởi tạo UI chung cho từng mode
+    function initUI() {
+        // Xử lý nút submit
+        if (mode === 'CREATE') {
+            document.getElementById('lessonFormSubmitButton_text').textContent = 'Tạo bài học';
+        } else {
+            document.getElementById('lessonFormSubmitButton_text').textContent = 'Cập nhật';
+        }
+    }
 
     // ========================================
     // XỬ LÝ LOAD VÀ RENDER DỮ LIỆU BÀI HỌC
@@ -360,67 +366,6 @@
     // ========================================
 
     /**
-     * Xử lý khi người dùng chọn/xóa file thumbnail
-     * @param {File|null} file - File ảnh hoặc null để xóa
-     */
-    function handleThumbnailFile(file) {
-        const MAX_SIZE = 2 * 1024 * 1024; // 2MB
-        const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-
-        // Giải phóng URL preview cũ nếu có
-        if (thumbnailPreview) {
-            try {
-                URL.revokeObjectURL(thumbnailPreview);
-            } catch (e) {
-                // noop
-            }
-        }
-
-        // Nếu file = null, reset về trạng thái ban đầu
-        if (!file) {
-            const thumbnailEl = document.getElementById('thumbnailPreview');
-            const placeholderEl = document.getElementById('thumbnailIconPlaceholder');
-            const clearBtn = document.getElementById('btnClearNewThumbnail');
-            const input = document.getElementById('thumbnail');
-
-            if (lessonData?.thumbnail_path) {
-                thumbnailEl.src = lessonData?.thumbnail_path;
-                thumbnailEl.classList.remove('hidden');
-                placeholderEl.classList.add('hidden');
-            } else {
-                thumbnailEl.classList.add('hidden');
-                placeholderEl.classList.remove('hidden');
-            }
-            clearBtn.classList.add('hidden');
-            if (input) input.value = '';
-            thumbnailPreview = null;
-            return;
-        }
-
-        if (!ALLOWED_TYPES.includes(file.type)) {
-            showNotificationModel_Global('Định dạng không hỗ trợ. Hãy chọn ảnh PNG, JPG, WEBP hoặc GIF.', 'error');
-            return;
-        }
-
-        if (file.size > MAX_SIZE) {
-            showNotificationModel_Global('Ảnh quá lớn. Kích thước tối đa 2MB.', 'error');
-            return;
-        }
-
-        const previewUrl = URL.createObjectURL(file);
-        thumbnailPreview = previewUrl;
-
-        const thumbnailEl = document.getElementById('thumbnailPreview');
-        const placeholderEl = document.getElementById('thumbnailIconPlaceholder');
-        const clearBtn = document.getElementById('btnClearNewThumbnail');
-
-        thumbnailEl.src = previewUrl;
-        thumbnailEl.classList.remove('hidden');
-        placeholderEl.classList.add('hidden');
-        clearBtn.classList.remove('hidden');
-    }
-
-    /**
      * Khởi tạo form upload thumbnail với drag & drop và button handlers
      */
     function initThumbnailPreviewForm() {
@@ -459,7 +404,7 @@
 
                 const file = e.dataTransfer.files && e.dataTransfer.files[0] ? e.dataTransfer.files[0] : null;
                 if (file) {
-                    handleThumbnailFile(file);
+                    handleChangeThumbnailFile(file);
                     if (input) input.files = e.dataTransfer.files;
                 }
             });
@@ -470,7 +415,7 @@
             input.addEventListener('change', (e) => {
                 const file = e.target.files && e.target.files[0] ? e.target.files[0] : null;
                 if (file) {
-                    handleThumbnailFile(file);
+                    handleChangeThumbnailFile(file);
                 }
             });
         }
@@ -478,9 +423,70 @@
         // Clear button handler
         if (clearBtn) {
             clearBtn.addEventListener('click', () => {
-                handleThumbnailFile(null);
+                handleChangeThumbnailFile(null);
             });
         }
+    }
+
+        /**
+     * Xử lý khi người dùng chọn/xóa file thumbnail
+     * @param {File|null} file - File ảnh hoặc null để xóa
+     */
+    function handleChangeThumbnailFile(file) {
+        const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+        const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+        // Giải phóng URL preview cũ nếu có
+        if (thumbnailPreview) {
+            try {
+                URL.revokeObjectURL(thumbnailPreview);
+            } catch (e) {
+                // noop
+            }
+        }
+
+        // Nếu file = null, reset về trạng thái ban đầu
+        if (!file) {
+            const thumbnailEl = document.getElementById('thumbnailPreview');
+            const placeholderEl = document.getElementById('thumbnailIconPlaceholder');
+            const clearBtn = document.getElementById('btnClearNewThumbnail');
+            const input = document.getElementById('thumbnail');
+
+            if (lessonData?.thumbnail_path) {
+                thumbnailEl.src = lessonData?.thumbnail_path;
+                thumbnailEl.classList.remove('hidden');
+                placeholderEl.classList.add('hidden');
+            } else {
+                thumbnailEl.classList.add('hidden');
+                placeholderEl.classList.remove('hidden');
+            }
+            clearBtn.classList.add('hidden');
+            if (input) input.value = '';
+            thumbnailPreview = null;
+            return;
+        }
+
+        if (!ALLOWED_TYPES.includes(file.type)) {
+            showNotificationModel_Global('Định dạng không hỗ trợ. Hãy chọn ảnh PNG, JPG, WEBP hoặc GIF.', 'error');
+            return;
+        }
+
+        if (file.size > MAX_SIZE) {
+            showNotificationModel_Global('Ảnh quá lớn. Kích thước tối đa 10MB.', 'error');
+            return;
+        }
+
+        const previewUrl = URL.createObjectURL(file);
+        thumbnailPreview = previewUrl;
+
+        const thumbnailEl = document.getElementById('thumbnailPreview');
+        const placeholderEl = document.getElementById('thumbnailIconPlaceholder');
+        const clearBtn = document.getElementById('btnClearNewThumbnail');
+
+        thumbnailEl.src = previewUrl;
+        thumbnailEl.classList.remove('hidden');
+        placeholderEl.classList.add('hidden');
+        clearBtn.classList.remove('hidden');
     }
 
     // ========================================
@@ -491,10 +497,9 @@
      * Xử lý khi người dùng chọn/xóa file video
      * @param {File|null} file - File video hoặc null để xóa
      */
-    function handleVideoFile(file) {
+    function handleChangeVideoFile(file) {
         const ALLOWED_TYPES = ['video/mp4', 'video/avi', 'video/quicktime', 'video/webm', 'video/x-msvideo'];
         const videoTypeUrlRadio = document.getElementById('video_type_url');
-        const usingBackgroundUpload = true; // Luôn dùng background upload
 
         // Nếu file = null, reset video và hủy upload nếu đang chạy
         if (!file) {
@@ -504,7 +509,6 @@
             clearBtn.classList.add('hidden');
             fileNameEl.classList.add('hidden');
             if (input) input.value = '';
-            videoFile = null;
             if (!videoTypeUrlRadio || !videoTypeUrlRadio.checked) {
                 if (existingVideoSource && !existingVideoIsExternal) {
                     showVideoFilePreview(existingVideoSource);
@@ -512,10 +516,8 @@
                     resetVideoPreview();
                 }
             }
-            if (usingBackgroundUpload) {
-                cancelBackgroundUpload(true);
-                updateBackgroundUploadUI();
-            }
+            cancelBackgroundUpload(true);
+            changeVideoUploadUI();
             return;
         }
 
@@ -525,11 +527,10 @@
         }
 
         if (file.size > MAX_BACKGROUND_VIDEO_SIZE) {
-            showNotificationModel_Global('Video quá lớn. Tối đa 10GB cho upload nền.', 'error');
+            showNotificationModel_Global('Video quá lớn, Tối đa 10GB.', 'error');
             return;
         }
 
-        videoFile = null;
         const clearBtn = document.getElementById('btnClearNewVideo');
         const fileNameEl = document.getElementById('videoFileName');
         clearBtn.classList.remove('hidden');
@@ -539,6 +540,7 @@
 
         startBackgroundUploadFlow(file);
     }
+
 
     // ========================================
     // XỬ LÝ VIDEO PREVIEW
@@ -570,53 +572,27 @@
         }
     }
 
-    function isDirectVideoUrl(url) {
-        return /\.(mp4|mov|webm|ogg|m3u8)(\?.*)?$/i.test(url);
-    }
-
-    function getVideoPreviewElements() {
-        return {
-            container: document.getElementById('videoPreviewContainer'),
-            videoEl: document.getElementById('videoFilePreview'),
-            iframeEl: document.getElementById('videoUrlPreview'),
-            placeholder: document.getElementById('videoIconPlaceholder')
-        };
-    }
-
     function resetVideoPreview() {
-        const { container, videoEl, iframeEl, placeholder } = getVideoPreviewElements();
-        if (!container || !videoEl || !iframeEl || !placeholder) return;
+        if (!videoPreviewContainer || !videoFilePreview || !videoUrlPreview || !videoIconPlaceholder) return;
 
         if (videoPreviewObjectUrl) {
             try {
                 URL.revokeObjectURL(videoPreviewObjectUrl);
             } catch (e) {
-                // noop
+                console.error('Error revoking object URL:', e);
             } finally {
                 videoPreviewObjectUrl = null;
             }
         }
 
-        videoEl.pause();
-        videoEl.removeAttribute('src');
-        videoEl.load();
-        iframeEl.src = '';
+        videoFilePreview.pause();
+        videoFilePreview.removeAttribute('src');
+        videoFilePreview.load();
+        videoUrlPreview.src = '';
 
-        videoEl.classList.add('hidden');
-        iframeEl.classList.add('hidden');
-        placeholder.classList.remove('hidden');
-        // container.classList.add('hidden');
-    }
-
-    function updateVideoUploadModeUI() {
-        const isBackground = true; // Luôn dùng background upload
-        const backgroundPanel = document.getElementById('backgroundUploadPanel');
-        // const directHint = document.getElementById('videoDirectUploadHint');
-        // backgroundPanel sẽ được hiển thị trong updateBackgroundUploadUI() khi có upload
-        // if (directHint) {
-        //     directHint.classList.add('hidden');
-        // }
-        updateBackgroundUploadUI();
+        videoFilePreview.classList.add('hidden');
+        videoUrlPreview.classList.add('hidden');
+        videoIconPlaceholder.classList.remove('hidden');
     }
 
     // ========================================
@@ -627,12 +603,10 @@
      * Reset trạng thái upload nền về ban đầu
      * @param {Object} options - Tùy chọn: keepFile (giữ thông tin file), silent (không update UI)
      */
-    function resetBackgroundUploadState(options = {}) {
+    function resetVideoUploadState(options = {}) {
         // Dừng polling status nếu đang chạy
-        if (backgroundUploadState.pollingIntervalId) {
-            clearInterval(backgroundUploadState.pollingIntervalId);
-            backgroundUploadState.pollingIntervalId = null;
-        }
+        stopBackgroundStatusPolling();
+
         // Reset toàn bộ state
         backgroundUploadState = {
             uploadId: null,
@@ -651,7 +625,7 @@
             failedChunks: new Map()
         };
         if (!options.silent) {
-            updateBackgroundUploadUI();
+            changeVideoUploadUI();
         }
     }
 
@@ -667,7 +641,7 @@
      * Cập nhật giao diện upload nền dựa trên trạng thái hiện tại
      * Bao gồm: progress bar, text, buttons, panel visibility
      */
-    function updateBackgroundUploadUI() {
+    function changeVideoUploadUI() {
         // Lấy các elements cần thiết
         const backgroundPanel = document.getElementById('backgroundUploadPanel');
         const progressBar = document.getElementById('backgroundUploadProgressBar');
@@ -739,9 +713,6 @@
         }
     }
 
-    // ========================================
-    // BACKGROUND UPLOAD WORKFLOW
-    // ========================================
 
     /**
      * Bắt đầu quy trình upload video nền
@@ -757,13 +728,13 @@
         }
 
         // Khởi tạo state mới
-        resetBackgroundUploadState({ silent: true });
+        resetVideoUploadState({ silent: true });
         backgroundUploadState.file = file;
         backgroundUploadState.fileName = file.name;
         backgroundUploadState.fileSize = file.size;
         backgroundUploadState.mimeType = file.type || 'application/octet-stream';
         backgroundUploadState.status = 'creating_session';
-        updateBackgroundUploadUI();
+        changeVideoUploadUI();
 
         try {
             // Bước 1: Tạo session upload
@@ -784,18 +755,17 @@
             backgroundUploadState.totalChunks = sessionData.total_chunks;
             backgroundUploadState.uploadedChunks = 0;
             backgroundUploadState.status = 'uploading';
-            updateBackgroundUploadUI();
+            changeVideoUploadUI();
 
-            await uploadBackgroundChunks();
+            await handleVideoUploadByChunk();
 
             backgroundUploadState.status = 'uploaded';
-            updateBackgroundUploadUI();
-            // showNotificationModel_Global('Upload video nền hoàn tất. Nhấn "Lưu" để hệ thống bắt đầu xử lý.', 'success');
+            changeVideoUploadUI();
         } catch (error) {
             console.error('Background upload error:', error);
             backgroundUploadState.lastError = error.message;
             backgroundUploadState.status = backgroundUploadState.cancelRequested ? 'cancelled' : 'failed';
-            updateBackgroundUploadUI();
+            changeVideoUploadUI();
             if (!backgroundUploadState.cancelRequested) {
                 showNotificationModel_Global(error.message || 'Upload video thất bại.', 'error');
             }
@@ -806,14 +776,13 @@
      * Upload tất cả các chunks của video song song
      * Upload đồng thời CONCURRENT_CHUNKS chunks, với retry mechanism
      */
-    async function uploadBackgroundChunks() {
-        const { file, chunkSize, totalChunks, uploadedChunks } = backgroundUploadState;
-        if (!file || !chunkSize) return;
+    async function handleVideoUploadByChunk() {
+        if (!backgroundUploadState?.file || !backgroundUploadState?.chunkSize) return;
 
         // Tạo danh sách các chunk cần upload (bỏ qua chunk đã upload)
         const chunksToUpload = [];
-        for (let chunkIndex = 1; chunkIndex <= totalChunks; chunkIndex++) {
-            if (chunkIndex > uploadedChunks) {
+        for (let chunkIndex = 1; chunkIndex <= backgroundUploadState?.totalChunks; chunkIndex++) {
+            if (chunkIndex > backgroundUploadState?.uploadedChunks) {
                 chunksToUpload.push(chunkIndex);
             }
         }
@@ -837,9 +806,9 @@
 
                 try {
                     // Cắt chunk từ file
-                    const start = (chunkIndex - 1) * chunkSize;
-                    const end = Math.min(file.size, start + chunkSize);
-                    const chunkBlob = file.slice(start, end);
+                    const start = (chunkIndex - 1) * backgroundUploadState?.chunkSize;
+                    const end = Math.min(backgroundUploadState.file.size, start + backgroundUploadState?.chunkSize);
+                    const chunkBlob = backgroundUploadState.file.slice(start, end);
 
                     // Upload chunk với retry
                     await uploadSingleChunkWithRetry(chunkIndex, chunkBlob);
@@ -849,7 +818,7 @@
 
                     // Cập nhật số chunk đã upload
                     backgroundUploadState.uploadedChunks++;
-                    updateBackgroundUploadUI();
+                    changeVideoUploadUI();
                 } catch (error) {
                     // Xóa khỏi danh sách đang upload
                     backgroundUploadState.uploadingChunks.delete(chunkIndex);
@@ -934,33 +903,34 @@
      */
     async function cancelBackgroundUpload(silent = false) {
         if (!backgroundUploadState.uploadId) {
-            resetBackgroundUploadState({ silent: true });
-            if (!silent) updateBackgroundUploadUI();
-            return;
+            resetVideoUploadState({ silent: true });
+            if (!silent) changeVideoUploadUI();
+            return true;
         }
+
+        let isSuccess = false;
 
         try {
             // Đánh dấu yêu cầu hủy TRƯỚC KHI gọi API
             backgroundUploadState.cancelRequested = true;
-            
+
             // Đợi một chút để các chunk đang upload có thời gian kiểm tra flag
             await new Promise(resolve => setTimeout(resolve, 100));
-            
+
             // Gọi API hủy upload
             await apiRequest(`/lesson-video-uploads/${backgroundUploadState.uploadId}`, {
                 method: 'DELETE'
             });
-            
+
             // Đợi thêm chút nữa để đảm bảo các chunk đã dừng
             await new Promise(resolve => setTimeout(resolve, 200));
+            isSuccess = true;
         } catch (error) {
             console.error('Cancel upload error:', error);
+            isSuccess = false;
         } finally {
-            // Reset state
-            resetBackgroundUploadState({ silent: false });
-            if (!silent) {
-                showNotificationModel_Global('Đã hủy upload video thành công.', 'info');
-            }
+            resetVideoUploadState({ silent: false });
+            return isSuccess;
         }
     }
 
@@ -974,7 +944,7 @@
             return;
         }
         backgroundUploadState.status = 'completing';
-        updateBackgroundUploadUI();
+        changeVideoUploadUI();
         try {
             const response = await apiRequest(`/lesson-video-uploads/${backgroundUploadState.uploadId}/complete`, {
                 method: 'POST',
@@ -984,14 +954,14 @@
             });
             backgroundUploadState.status = response?.data?.status || 'processing';
             backgroundUploadState.lastError = null;
-            updateBackgroundUploadUI();
+            changeVideoUploadUI();
             showNotificationModel_Global(response.message || 'Video đang được xử lý, bạn có thể tiếp tục làm việc.', 'success');
             startBackgroundStatusPolling();
         } catch (error) {
             console.error('Complete upload error:', error);
             backgroundUploadState.lastError = error.message;
             backgroundUploadState.status = 'failed';
-            updateBackgroundUploadUI();
+            changeVideoUploadUI();
             showNotificationModel_Global(error.message || 'Không thể gửi yêu cầu xử lý video.', 'error');
             throw error;
         }
@@ -1042,15 +1012,14 @@
             backgroundUploadState.uploadedChunks = data.uploaded_chunks ?? backgroundUploadState.uploadedChunks;
             backgroundUploadState.totalChunks = data.total_chunks ?? backgroundUploadState.totalChunks;
             backgroundUploadState.lastError = data.error_message || backgroundUploadState.lastError;
-            updateBackgroundUploadUI();
+            changeVideoUploadUI();
         } catch (error) {
             console.error('Fetch status error:', error);
         }
     }
 
     function showVideoFilePreview(source, isBlobSource = false) {
-        const { container, videoEl, iframeEl, placeholder } = getVideoPreviewElements();
-        if (!container || !videoEl || !iframeEl || !placeholder) return;
+        if (!videoPreviewContainer || !videoFilePreview || !videoUrlPreview || !videoIconPlaceholder) return;
 
         if (videoPreviewObjectUrl) {
             try {
@@ -1063,22 +1032,33 @@
         }
 
         let finalSrc = source;
+
+        // Nếu là File/Blob (user chọn file mới), tạo ObjectURL
         if (isBlobSource && source instanceof File) {
             finalSrc = URL.createObjectURL(source);
             videoPreviewObjectUrl = finalSrc;
+        } else if (!isBlobSource && source && typeof source === 'string') {
+            // Kiểm tra nếu là video file nội bộ (không phải external URL)
+            const isExternalUrl = source.startsWith('http://') || source.startsWith('https://');
+            const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
+            const isVideoFile = videoExtensions.some(ext => source.toLowerCase().includes(ext));
+
+            // Nếu là video file nội bộ và đang ở chế độ EDIT, dùng route stream
+            if (isVideoFile && !isExternalUrl && mode === 'EDIT' && lessonId) {
+                finalSrc = `${API_BASE_URL}/lessons/${lessonId}/stream`;
+            }
         }
 
-        // container.classList.remove('hidden');
-        placeholder.classList.add('hidden');
-        iframeEl.classList.add('hidden');
-        videoEl.classList.remove('hidden');
-        videoEl.src = finalSrc;
-        videoEl.load();
+        // videoPreviewContainer.classList.remove('hidden');
+        videoIconPlaceholder.classList.add('hidden');
+        videoUrlPreview.classList.add('hidden');
+        videoFilePreview.classList.remove('hidden');
+        videoFilePreview.src = finalSrc;
+        videoFilePreview.load();
     }
 
     function showVideoUrlPreview(url) {
-        const { container, videoEl, iframeEl, placeholder } = getVideoPreviewElements();
-        if (!container || !videoEl || !iframeEl || !placeholder) return;
+        if (!videoPreviewContainer || !videoFilePreview || !videoUrlPreview || !videoIconPlaceholder) return;
 
         if (videoPreviewObjectUrl) {
             try {
@@ -1090,11 +1070,11 @@
             }
         }
 
-        // container.classList.remove('hidden');
-        placeholder.classList.add('hidden');
-        videoEl.classList.add('hidden');
-        iframeEl.classList.remove('hidden');
-        iframeEl.src = url;
+        // videoPreviewContainer.classList.remove('hidden');
+        videoIconPlaceholder.classList.add('hidden');
+        videoFilePreview.classList.add('hidden');
+        videoUrlPreview.classList.remove('hidden');
+        videoUrlPreview.src = url;
     }
 
     function handleVideoUrlInput(force = false) {
@@ -1118,7 +1098,9 @@
             return;
         }
 
-        if (isDirectVideoUrl(url) || (!url.startsWith('http://') && !url.startsWith('https://'))) {
+        const isDirectVideoUrl = /\.(mp4|mov|webm|ogg|m3u8)(\?.*)?$/i.test(url);
+
+        if (isDirectVideoUrl || (!url.startsWith('http://') && !url.startsWith('https://'))) {
             showVideoFilePreview(url);
             return;
         }
@@ -1136,17 +1118,39 @@
         const videoFileSection = document.getElementById('videoFileSection');
         const videoUrlInput = document.getElementById('video_url');
         const backgroundRetryBtn = document.getElementById('btnRetryBackgroundUpload');
-        const btnCancel = document.getElementById('btnCancel');
+        const lessonFormCancelButton = document.getElementById('lessonFormCancelButton');
 
         // Cancel button handler
-        if (btnCancel) {
-            btnCancel.addEventListener('click', async () => {
-                // Hủy upload nền nếu đang chạy
-                if (['creating_session', 'uploading', 'uploaded', 'completing'].includes(backgroundUploadState.status)) {
-                    await cancelBackgroundUpload(true);
-                }
-                // Quay lại trang trước
-                handleBackToPrevPage();
+        if (lessonFormCancelButton) {
+            lessonFormCancelButton.addEventListener('click', async () => {
+
+                openSingleDeleteModalGeneric_Global({
+                    objectName: lessonData != null ? OBJECTNAMEMODAL.LESSON : OBJECTNAMEMODAL.VIDEO,
+                    title: `Hủy ${mode === 'CREATE' ? 'tạo mới' : 'chỉnh sửa'} bài học`,
+                    message: `Việc ${mode === 'CREATE' ? 'tạo mới' : 'chỉnh sửa'} bài học sẽ bị hủy, video bạn chọn sẽ bị hủy. Bạn có chắc chắn?`,
+                    nameValue: lessonData?.title || '-',
+                    descValue: lessonData?.description || '-',
+                    confirmText: `Hủy ${mode === 'CREATE' ? 'tạo mới' : 'chỉnh sửa'} bài học`,
+                    cancelText: 'Đóng',
+                    actionFuncCallback: async () => {
+                        try {
+                            let isSuccess = true;
+                            // Hủy upload nền nếu đang chạy
+                            if (['creating_session', 'uploading', 'uploaded', 'completing'].includes(backgroundUploadState.status)) {
+                                isSuccess = await cancelBackgroundUpload(true);
+                            }
+                            // handleBackToPrevPage();
+                            return isSuccess;
+                        } catch (error) {
+                            console.error('Error canceling upload:', error);
+                            return false; // Trả về false nếu có lỗi
+                        }
+                    },
+                    successFuncCallback: () => {
+                        handleBackToPrevPage();
+                        // showNotificationModel_Global(`Hủy ${mode === 'CREATE' ? 'tạo mới' : 'chỉnh sửa'} bài học thành công`, 'success', handleBackToPrevPage);
+                    }
+                })
             });
         }
 
@@ -1170,8 +1174,8 @@
                     videoFileSection.classList.remove('hidden');
                     videoUrlInput.required = false;
                     if (input) input.required = true;
-                    if (videoFile) {
-                        showVideoFilePreview(videoFile, true);
+                    if (backgroundUploadState.file) {
+                        showVideoFilePreview(backgroundUploadState.file, true);
                     } else if (existingVideoSource && !existingVideoIsExternal) {
                         showVideoFilePreview(existingVideoSource);
                     } else {
@@ -1212,7 +1216,7 @@
 
                 const file = e.dataTransfer.files && e.dataTransfer.files[0] ? e.dataTransfer.files[0] : null;
                 if (file) {
-                    handleVideoFile(file);
+                    handleChangeVideoFile(file);
                     if (input) input.files = e.dataTransfer.files;
                 }
             });
@@ -1223,7 +1227,7 @@
             input.addEventListener('change', (e) => {
                 const file = e.target.files && e.target.files[0] ? e.target.files[0] : null;
                 if (file) {
-                    handleVideoFile(file);
+                    handleChangeVideoFile(file);
                 }
             });
         }
@@ -1246,7 +1250,7 @@
                             try {
                                 await cancelBackgroundUpload();
                                 // Xóa video đã chọn sau khi hủy upload
-                                handleVideoFile(null);
+                                handleChangeVideoFile(null);
                                 return true; // Trả về true để báo thành công
                             } catch (error) {
                                 console.error('Error canceling upload:', error);
@@ -1256,7 +1260,7 @@
                     })
                 } else {
                     // Xóa video đã chọn
-                    handleVideoFile(null);
+                    handleChangeVideoFile(null);
                 }
             });
         }
@@ -1267,7 +1271,7 @@
             videoUrlInput.addEventListener('blur', () => handleVideoUrlInput());
         }
 
-        updateVideoUploadModeUI();
+        changeVideoUploadUI();
     }
 
     // ========================================
@@ -1303,15 +1307,18 @@
         }
 
         if (isBackgroundMode) {
-            if (backgroundUploadState.file != null && !backgroundUploadState.uploadId) {
-                showNotificationModel_Global('Vui lòng chọn video và upload nền hoàn tất trước khi lưu.', 'error');
-                return;
-            }
+            // if (backgroundUploadState.file != null && !backgroundUploadState.uploadId) {
+            //     showNotificationModel_Global('Vui lòng chọn video và upload nền hoàn tất trước khi lưu.', 'warning');
+            //     return;
+            // }
             if (backgroundUploadState.file != null && !['uploaded', 'processing', 'completed'].includes(backgroundUploadState.status)) {
-                showNotificationModel_Global('Video vẫn đang upload. Vui lòng chờ hoàn tất để lưu.', 'error');
+                showNotificationModel_Global('Video vẫn đang upload. Vui lòng chờ hoàn tất để lưu.', 'warning');
                 return;
             }
         }
+
+        handleChangeStateButtonSubmitting(true);
+
 
         const isEdit = Boolean(lessonIdValue);
         const url = isEdit ? `/lessons/${lessonIdValue}` : '/lessons';
@@ -1376,10 +1383,35 @@
                     }
                 }
 
+                handleChangeStateButtonSubmitting(false);
                 showNotificationModel_Global(data.message || 'Lưu thành công', 'success', handleBackToPrevPage);
             }
         } catch (error) {
+            handleChangeStateButtonSubmitting(false);
             showNotificationModel_Global(error.message, 'error', handleBackToPrevPage);
+        }
+    }
+
+    function handleChangeStateButtonSubmitting(isSubmitting) {
+        const submitButton = document.getElementById('lessonFormSubmitButton');
+        const cancelButton = document.getElementById('lessonFormCancelButton');
+        const saveIcon = document.getElementById('lessonFormSubmitButton_saveIcon');
+        const loadingIcon = document.getElementById('lessonFormSubmitButton_loadingIcon');
+        const submitButtonText = document.getElementById('lessonFormSubmitButton_text');
+        if (isSubmitting == true) {
+            cancelButton.disabled = true;
+            submitButton.disabled = true;
+            submitButton.classList.add('cursor-not-allowed', 'opacity-50');
+            submitButtonText.textContent = mode === 'CREATE' ? 'Đang tạo...' : 'Đang cập nhật...';
+            saveIcon.classList.add('hidden');
+            loadingIcon.classList.remove('hidden');
+        }
+        if (isSubmitting == false) {
+            cancelButton.disabled = false;
+            submitButton.disabled = false;
+            saveIcon.classList.remove('hidden');
+            loadingIcon.classList.add('hidden');
+            initUI();
         }
     }
 
@@ -1401,25 +1433,6 @@
         if (['creating_session', 'uploading'].includes(backgroundUploadState.status)) {
             event.preventDefault();
             event.returnValue = '';
-        }
-    });
-
-    /**
-     * Đóng modal thông báo
-     */
-    function closeAlertModal() {
-        const alertModal = document.getElementById('alertModal');
-        alertModal.style.display = 'none';
-        document.body.style.overflow = '';
-    }
-
-    // Close modal on Escape key
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            const alertModal = document.getElementById('alertModal');
-            if (alertModal && alertModal.style.display !== 'none') {
-                closeAlertModal();
-            }
         }
     });
 </script>

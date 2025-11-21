@@ -46,4 +46,6 @@ Route::prefix('admin')->middleware('auth.cookie')->group(function () {
     Route::get('/reports/students', [AdminController::class, 'reportsStudents'])->name('admin.reports.students');
     Route::get('/reports/courses', [AdminController::class, 'reportsCourses'])->name('admin.reports.courses');
     Route::get('/reports/activities', [AdminController::class, 'reportsActivities'])->name('admin.reports.activities');
+    Route::get('/profile', [AdminController::class, 'profile'])->name('admin.profile.show');
+    Route::get('/profile/edit', [AdminController::class, 'editProfile'])->name('admin.profile.edit');
 });

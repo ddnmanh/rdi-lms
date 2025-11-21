@@ -241,14 +241,26 @@
         const videoElement = document.getElementById('lessonVideo');
         const videoSource = document.getElementById('videoSource');
         const videoLink = document.getElementById('videoLink');
-        
+
 
         if (videoUrl) {
+            // Check if it's an external URL (http://, https://)
+            const isExternalUrl = videoUrl.startsWith('http://') || videoUrl.startsWith('https://');
+
             // Check if it's a direct video file
             const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
             const isVideoFile = videoExtensions.some(ext => videoUrl.toLowerCase().includes(ext));
 
-            if (isVideoFile) {
+            if (isVideoFile && !isExternalUrl) {
+                // Internal video file - use stream route
+                const streamUrl = `${API_BASE_URL}/lessons/${lesson.id}/stream`;
+                videoSource.src = streamUrl;
+                videoSource.type = getVideoMimeType(videoUrl);
+                videoElement.load();
+                videoElement.style.display = 'block';
+                videoLink.style.display = 'none';
+            } else if (isVideoFile && isExternalUrl) {
+                // External video file - use direct URL
                 videoSource.src = videoUrl;
                 videoSource.type = getVideoMimeType(videoUrl);
                 videoElement.load();

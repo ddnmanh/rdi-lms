@@ -16,6 +16,13 @@
     display: none;
 }
 
+.sidebar-group-separator {
+    display: none;
+}
+#sidebar.collapsed .sidebar-group-separator {
+    display: block;
+}
+
 #sidebar.collapsed .sidebar-item {
     justify-content: center;
     padding-left: 0;

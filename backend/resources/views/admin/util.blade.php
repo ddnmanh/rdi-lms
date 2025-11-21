@@ -360,16 +360,15 @@
 
             try {
                 const result = await actionFuncCallback();
+                closeDeleteModalGeneric_Global();
                 if (result) {
-                    closeDeleteModalGeneric_Global();
-                    showNotificationModel_Global(`Xóa thành công ${objectNameLabel} ${nameValue}`, 'success', successFuncCallback);
+                    successFuncCallback();
                 } else {
-                    closeDeleteModalGeneric_Global();
-                    showNotificationModel_Global(`Có lỗi khi xóa ${objectNameLabel} ${nameValue}`, 'error', failFuncCallback);
+                    failFuncCallback();
                 }
             } catch (error) {
                 closeDeleteModalGeneric_Global();
-                showNotificationModel_Global(error.message || 'Đã xảy ra lỗi', 'error', failFuncCallback);
+                failFuncCallback();
             }
         }, { once: true }); // Use 'once' option to auto-remove listener after first click
 
@@ -446,16 +445,15 @@
 
             try {
                 const result = await actionFuncCallback();
+                closeDeleteModalGeneric_Global();
                 if (result) {
-                    closeDeleteModalGeneric_Global();
-                    showNotificationModel_Global(`Xóa thành công ${arrayIds.length} ${objectNameLabel}`, 'success', successFuncCallback);
+                    successFuncCallback();
                 } else {
-                    closeDeleteModalGeneric_Global();
-                    showNotificationModel_Global(`Đã xảy ra lỗi khi xóa ${arrayIds.length} ${objectNameLabel}`, 'error', failFuncCallback);
+                    failFuncCallback();
                 }
             } catch (error) {
                 closeDeleteModalGeneric_Global();
-                showNotificationModel_Global(error.message, 'error', failFuncCallback);
+                failFuncCallback();
             }
         });
         document.body.style.overflow = 'hidden';

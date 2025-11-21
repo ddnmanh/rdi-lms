@@ -37,7 +37,7 @@ class CheckPermission
         // Loại bỏ prefix 'api' nếu có (vì trong database có thể lưu với hoặc không có prefix)
         $pathWithoutApi = preg_replace('/^api\//', '', $path);
         $pathWithApi = '/api/' . $pathWithoutApi;
-        $pathWithSlash = '/' . $pathWithoutApi;
+        $pathWithSlash = '/' . $pathWithoutApi; 
 
         // Kiểm tra quyền với các format path khác nhau
         $hasPermission = $user->hasPermission($method, $pathWithApi)

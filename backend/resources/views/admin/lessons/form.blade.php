@@ -929,7 +929,7 @@
             console.error('Cancel upload error:', error);
             isSuccess = false;
         } finally {
-            resetVideoUploadState({ silent: false }); 
+            resetVideoUploadState({ silent: false });
             return isSuccess;
         }
     }
@@ -1032,9 +1032,21 @@
         }
 
         let finalSrc = source;
+
+        // Nếu là File/Blob (user chọn file mới), tạo ObjectURL
         if (isBlobSource && source instanceof File) {
             finalSrc = URL.createObjectURL(source);
             videoPreviewObjectUrl = finalSrc;
+        } else if (!isBlobSource && source && typeof source === 'string') {
+            // Kiểm tra nếu là video file nội bộ (không phải external URL)
+            const isExternalUrl = source.startsWith('http://') || source.startsWith('https://');
+            const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
+            const isVideoFile = videoExtensions.some(ext => source.toLowerCase().includes(ext));
+
+            // Nếu là video file nội bộ và đang ở chế độ EDIT, dùng route stream
+            if (isVideoFile && !isExternalUrl && mode === 'EDIT' && lessonId) {
+                finalSrc = `${API_BASE_URL}/lessons/${lessonId}/stream`;
+            }
         }
 
         // videoPreviewContainer.classList.remove('hidden');
@@ -1138,7 +1150,7 @@
                         handleBackToPrevPage();
                         // showNotificationModel_Global(`Hủy ${mode === 'CREATE' ? 'tạo mới' : 'chỉnh sửa'} bài học thành công`, 'success', handleBackToPrevPage);
                     }
-                }) 
+                })
             });
         }
 
@@ -1162,8 +1174,8 @@
                     videoFileSection.classList.remove('hidden');
                     videoUrlInput.required = false;
                     if (input) input.required = true;
-                    if (videoFile) {
-                        showVideoFilePreview(videoFile, true);
+                    if (backgroundUploadState.file) {
+                        showVideoFilePreview(backgroundUploadState.file, true);
                     } else if (existingVideoSource && !existingVideoIsExternal) {
                         showVideoFilePreview(existingVideoSource);
                     } else {

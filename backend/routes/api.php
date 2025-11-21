@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
+use App\Http\Controllers\LessonVideoStreamController;
 use App\Http\Controllers\LessonVideoUploadController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
@@ -81,6 +82,7 @@ Route::prefix('auth')->group(function () {
 
 // Protected routes - require authentication
 Route::middleware('auth:api')->group(function () {
+
     // Authentication (không cần kiểm tra permission vì là thông tin cá nhân)
     Route::prefix('auth')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout'], [
@@ -243,6 +245,12 @@ Route::middleware('auth:api')->group(function () {
             'group' => 'Bài học',
             'name' => 'Xóa Bài học',
             'description' => 'Cho phép xóa bài học, không thể xóa bài học đang thuộc về một khóa học'
+        ]);
+
+        routeWithPermission('get', '/{lesson}/stream', [LessonVideoStreamController::class, 'stream'], [
+            'group' => 'Bài học',
+            'name' => 'Stream video Bài học',
+            'description' => 'Cho phép stream video bài học với hỗ trợ HTTP range để ứng dụng Flutter có thể phát mà không cần tải toàn bộ file'
         ]);
     });
 

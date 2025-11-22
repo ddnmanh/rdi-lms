@@ -392,20 +392,14 @@ grep client_max_body_size /opt/homebrew/etc/nginx/nginx.conf
 
 <div align="center">
 
-## 🎉 Hoàn tất!
+### 🎉 Hoàn tất!
 
 Server của bạn đã được cấu hình để xử lý upload file dạng multi-chunk đồng thời với hiệu năng cao.
-
-**Bước tiếp theo gợi ý:**
-- Thử nghiệm với các kịch bản upload thực tế
-- Theo dõi log và hiệu năng hệ thống
-- Tinh chỉnh thêm cấu hình dựa trên tải thực tế
 
 ---
 
 ### 📚 Tài liệu tham khảo
 
 [Tài liệu PHP-FPM](https://www.php.net/manual/en/install.fpm.php) • [Tài liệu Nginx](https://nginx.org/en/docs/) • [Laravel File Upload](https://laravel.com/docs/8.x/filesystem)
-
 
 </div>

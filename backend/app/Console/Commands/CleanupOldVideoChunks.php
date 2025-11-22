@@ -107,7 +107,7 @@ class CleanupOldVideoChunks extends Command
      */
     protected function cleanupOrphanedChunks(Carbon $cutoffTime, int &$deletedCount, int &$freedSpace): void
     {
-        $baseDir = storage_path('app/lesson-video-uploads');
+        $baseDir = storage_path('app/temp/lessons/videos');
 
         if (!File::isDirectory($baseDir)) {
             return;
@@ -119,7 +119,7 @@ class CleanupOldVideoChunks extends Command
 
         foreach ($directories as $directory) {
             $directoryName = basename($directory);
-            $fullPath = "lesson-video-uploads/{$directoryName}";
+            $fullPath = "temp/lessons/videos/{$directoryName}";
 
             // Kiểm tra xem có record trong database không
             $exists = LessonVideoUpload::where('temp_directory', $fullPath)->exists();

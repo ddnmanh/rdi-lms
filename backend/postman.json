@@ -1,2254 +1,2553 @@
 {
-    "info": {
-        "_postman_id": "lms-api-collection",
-        "name": "LMS API Collection",
-        "description": "API collection cho hệ thống Quản lý Học trực tuyến (LMS)",
-        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-    },
-    "item": [
-        {
-            "name": "Authentication (Public)",
-            "item": [
-                {
-                    "name": "Register",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\",\n  \"fullname\": \"Nguyễn Văn A\",\n  \"birthday\": \"2000-01-01\"\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/auth/register",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "auth",
-                                "register"
-                            ]
-                        },
-                        "description": "Đăng ký tài khoản mới đồng thời trả về access_token và refresh_token."
-                    }
-                },
-                {
-                    "name": "Login",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "exec": [
-                                    "if (pm.response.code === 200) {",
-                                    "    var jsonData = pm.response.json();",
-                                    "    if (jsonData.success && jsonData.data.access_token) {",
-                                    "        pm.environment.set(\"access_token\", jsonData.data.access_token);",
-                                    "        pm.environment.set(\"refresh_token\", jsonData.data.refresh_token);",
-                                    "    }",
-                                    "}"
-                                ],
-                                "type": "text/javascript"
-                            }
-                        }
-                    ],
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/auth/login",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "auth",
-                                "login"
-                            ]
-                        },
-                        "description": "Đăng nhập và lưu access_token, refresh_token vào environment."
-                    }
-                },
-                {
-                    "name": "Refresh Token",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/auth/refresh",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "auth",
-                                "refresh"
-                            ]
-                        },
-                        "description": "Làm mới access token. Token mới sẽ được set vào cookie HttpOnly khi gọi thành công."
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Authentication (Protected)",
-            "item": [
-                {
-                    "name": "Logout",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/auth/logout",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "auth",
-                                "logout"
-                            ]
-                        },
-                        "description": "Đăng xuất, revoke refresh token và xóa cookie."
-                    }
-                },
-                {
-                    "name": "Get Current User",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/auth/me",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "auth",
-                                "me"
-                            ]
-                        },
-                        "description": "Lấy thông tin user hiện tại cùng danh sách vai trò."
-                    }
-                }
-            ]
-        },
-        {
-            "name": "User Management",
-            "item": [
-                {
-                    "name": "Get All Users",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/users?search=&search_email=&search_fullname=&role_id=&role_name=&created_at_from=&created_at_to=&sort_by=id&order_by=desc&per_page=15&page=1",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "users"
-                            ],
-                            "query": [
-                                {
-                                    "key": "search",
-                                    "value": "",
-                                    "description": "Tìm kiếm theo email hoặc fullname"
-                                },
-                                {
-                                    "key": "search_email",
-                                    "value": "",
-                                    "description": "Tìm kiếm riêng theo email"
-                                },
-                                {
-                                    "key": "search_fullname",
-                                    "value": "",
-                                    "description": "Tìm kiếm riêng theo fullname"
-                                },
-                                {
-                                    "key": "role_id",
-                                    "value": "",
-                                    "description": "Lọc theo role ID"
-                                },
-                                {
-                                    "key": "role_name",
-                                    "value": "",
-                                    "description": "Lọc theo tên role"
-                                },
-                                {
-                                    "key": "created_at_from",
-                                    "value": "",
-                                    "description": "Lọc từ ngày tạo (Y-m-d)"
-                                },
-                                {
-                                    "key": "created_at_to",
-                                    "value": "",
-                                    "description": "Lọc đến ngày tạo (Y-m-d)"
-                                },
-                                {
-                                    "key": "sort_by",
-                                    "value": "id",
-                                    "description": "Sắp xếp theo trường (id, email, fullname, created_at, updated_at)"
-                                },
-                                {
-                                    "key": "order_by",
-                                    "value": "desc",
-                                    "description": "Thứ tự sắp xếp (asc, desc)"
-                                },
-                                {
-                                    "key": "per_page",
-                                    "value": "15",
-                                    "description": "Số lượng phần tử mỗi trang (1-100)"
-                                },
-                                {
-                                    "key": "page",
-                                    "value": "1",
-                                    "description": "Trang hiện tại"
-                                }
-                            ]
-                        },
-                        "description": "Danh sách người dùng với phân trang và bộ lọc."
-                    }
-                },
-                {
-                    "name": "Create User",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"email\": \"student@example.com\",\n  \"password\": \"password123\",\n  \"fullname\": \"Sinh Viên A\",\n  \"birthday\": \"2000-01-01\",\n  \"avatar_path\": \"/storage/avatars/avatar.jpg\",\n  \"role_ids\": [2]\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/users",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "users"
-                            ]
-                        },
-                        "description": "Tạo mới một người dùng (JSON). Để upload avatar, sử dụng request \"Create User (with File Upload)\" bên dưới."
-                    }
-                },
-                {
-                    "name": "Create User (with File Upload)",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "formdata",
-                            "formdata": [
-                                {
-                                    "key": "email",
-                                    "value": "student@example.com",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "password",
-                                    "value": "password123",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "fullname",
-                                    "value": "Sinh Viên A",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "birthday",
-                                    "value": "2000-01-01",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "role_ids[]",
-                                    "value": "2",
-                                    "type": "text",
-                                    "description": "Có thể thêm nhiều role_ids[]"
-                                },
-                                {
-                                    "key": "avatar",
-                                    "type": "file",
-                                    "src": [],
-                                    "description": "File ảnh avatar (jpeg, png, jpg, gif, webp, max 2MB)"
-                                }
-                            ]
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/users",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "users"
-                            ]
-                        },
-                        "description": "Tạo mới một người dùng với upload avatar."
-                    }
-                },
-                {
-                    "name": "Get User by ID",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/users/:id",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "users",
-                                ":id"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "id",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Lấy thông tin chi tiết của một người dùng kèm roles và courses."
-                    }
-                },
-                {
-                    "name": "Update User",
-                    "request": {
-                        "method": "PUT",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"email\": \"student@example.com\",\n  \"password\": \"newpassword123\",\n  \"fullname\": \"Sinh Viên A Updated\",\n  \"birthday\": \"2000-01-01\",\n  \"avatar_path\": \"/storage/avatars/avatar.jpg\",\n  \"role_ids\": [2]\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/users/:id",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "users",
-                                ":id"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "id",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Cập nhật thông tin người dùng (JSON). Để upload avatar, sử dụng request \"Update User (with File Upload)\" bên dưới."
-                    }
-                },
-                {
-                    "name": "Update User (with File Upload)",
-                    "request": {
-                        "method": "PUT",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "formdata",
-                            "formdata": [
-                                {
-                                    "key": "email",
-                                    "value": "student@example.com",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "password",
-                                    "value": "newpassword123",
-                                    "type": "text",
-                                    "description": "Để trống nếu không muốn đổi password"
-                                },
-                                {
-                                    "key": "fullname",
-                                    "value": "Sinh Viên A Updated",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "birthday",
-                                    "value": "2000-01-01",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "role_ids[]",
-                                    "value": "2",
-                                    "type": "text",
-                                    "description": "Có thể thêm nhiều role_ids[]"
-                                },
-                                {
-                                    "key": "avatar",
-                                    "type": "file",
-                                    "src": [],
-                                    "description": "File ảnh avatar (jpeg, png, jpg, gif, webp, max 2MB)"
-                                }
-                            ]
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/users/:id",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "users",
-                                ":id"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "id",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Cập nhật người dùng với upload avatar. Middleware HandlePutFormData tự động xử lý PUT request với multipart/form-data. Có thể gửi PUT trực tiếp hoặc POST với _method=PUT."
-                    }
-                },
-                {
-                    "name": "Delete Users",
-                    "request": {
-                        "method": "DELETE",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"user_ids\": [2, 3]\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/users",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "users"
-                            ]
-                        },
-                        "description": "Xóa mềm nhiều người dùng một lúc (yêu cầu quyền cao hơn người bị xóa)."
-                    }
-                },
-                {
-                    "name": "Assign Roles to User",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"role_ids\": [1, 2]\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/users/:id/roles",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "users",
-                                ":id",
-                                "roles"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "id",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Gán (sync) danh sách role cho người dùng."
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Role Management",
-            "item": [
-                {
-                    "name": "Get All Roles",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/roles?search=&level_from=&level_to=&user_id=&permission_id=&sort_by=level&order_by=asc&per_page=15&page=1",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "roles"
-                            ],
-                            "query": [
-                                {
-                                    "key": "search",
-                                    "value": "",
-                                    "description": "Tìm kiếm theo name hoặc description"
-                                },
-                                {
-                                    "key": "level_from",
-                                    "value": "",
-                                    "description": "Lọc từ level (1-255)"
-                                },
-                                {
-                                    "key": "level_to",
-                                    "value": "",
-                                    "description": "Lọc đến level (1-255)"
-                                },
-                                {
-                                    "key": "user_id",
-                                    "value": "",
-                                    "description": "Lọc các roles có user tương ứng"
-                                },
-                                {
-                                    "key": "permission_id",
-                                    "value": "",
-                                    "description": "Lọc các roles có permission tương ứng"
-                                },
-                                {
-                                    "key": "sort_by",
-                                    "value": "level",
-                                    "description": "Sắp xếp theo (id, name, level, created_at, updated_at)"
-                                },
-                                {
-                                    "key": "order_by",
-                                    "value": "asc",
-                                    "description": "Thứ tự sắp xếp (asc, desc)"
-                                },
-                                {
-                                    "key": "per_page",
-                                    "value": "15",
-                                    "description": "Số lượng phần tử mỗi trang"
-                                },
-                                {
-                                    "key": "page",
-                                    "value": "1",
-                                    "description": "Trang hiện tại"
-                                }
-                            ]
-                        },
-                        "description": "Danh sách role với phân trang và bộ lọc."
-                    }
-                },
-                {
-                    "name": "Create Role",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"name\": \"MODERATOR\",\n  \"description\": \"Người điều hành\",\n  \"level\": 50,\n  \"permission_ids\": [1, 2, 3]\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/roles",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "roles"
-                            ]
-                        },
-                        "description": "Tạo role mới và gán danh sách permission nếu có."
-                    }
-                },
-                {
-                    "name": "Get Role by ID",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/roles/:id",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "roles",
-                                ":id"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "id",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Xem chi tiết thông tin role kèm users và permissions."
-                    }
-                },
-                {
-                    "name": "Update Role",
-                    "request": {
-                        "method": "PUT",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"name\": \"MODERATOR\",\n  \"description\": \"Người điều hành (Updated)\",\n  \"level\": 50,\n  \"permission_ids\": [1, 2, 3, 4]\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/roles/:id",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "roles",
-                                ":id"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "id",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Cập nhật role và danh sách permission."
-                    }
-                },
-                {
-                    "name": "Delete Role",
-                    "request": {
-                        "method": "DELETE",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/roles/:id",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "roles",
-                                ":id"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "id",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Xóa mềm role (không thể xóa nếu đang được tham chiếu trong logic khác)."
-                    }
-                },
-                {
-                    "name": "Assign Permissions to Role",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"permission_ids\": [1, 2, 3, 4, 5]\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/roles/:id/permissions",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "roles",
-                                ":id",
-                                "permissions"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "id",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Gán lại toàn bộ danh sách permission cho role."
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Course Management",
-            "item": [
-                {
-                    "name": "Get All Courses",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/courses?search=&user_id=&start_date_from=&start_date_to=&end_date_from=&end_date_to=&date_range=all&min_users=&max_users=&min_lessons=&max_lessons=&sort_by=id&order_by=desc&per_page=15&page=1",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "courses"
-                            ],
-                            "query": [
-                                {
-                                    "key": "search",
-                                    "value": "",
-                                    "description": "Tìm kiếm theo title hoặc description"
-                                },
-                                {
-                                    "key": "user_id",
-                                    "value": "",
-                                    "description": "Lọc theo user tham gia"
-                                },
-                                {
-                                    "key": "start_date_from",
-                                    "value": "",
-                                    "description": "Ngày bắt đầu từ (Y-m-d)"
-                                },
-                                {
-                                    "key": "start_date_to",
-                                    "value": "",
-                                    "description": "Ngày bắt đầu đến (Y-m-d)"
-                                },
-                                {
-                                    "key": "end_date_from",
-                                    "value": "",
-                                    "description": "Ngày kết thúc từ (Y-m-d)"
-                                },
-                                {
-                                    "key": "end_date_to",
-                                    "value": "",
-                                    "description": "Ngày kết thúc đến (Y-m-d)"
-                                },
-                                {
-                                    "key": "date_range",
-                                    "value": "all",
-                                    "description": "Khoảng thời gian (active, upcoming, past, all)"
-                                },
-                                {
-                                    "key": "min_users",
-                                    "value": "",
-                                    "description": "Số user tối thiểu"
-                                },
-                                {
-                                    "key": "max_users",
-                                    "value": "",
-                                    "description": "Số user tối đa"
-                                },
-                                {
-                                    "key": "min_lessons",
-                                    "value": "",
-                                    "description": "Số lesson tối thiểu"
-                                },
-                                {
-                                    "key": "max_lessons",
-                                    "value": "",
-                                    "description": "Số lesson tối đa"
-                                },
-                                {
-                                    "key": "sort_by",
-                                    "value": "id",
-                                    "description": "Sắp xếp theo (id, title, start_date, end_date, created_at, updated_at, users_count, lessons_count)"
-                                },
-                                {
-                                    "key": "order_by",
-                                    "value": "desc",
-                                    "description": "Thứ tự sắp xếp"
-                                },
-                                {
-                                    "key": "per_page",
-                                    "value": "15",
-                                    "description": "Số phần tử mỗi trang"
-                                },
-                                {
-                                    "key": "page",
-                                    "value": "1",
-                                    "description": "Trang hiện tại"
-                                }
-                            ]
-                        },
-                        "description": "Danh sách khóa học với phân trang, số lượng người học và bài học."
-                    }
-                },
-                {
-                    "name": "Create Course",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"title\": \"Lập trình Laravel\",\n  \"description\": \"Khóa học về Laravel framework\",\n  \"start_date\": \"2024-01-01 00:00:00\",\n  \"end_date\": \"2024-12-31 23:59:59\",\n  \"timezone\": \"Asia/Ho_Chi_Minh\"\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/courses",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "courses"
-                            ]
-                        },
-                        "description": "Tạo khóa học mới (JSON). Để upload thumbnail, sử dụng request \"Create Course (with File Upload)\" bên dưới."
-                    }
-                },
-                {
-                    "name": "Create Course (with File Upload)",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "formdata",
-                            "formdata": [
-                                {
-                                    "key": "title",
-                                    "value": "Lập trình Laravel",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "description",
-                                    "value": "Khóa học về Laravel framework",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "start_date",
-                                    "value": "2024-01-01 00:00:00",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "end_date",
-                                    "value": "2024-12-31 23:59:59",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "timezone",
-                                    "value": "Asia/Ho_Chi_Minh",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "thumbnail",
-                                    "type": "file",
-                                    "src": [],
-                                    "description": "File ảnh thumbnail (jpeg, png, jpg, gif, webp, max 2MB)"
-                                }
-                            ]
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/courses",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "courses"
-                            ]
-                        },
-                        "description": "Tạo khóa học mới với upload thumbnail."
-                    }
-                },
-                {
-                    "name": "Get Course by ID",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/courses/:id",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "courses",
-                                ":id"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "id",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Xem chi tiết khóa học cùng danh sách bài học (sắp xếp theo display_order)."
-                    }
-                },
-                {
-                    "name": "Update Course",
-                    "request": {
-                        "method": "PUT",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"title\": \"Lập trình Laravel (Updated)\",\n  \"description\": \"Khóa học về Laravel framework - Updated\",\n  \"start_date\": \"2024-01-01 00:00:00\",\n  \"end_date\": \"2024-12-31 23:59:59\",\n  \"timezone\": \"Asia/Ho_Chi_Minh\"\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/courses/:id",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "courses",
-                                ":id"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "id",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Cập nhật thông tin khóa học (JSON). Để upload thumbnail, sử dụng request \"Update Course (with File Upload)\" bên dưới."
-                    }
-                },
-                {
-                    "name": "Update Course (with File Upload)",
-                    "request": {
-                        "method": "PUT",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "formdata",
-                            "formdata": [
-                                {
-                                    "key": "title",
-                                    "value": "Lập trình Laravel (Updated)",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "description",
-                                    "value": "Khóa học về Laravel framework - Updated",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "start_date",
-                                    "value": "2024-01-01 00:00:00",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "end_date",
-                                    "value": "2024-12-31 23:59:59",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "timezone",
-                                    "value": "Asia/Ho_Chi_Minh",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "thumbnail",
-                                    "type": "file",
-                                    "src": []
-                                }
-                            ]
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/courses/:id",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "courses",
-                                ":id"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "id",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Cập nhật khóa học với upload thumbnail. Middleware HandlePutFormData tự động xử lý PUT request với multipart/form-data. Có thể gửi PUT trực tiếp hoặc POST với _method=PUT."
-                    }
-                },
-                {
-                    "name": "Delete Courses",
-                    "request": {
-                        "method": "DELETE",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"course_ids\": [1, 2]\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/courses",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "courses"
-                            ]
-                        },
-                        "description": "Xóa mềm nhiều khóa học, đồng thời tách users và lessons liên quan."
-                    }
-                },
-                {
-                    "name": "Sync Course Users",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"user_ids\": [1, 2, 3]\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/courses/:id/users/add",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "courses",
-                                ":id",
-                                "users",
-                                "add"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "id",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Gán danh sách sinh viên cho khóa học (sync: thay thế toàn bộ danh sách hiện có)."
-                    }
-                },
-                {
-                    "name": "Remove Users from Course",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"user_ids\": [2, 3]\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/courses/:id/users/remove",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "courses",
-                                ":id",
-                                "users",
-                                "remove"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "id",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Gỡ nhiều sinh viên khỏi khóa học hiện tại."
-                    }
-                },
-                {
-                    "name": "Add Lessons to Course",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"lessons\": [\n    {\n      \"id\": 5,\n      \"display_order\": 1\n    },\n    {\n      \"id\": 6,\n      \"display_order\": 2\n    }\n  ]\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/courses/:id/lessons/add",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "courses",
-                                ":id",
-                                "lessons",
-                                "add"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "id",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Thêm các bài học chưa thuộc khóa nào (hoặc thuộc chính khóa này) cùng thứ tự hiển thị."
-                    }
-                },
-                {
-                    "name": "Remove Lessons from Course",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"lesson_ids\": [5, 6]\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/courses/:id/lessons/remove",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "courses",
-                                ":id",
-                                "lessons",
-                                "remove"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "id",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Gỡ các bài học đang thuộc khóa học hiện tại."
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Lesson Management",
-            "item": [
-                {
-                    "name": "Get All Lessons",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/lessons?course_id=&orphaned=&search=&duration_min=&duration_max=&sort_by=course_id&order_by=asc&per_page=15&page=1",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "lessons"
-                            ],
-                            "query": [
-                                {
-                                    "key": "course_id",
-                                    "value": "",
-                                    "description": "Lọc theo khóa học"
-                                },
-                                {
-                                    "key": "orphaned",
-                                    "value": "",
-                                    "description": "true để lấy các bài học chưa thuộc khóa nào"
-                                },
-                                {
-                                    "key": "search",
-                                    "value": "",
-                                    "description": "Tìm kiếm theo title hoặc description"
-                                },
-                                {
-                                    "key": "duration_min",
-                                    "value": "",
-                                    "description": "Thời lượng tối thiểu (giây)"
-                                },
-                                {
-                                    "key": "duration_max",
-                                    "value": "",
-                                    "description": "Thời lượng tối đa (giây)"
-                                },
-                                {
-                                    "key": "sort_by",
-                                    "value": "course_id",
-                                    "description": "Sắp xếp theo (id, title, duration, course_id, created_at, updated_at, display_order)"
-                                },
-                                {
-                                    "key": "order_by",
-                                    "value": "asc",
-                                    "description": "Thứ tự sắp xếp"
-                                },
-                                {
-                                    "key": "per_page",
-                                    "value": "15",
-                                    "description": "Số phần tử mỗi trang"
-                                },
-                                {
-                                    "key": "page",
-                                    "value": "1",
-                                    "description": "Trang hiện tại"
-                                }
-                            ]
-                        },
-                        "description": "Danh sách bài học với bộ lọc theo khóa học, thời lượng và trạng thái mồ côi."
-                    }
-                },
-                {
-                    "name": "Create Lesson",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"course_id\": 1,\n  \"title\": \"Giới thiệu Laravel\",\n  \"description\": \"Bài học đầu tiên\",\n  \"duration\": 1800,\n  \"video_path\": \"https://example.com/video.mp4\",\n  \"display_order\": 1\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/lessons",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "lessons"
-                            ]
-                        },
-                        "description": "Tạo bài học mới (JSON). Để upload thumbnail/video, sử dụng request \"Create Lesson (with File Upload)\" bên dưới."
-                    }
-                },
-                {
-                    "name": "Create Lesson (with File Upload)",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "formdata",
-                            "formdata": [
-                                {
-                                    "key": "course_id",
-                                    "value": "1",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "title",
-                                    "value": "Giới thiệu Laravel",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "description",
-                                    "value": "Bài học đầu tiên",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "duration",
-                                    "value": "1800",
-                                    "type": "text",
-                                    "description": "Thời lượng tính bằng giây"
-                                },
-                                {
-                                    "key": "display_order",
-                                    "value": "1",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "video_path",
-                                    "value": "https://example.com/video.mp4",
-                                    "type": "text",
-                                    "description": "Đường dẫn video (nếu không upload file video)"
-                                },
-                                {
-                                    "key": "thumbnail",
-                                    "type": "file",
-                                    "src": [],
-                                    "description": "File ảnh thumbnail (jpeg, png, jpg, gif, webp, max 2MB)"
-                                },
-                                {
-                                    "key": "video",
-                                    "type": "file",
-                                    "src": [],
-                                    "description": "File video (mp4, avi, mov, webm, max 500MB). Chỉ upload nếu không dùng video_path. Phải cung cấp video_path hoặc upload file video."
-                                }
-                            ]
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/lessons",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "lessons"
-                            ]
-                        },
-                        "description": "Tạo bài học mới với upload thumbnail/video. Phải cung cấp video_path hoặc upload file video."
-                    }
-                },
-                {
-                    "name": "Get Lesson by ID",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/lessons/:id",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "lessons",
-                                ":id"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "id",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Xem chi tiết bài học kèm thông tin khóa học."
-                    }
-                },
-                {
-                    "name": "Update Lesson",
-                    "request": {
-                        "method": "PUT",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"title\": \"Giới thiệu Laravel (Updated)\",\n  \"description\": \"Bài học đầu tiên - Updated\",\n  \"duration\": 2000,\n  \"video_path\": \"https://example.com/video-updated.mp4\",\n  \"display_order\": 1\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/lessons/:id",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "lessons",
-                                ":id"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "id",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Cập nhật thông tin bài học (JSON). Để upload thumbnail/video, sử dụng request \"Update Lesson (with File Upload)\" bên dưới."
-                    }
-                },
-                {
-                    "name": "Update Lesson (with File Upload)",
-                    "request": {
-                        "method": "PUT",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "formdata",
-                            "formdata": [
-                                {
-                                    "key": "title",
-                                    "value": "Giới thiệu Laravel (Updated)",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "description",
-                                    "value": "Bài học đầu tiên - Updated",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "duration",
-                                    "value": "2000",
-                                    "type": "text",
-                                    "description": "Thời lượng tính bằng giây"
-                                },
-                                {
-                                    "key": "display_order",
-                                    "value": "1",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "video_path",
-                                    "value": "https://example.com/video-updated.mp4",
-                                    "type": "text",
-                                    "description": "Đường dẫn video (nếu không upload file video)"
-                                },
-                                {
-                                    "key": "thumbnail",
-                                    "type": "file",
-                                    "src": [],
-                                    "description": "File ảnh thumbnail (jpeg, png, jpg, gif, webp, max 2MB)"
-                                },
-                                {
-                                    "key": "video",
-                                    "type": "file",
-                                    "src": [],
-                                    "description": "File video (mp4, avi, mov, webm, max 500MB). Chỉ upload nếu không dùng video_path"
-                                }
-                            ]
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/lessons/:id",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "lessons",
-                                ":id"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "id",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Cập nhật bài học với upload thumbnail/video. Middleware HandlePutFormData tự động xử lý PUT request với multipart/form-data. Có thể gửi PUT trực tiếp hoặc POST với _method=PUT. Phải cung cấp video_path hoặc upload file video."
-                    }
-                },
-                {
-                    "name": "Delete Lessons",
-                    "request": {
-                        "method": "DELETE",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"lesson_ids\": [10, 11]\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/lessons",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "lessons"
-                            ]
-                        },
-                        "description": "Xóa mềm các bài học đang không thuộc khóa nào (chỉ các bài orphaned)."
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Student",
-            "item": [
-                {
-                    "name": "Get Student Courses",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/student/courses?search=&sort_by=id&order_by=desc",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "student",
-                                "courses"
-                            ],
-                            "query": [
-                                {
-                                    "key": "search",
-                                    "value": "",
-                                    "description": "Tìm kiếm theo title hoặc description"
-                                },
-                                {
-                                    "key": "sort_by",
-                                    "value": "id",
-                                    "description": "Sắp xếp theo (id, title, start_date, end_date, created_at, updated_at)"
-                                },
-                                {
-                                    "key": "order_by",
-                                    "value": "desc",
-                                    "description": "Thứ tự sắp xếp"
-                                }
-                            ]
-                        },
-                        "description": "Danh sách khóa học mà sinh viên hiện tại được gán."
-                    }
-                },
-                {
-                    "name": "Get Student Course Detail",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/student/courses/:courseId",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "student",
-                                "courses",
-                                ":courseId"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "courseId",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Xem chi tiết khóa học và tiến độ từng bài học của sinh viên."
-                    }
-                },
-                {
-                    "name": "Get Student Lesson Detail",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/student/lessons/:lessonId",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "student",
-                                "lessons",
-                                ":lessonId"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "lessonId",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Chi tiết bài học của sinh viên kèm thông tin tiến độ cá nhân."
-                    }
-                },
-                {
-                    "name": "Update Progress",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"lesson_id\": 1,\n  \"watched_duration\": 900,\n  \"last_position\": 900\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/student/progress",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "student",
-                                "progress"
-                            ]
-                        },
-                        "description": "Cập nhật tiến độ xem bài học của sinh viên hiện tại."
-                    }
-                },
-                {
-                    "name": "Get Course Progress",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/student/courses/:courseId/progress",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "student",
-                                "courses",
-                                ":courseId",
-                                "progress"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "courseId",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Tổng hợp tiến độ học của sinh viên trong một khóa học."
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Reports",
-            "item": [
-                {
-                    "name": "Get Overview",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/reports/overview",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "reports",
-                                "overview"
-                            ]
-                        },
-                        "description": "Tổng quan thống kê: số khóa học, số sinh viên, số bài học và số học viên mỗi khóa."
-                    }
-                },
-                {
-                    "name": "Get Course Statistics",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/reports/courses/:courseId/statistics",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "reports",
-                                "courses",
-                                ":courseId",
-                                "statistics"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "courseId",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Thống kê khóa học: số sinh viên, số bài học, tổng thời lượng."
-                    }
-                },
-                {
-                    "name": "Get Course Students",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/reports/courses/:courseId/students?search=&progress_min=&progress_max=&is_completed=&sort_by=user_id&order_by=asc&per_page=15&page=1",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "reports",
-                                "courses",
-                                ":courseId",
-                                "students"
-                            ],
-                            "query": [
-                                {
-                                    "key": "search",
-                                    "value": "",
-                                    "description": "Tìm kiếm theo email hoặc fullname"
-                                },
-                                {
-                                    "key": "progress_min",
-                                    "value": "",
-                                    "description": "Tiến độ tối thiểu (%)"
-                                },
-                                {
-                                    "key": "progress_max",
-                                    "value": "",
-                                    "description": "Tiến độ tối đa (%)"
-                                },
-                                {
-                                    "key": "is_completed",
-                                    "value": "",
-                                    "description": "Lọc theo trạng thái hoàn thành (true/false)"
-                                },
-                                {
-                                    "key": "sort_by",
-                                    "value": "user_id",
-                                    "description": "Sắp xếp theo (user_id, email, fullname, overall_percentage, total_watched_duration)"
-                                },
-                                {
-                                    "key": "order_by",
-                                    "value": "asc",
-                                    "description": "Thứ tự sắp xếp"
-                                },
-                                {
-                                    "key": "per_page",
-                                    "value": "15",
-                                    "description": "Số lượng phần tử mỗi trang"
-                                },
-                                {
-                                    "key": "page",
-                                    "value": "1",
-                                    "description": "Trang hiện tại"
-                                }
-                            ],
-                            "variable": [
-                                {
-                                    "key": "courseId",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Danh sách học viên trong khóa học cùng tiến độ học và hỗ trợ lọc/sắp xếp."
-                    }
-                },
-                {
-                    "name": "Get Student Course Progress",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/reports/courses/:courseId/students/:userId/progress",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "reports",
-                                "courses",
-                                ":courseId",
-                                "students",
-                                ":userId",
-                                "progress"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "courseId",
-                                    "value": "1"
-                                },
-                                {
-                                    "key": "userId",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Chi tiết tiến độ học của một sinh viên trong một khóa học cụ thể."
-                    }
-                },
-                {
-                    "name": "Get Student Login History",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/reports/students/:userId/login-history",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "reports",
-                                "students",
-                                ":userId",
-                                "login-history"
-                            ],
-                            "variable": [
-                                {
-                                    "key": "userId",
-                                    "value": "1"
-                                }
-                            ]
-                        },
-                        "description": "Lịch sử đăng nhập của sinh viên dựa trên bảng refresh_tokens."
-                    }
-                }
-            ]
-        }
-    ],
-    "variable": [
-        {
-            "key": "base_url",
-            "value": "http://localhost:8000",
-            "type": "string"
-        },
-        {
-            "key": "access_token",
-            "value": "",
-            "type": "string"
-        },
-        {
-            "key": "refresh_token",
-            "value": "",
-            "type": "string"
-        }
-    ]
+	"info": {
+		"_postman_id": "5d1ede6b-4a0a-4289-af3d-717d968dbdaf",
+		"name": "LMS API Collection",
+		"description": "API collection cho hệ thống Quản lý Học trực tuyến (LMS)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49375398"
+	},
+	"item": [
+		{
+			"name": "Authentication (Public)",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\",\n  \"fullname\": \"Nguyễn Văn A\",\n  \"birthday\": \"2000-01-01\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "Đăng ký tài khoản mới đồng thời trả về access_token và refresh_token."
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.success && jsonData.data.access_token) {",
+									"        pm.environment.set(\"access_token\", jsonData.data.access_token);",
+									"        pm.environment.set(\"refresh_token\", jsonData.data.refresh_token);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "// {\n//   \"email\": \"root@rdi.tvu.vn\",\n//   \"password\": \"123123123\"\n// }\n// {\n//   \"email\": \"admin2@lms.test\",\n//   \"password\": \"123123123\"\n// }\n{\n  \"email\": \"student3@lms.test\",\n  \"password\": \"123123123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Đăng nhập và lưu access_token, refresh_token vào environment."
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/refresh",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"refresh"
+							]
+						},
+						"description": "Làm mới access token. Token mới sẽ được set vào cookie HttpOnly khi gọi thành công."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Authentication (Protected)",
+			"item": [
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						},
+						"description": "Đăng xuất, revoke refresh token và xóa cookie."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"me"
+							]
+						},
+						"description": "Lấy thông tin user hiện tại cùng danh sách vai trò."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullname\": \"Nguyễn Văn A Updated\",\n  \"birthday\": \"2000-01-01\",\n  \"avatar_path\": \"/storage/avatars/avatar.jpg\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/update-profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"update-profile"
+							]
+						},
+						"description": "Cập nhật thông tin cá nhân (fullname, birthday, avatar)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User Management",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/users?search=&search_email=&search_fullname=&role_id=&role_name=&created_at_from=&created_at_to=&sort_by=id&order_by=desc&per_page=15&page=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Tìm kiếm theo email hoặc fullname"
+								},
+								{
+									"key": "search_email",
+									"value": "",
+									"description": "Tìm kiếm riêng theo email"
+								},
+								{
+									"key": "search_fullname",
+									"value": "",
+									"description": "Tìm kiếm riêng theo fullname"
+								},
+								{
+									"key": "role_id",
+									"value": "",
+									"description": "Lọc theo role ID"
+								},
+								{
+									"key": "role_name",
+									"value": "",
+									"description": "Lọc theo tên role"
+								},
+								{
+									"key": "created_at_from",
+									"value": "",
+									"description": "Lọc từ ngày tạo (Y-m-d)"
+								},
+								{
+									"key": "created_at_to",
+									"value": "",
+									"description": "Lọc đến ngày tạo (Y-m-d)"
+								},
+								{
+									"key": "sort_by",
+									"value": "id",
+									"description": "Sắp xếp theo trường (id, email, fullname, created_at, updated_at)"
+								},
+								{
+									"key": "order_by",
+									"value": "desc",
+									"description": "Thứ tự sắp xếp (asc, desc)"
+								},
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Số lượng phần tử mỗi trang (1-100)"
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Trang hiện tại"
+								}
+							]
+						},
+						"description": "Danh sách người dùng với phân trang và bộ lọc."
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"student@example.com\",\n  \"password\": \"password123\",\n  \"fullname\": \"Sinh Viên A\",\n  \"birthday\": \"2000-01-01\",\n  \"avatar_path\": \"/storage/avatars/avatar.jpg\",\n  \"role_ids\": [2]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						},
+						"description": "Tạo mới một người dùng (JSON). Để upload avatar, sử dụng request \"Create User (with File Upload)\" bên dưới."
+					},
+					"response": []
+				},
+				{
+					"name": "Create User (with File Upload)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "student@example.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "password123",
+									"type": "text"
+								},
+								{
+									"key": "fullname",
+									"value": "Sinh Viên A",
+									"type": "text"
+								},
+								{
+									"key": "birthday",
+									"value": "2000-01-01",
+									"type": "text"
+								},
+								{
+									"key": "role_ids[]",
+									"value": "2",
+									"description": "Có thể thêm nhiều role_ids[]",
+									"type": "text"
+								},
+								{
+									"key": "avatar",
+									"description": "File ảnh avatar (jpeg, png, jpg, gif, webp, max 2MB)",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						},
+						"description": "Tạo mới một người dùng với upload avatar."
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/users/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Lấy thông tin chi tiết của một người dùng kèm roles và courses."
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"student@example.com\",\n  \"password\": \"newpassword123\",\n  \"fullname\": \"Sinh Viên A Updated\",\n  \"birthday\": \"2000-01-01\",\n  \"avatar_path\": \"/storage/avatars/avatar.jpg\",\n  \"role_ids\": [2]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Cập nhật thông tin người dùng (JSON). Để upload avatar, sử dụng request \"Update User (with File Upload)\" bên dưới."
+					},
+					"response": []
+				},
+				{
+					"name": "Update User (with File Upload)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "student@example.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "newpassword123",
+									"description": "Để trống nếu không muốn đổi password",
+									"type": "text"
+								},
+								{
+									"key": "fullname",
+									"value": "Sinh Viên A Updated",
+									"type": "text"
+								},
+								{
+									"key": "birthday",
+									"value": "2000-01-01",
+									"type": "text"
+								},
+								{
+									"key": "role_ids[]",
+									"value": "2",
+									"description": "Có thể thêm nhiều role_ids[]",
+									"type": "text"
+								},
+								{
+									"key": "avatar",
+									"description": "File ảnh avatar (jpeg, png, jpg, gif, webp, max 2MB)",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Cập nhật người dùng với upload avatar. Middleware HandlePutFormData tự động xử lý PUT request với multipart/form-data. Có thể gửi PUT trực tiếp hoặc POST với _method=PUT."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Users",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_ids\": [2, 3]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						},
+						"description": "Xóa mềm nhiều người dùng một lúc (yêu cầu quyền cao hơn người bị xóa)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Role Management",
+			"item": [
+				{
+					"name": "Get All Roles",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/roles?search=&level_from=&level_to=&user_id=&permission_id=&sort_by=level&order_by=asc&per_page=15&page=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"roles"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Tìm kiếm theo name hoặc description"
+								},
+								{
+									"key": "level_from",
+									"value": "",
+									"description": "Lọc từ level (1-255)"
+								},
+								{
+									"key": "level_to",
+									"value": "",
+									"description": "Lọc đến level (1-255)"
+								},
+								{
+									"key": "user_id",
+									"value": "",
+									"description": "Lọc các roles có user tương ứng"
+								},
+								{
+									"key": "permission_id",
+									"value": "",
+									"description": "Lọc các roles có permission tương ứng"
+								},
+								{
+									"key": "sort_by",
+									"value": "level",
+									"description": "Sắp xếp theo (id, name, level, created_at, updated_at)"
+								},
+								{
+									"key": "order_by",
+									"value": "asc",
+									"description": "Thứ tự sắp xếp (asc, desc)"
+								},
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Số lượng phần tử mỗi trang"
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Trang hiện tại"
+								}
+							]
+						},
+						"description": "Danh sách role với phân trang và bộ lọc."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Role",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"MODERATOR\",\n  \"description\": \"Người điều hành\",\n  \"level\": 50,\n  \"permission_ids\": [1, 2, 3]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/roles",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"roles"
+							]
+						},
+						"description": "Tạo role mới và gán danh sách permission nếu có."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Role by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/roles/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"roles",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Xem chi tiết thông tin role kèm users và permissions."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Role",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"MODERATOR\",\n  \"description\": \"Người điều hành (Updated)\",\n  \"level\": 50,\n  \"permission_ids\": [1, 2, 3, 4]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/roles/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"roles",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Cập nhật role và danh sách permission."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Role",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"role_ids\": [1]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/roles",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"roles"
+							]
+						},
+						"description": "Xóa mềm role (không thể xóa nếu đang được tham chiếu trong logic khác)."
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Permissions to Role",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"permission_ids\": [1, 2, 3, 4, 5]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/roles/:id/permissions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"roles",
+								":id",
+								"permissions"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Gán lại toàn bộ danh sách permission cho role."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Course Management",
+			"item": [
+				{
+					"name": "Get All Courses",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/courses?search=&user_id=&start_date_from=&start_date_to=&end_date_from=&end_date_to=&date_range=all&min_users=&max_users=&min_lessons=&max_lessons=&sort_by=id&order_by=desc&per_page=15&page=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"courses"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Tìm kiếm theo title hoặc description"
+								},
+								{
+									"key": "user_id",
+									"value": "",
+									"description": "Lọc theo user tham gia"
+								},
+								{
+									"key": "start_date_from",
+									"value": "",
+									"description": "Ngày bắt đầu từ (Y-m-d)"
+								},
+								{
+									"key": "start_date_to",
+									"value": "",
+									"description": "Ngày bắt đầu đến (Y-m-d)"
+								},
+								{
+									"key": "end_date_from",
+									"value": "",
+									"description": "Ngày kết thúc từ (Y-m-d)"
+								},
+								{
+									"key": "end_date_to",
+									"value": "",
+									"description": "Ngày kết thúc đến (Y-m-d)"
+								},
+								{
+									"key": "date_range",
+									"value": "all",
+									"description": "Khoảng thời gian (active, upcoming, past, all)"
+								},
+								{
+									"key": "min_users",
+									"value": "",
+									"description": "Số user tối thiểu"
+								},
+								{
+									"key": "max_users",
+									"value": "",
+									"description": "Số user tối đa"
+								},
+								{
+									"key": "min_lessons",
+									"value": "",
+									"description": "Số lesson tối thiểu"
+								},
+								{
+									"key": "max_lessons",
+									"value": "",
+									"description": "Số lesson tối đa"
+								},
+								{
+									"key": "sort_by",
+									"value": "id",
+									"description": "Sắp xếp theo (id, title, start_date, end_date, created_at, updated_at, users_count, lessons_count)"
+								},
+								{
+									"key": "order_by",
+									"value": "desc",
+									"description": "Thứ tự sắp xếp"
+								},
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Số phần tử mỗi trang"
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Trang hiện tại"
+								}
+							]
+						},
+						"description": "Danh sách khóa học với phân trang, số lượng người học và bài học."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Course",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Lập trình Laravel\",\n  \"description\": \"Khóa học về Laravel framework\",\n  \"start_date\": \"2024-01-01 00:00:00\",\n  \"end_date\": \"2024-12-31 23:59:59\",\n  \"timezone\": \"Asia/Ho_Chi_Minh\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/courses",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"courses"
+							]
+						},
+						"description": "Tạo khóa học mới (JSON). Để upload thumbnail, sử dụng request \"Create Course (with File Upload)\" bên dưới."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Course (with File Upload)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Lập trình Laravel",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Khóa học về Laravel framework",
+									"type": "text"
+								},
+								{
+									"key": "start_date",
+									"value": "2024-01-01 00:00:00",
+									"type": "text"
+								},
+								{
+									"key": "end_date",
+									"value": "2024-12-31 23:59:59",
+									"type": "text"
+								},
+								{
+									"key": "timezone",
+									"value": "Asia/Ho_Chi_Minh",
+									"type": "text"
+								},
+								{
+									"key": "thumbnail",
+									"description": "File ảnh thumbnail (jpeg, png, jpg, gif, webp, max 2MB)",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/courses",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"courses"
+							]
+						},
+						"description": "Tạo khóa học mới với upload thumbnail."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Course by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/courses/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"courses",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Xem chi tiết khóa học cùng danh sách bài học (sắp xếp theo display_order)."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Course",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Lập trình Laravel (Updated)\",\n  \"description\": \"Khóa học về Laravel framework - Updated\",\n  \"start_date\": \"2024-01-01 00:00:00\",\n  \"end_date\": \"2024-12-31 23:59:59\",\n  \"timezone\": \"Asia/Ho_Chi_Minh\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/courses/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"courses",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Cập nhật thông tin khóa học (JSON). Để upload thumbnail, sử dụng request \"Update Course (with File Upload)\" bên dưới."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Course (with File Upload)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Lập trình Laravel (Updated)",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Khóa học về Laravel framework - Updated",
+									"type": "text"
+								},
+								{
+									"key": "start_date",
+									"value": "2024-01-01 00:00:00",
+									"type": "text"
+								},
+								{
+									"key": "end_date",
+									"value": "2024-12-31 23:59:59",
+									"type": "text"
+								},
+								{
+									"key": "timezone",
+									"value": "Asia/Ho_Chi_Minh",
+									"type": "text"
+								},
+								{
+									"key": "thumbnail",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/courses/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"courses",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Cập nhật khóa học với upload thumbnail. Middleware HandlePutFormData tự động xử lý PUT request với multipart/form-data. Có thể gửi PUT trực tiếp hoặc POST với _method=PUT."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Courses",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"course_ids\": [1, 2]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/courses",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"courses"
+							]
+						},
+						"description": "Xóa mềm nhiều khóa học, đồng thời tách users và lessons liên quan."
+					},
+					"response": []
+				},
+				{
+					"name": "Sync Course Users",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_ids\": [1, 2, 3]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/courses/:id/users/add",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"courses",
+								":id",
+								"users",
+								"add"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Gán danh sách sinh viên cho khóa học (sync: thay thế toàn bộ danh sách hiện có)."
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Users from Course",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_ids\": [2, 3]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/courses/:id/users/remove",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"courses",
+								":id",
+								"users",
+								"remove"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Gỡ nhiều sinh viên khỏi khóa học hiện tại."
+					},
+					"response": []
+				},
+				{
+					"name": "Add Lessons to Course",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"lessons\": [\n    {\n      \"id\": 5,\n      \"display_order\": 1\n    },\n    {\n      \"id\": 6,\n      \"display_order\": 2\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/courses/:id/lessons/add",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"courses",
+								":id",
+								"lessons",
+								"add"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Thêm các bài học chưa thuộc khóa nào (hoặc thuộc chính khóa này) cùng thứ tự hiển thị."
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Lessons from Course",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"lesson_ids\": [5, 6]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/courses/:id/lessons/remove",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"courses",
+								":id",
+								"lessons",
+								"remove"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Gỡ các bài học đang thuộc khóa học hiện tại."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Lesson Management",
+			"item": [
+				{
+					"name": "Upload Video",
+					"item": [
+						{
+							"name": "Create Upload Session",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"lesson_id\": 1,\n  \"file_name\": \"video.mp4\",\n  \"file_size\": 104857600,\n  \"mime_type\": \"video/mp4\",\n  \"chunk_size\": 52428800\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/lessons/video-uploads/sessions",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"lessons",
+										"video-uploads",
+										"sessions"
+									]
+								},
+								"description": "Tạo phiên upload chunk cho video bài học dung lượng lớn. Trả về upload_id, chunk_size, total_chunks."
+							},
+							"response": []
+						},
+						{
+							"name": "Upload Chunk",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "chunk",
+											"description": "File chunk video",
+											"type": "file",
+											"src": []
+										},
+										{
+											"key": "chunk_index",
+											"value": "0",
+											"description": "Chỉ số chunk (bắt đầu từ 0)",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/api/lessons/video-uploads/:IdLessonVideoUpload/chunks",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"lessons",
+										"video-uploads",
+										":IdLessonVideoUpload",
+										"chunks"
+									],
+									"variable": [
+										{
+											"key": "IdLessonVideoUpload",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Gửi từng chunk video lên máy chủ (có thể resume). Không giới hạn rate limit và tắt session để xử lý song song."
+							},
+							"response": []
+						},
+						{
+							"name": "Complete Upload",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/lessons/video-uploads/:IdLessonVideoUpload/complete",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"lessons",
+										"video-uploads",
+										":IdLessonVideoUpload",
+										"complete"
+									],
+									"variable": [
+										{
+											"key": "IdLessonVideoUpload",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Gửi yêu cầu ghép các chunk và cập nhật bài học. Xử lý bất đồng bộ."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Upload Status",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/lessons/video-uploads/:IdLessonVideoUpload",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"lessons",
+										"video-uploads",
+										":IdLessonVideoUpload"
+									],
+									"variable": [
+										{
+											"key": "IdLessonVideoUpload",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Lấy tiến độ, trạng thái xử lý video bất đồng bộ."
+							},
+							"response": []
+						},
+						{
+							"name": "Cancel Upload",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/lessons/video-uploads/:IdLessonVideoUpload",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"lessons",
+										"video-uploads",
+										":IdLessonVideoUpload"
+									],
+									"variable": [
+										{
+											"key": "IdLessonVideoUpload",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Hủy phiên upload và xóa dữ liệu tạm thời."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get All Lessons",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/lessons?course_id=&orphaned=&search=&duration_min=&duration_max=&sort_by=course_id&order_by=asc&per_page=15&page=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"lessons"
+							],
+							"query": [
+								{
+									"key": "course_id",
+									"value": "",
+									"description": "Lọc theo khóa học"
+								},
+								{
+									"key": "orphaned",
+									"value": "",
+									"description": "true để lấy các bài học chưa thuộc khóa nào"
+								},
+								{
+									"key": "search",
+									"value": "",
+									"description": "Tìm kiếm theo title hoặc description"
+								},
+								{
+									"key": "duration_min",
+									"value": "",
+									"description": "Thời lượng tối thiểu (giây)"
+								},
+								{
+									"key": "duration_max",
+									"value": "",
+									"description": "Thời lượng tối đa (giây)"
+								},
+								{
+									"key": "sort_by",
+									"value": "course_id",
+									"description": "Sắp xếp theo (id, title, duration, course_id, created_at, updated_at, display_order)"
+								},
+								{
+									"key": "order_by",
+									"value": "asc",
+									"description": "Thứ tự sắp xếp"
+								},
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Số phần tử mỗi trang"
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Trang hiện tại"
+								}
+							]
+						},
+						"description": "Danh sách bài học với bộ lọc theo khóa học, thời lượng và trạng thái mồ côi."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Lesson",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"course_id\": 1,\n  \"title\": \"Giới thiệu Laravel\",\n  \"description\": \"Bài học đầu tiên\",\n  \"duration\": 1800,\n  \"video_path\": \"https://example.com/video.mp4\",\n  \"display_order\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/lessons",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"lessons"
+							]
+						},
+						"description": "Tạo bài học mới (JSON). Để upload thumbnail/video, sử dụng request \"Create Lesson (with File Upload)\" bên dưới."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Lesson (with File Upload)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "course_id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "title",
+									"value": "Giới thiệu Laravel",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Bài học đầu tiên",
+									"type": "text"
+								},
+								{
+									"key": "duration",
+									"value": "1800",
+									"description": "Thời lượng tính bằng giây",
+									"type": "text"
+								},
+								{
+									"key": "display_order",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "video_path",
+									"value": "https://example.com/video.mp4",
+									"description": "Đường dẫn video (nếu không upload file video)",
+									"type": "text"
+								},
+								{
+									"key": "thumbnail",
+									"description": "File ảnh thumbnail (jpeg, png, jpg, gif, webp, max 2MB)",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "video",
+									"description": "File video (mp4, avi, mov, webm, max 500MB). Chỉ upload nếu không dùng video_path. Phải cung cấp video_path hoặc upload file video.",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/lessons",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"lessons"
+							]
+						},
+						"description": "Tạo bài học mới với upload thumbnail/video. Phải cung cấp video_path hoặc upload file video."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Lesson by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/lessons/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"lessons",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Xem chi tiết bài học kèm thông tin khóa học."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Lesson",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Giới thiệu Laravel (Updated)\",\n  \"description\": \"Bài học đầu tiên - Updated\",\n  \"duration\": 2000,\n  \"video_path\": \"https://example.com/video-updated.mp4\",\n  \"display_order\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/lessons/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"lessons",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Cập nhật thông tin bài học (JSON). Để upload thumbnail/video, sử dụng request \"Update Lesson (with File Upload)\" bên dưới."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Lesson (with File Upload)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Giới thiệu Laravel (Updated)",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Bài học đầu tiên - Updated",
+									"type": "text"
+								},
+								{
+									"key": "duration",
+									"value": "2000",
+									"description": "Thời lượng tính bằng giây",
+									"type": "text"
+								},
+								{
+									"key": "display_order",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "video_path",
+									"value": "https://example.com/video-updated.mp4",
+									"description": "Đường dẫn video (nếu không upload file video)",
+									"type": "text"
+								},
+								{
+									"key": "thumbnail",
+									"description": "File ảnh thumbnail (jpeg, png, jpg, gif, webp, max 2MB)",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "video",
+									"description": "File video (mp4, avi, mov, webm, max 500MB). Chỉ upload nếu không dùng video_path",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/lessons/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"lessons",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Cập nhật bài học với upload thumbnail/video. Middleware HandlePutFormData tự động xử lý PUT request với multipart/form-data. Có thể gửi PUT trực tiếp hoặc POST với _method=PUT. Phải cung cấp video_path hoặc upload file video."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Lessons",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"lesson_ids\": [10, 11]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/lessons",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"lessons"
+							]
+						},
+						"description": "Xóa mềm các bài học đang không thuộc khóa nào (chỉ các bài orphaned)."
+					},
+					"response": []
+				},
+				{
+					"name": "Stream Lesson Video",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Range",
+								"value": "bytes=0-",
+								"description": "HTTP Range header để hỗ trợ streaming (tùy chọn)"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/lessons/:lesson/stream",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"lessons",
+								":lesson",
+								"stream"
+							],
+							"variable": [
+								{
+									"key": "lesson",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Stream video bài học với hỗ trợ HTTP range để ứng dụng Flutter có thể phát mà không cần tải toàn bộ file."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Student",
+			"item": [
+				{
+					"name": "Get Student Courses",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/student/courses?search=&sort_by=id&order_by=desc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"student",
+								"courses"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Tìm kiếm theo title hoặc description"
+								},
+								{
+									"key": "sort_by",
+									"value": "id",
+									"description": "Sắp xếp theo (id, title, start_date, end_date, created_at, updated_at)"
+								},
+								{
+									"key": "order_by",
+									"value": "desc",
+									"description": "Thứ tự sắp xếp"
+								}
+							]
+						},
+						"description": "Danh sách khóa học mà sinh viên hiện tại được gán."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Student Course Detail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/student/courses/:courseId",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"student",
+								"courses",
+								":courseId"
+							],
+							"variable": [
+								{
+									"key": "courseId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Xem chi tiết khóa học và tiến độ từng bài học của sinh viên."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Student Lesson Detail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/student/lessons/:lessonId",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"student",
+								"lessons",
+								":lessonId"
+							],
+							"variable": [
+								{
+									"key": "lessonId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Chi tiết bài học của sinh viên kèm thông tin tiến độ cá nhân."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Progress",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"lesson_id\": 1,\n  \"watched_duration\": 900,\n  \"last_position\": 900\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/student/progress",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"student",
+								"progress"
+							]
+						},
+						"description": "Cập nhật tiến độ xem bài học của sinh viên hiện tại."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Course Progress",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/student/courses/:courseId/progress",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"student",
+								"courses",
+								":courseId",
+								"progress"
+							],
+							"variable": [
+								{
+									"key": "courseId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Tổng hợp tiến độ học của sinh viên trong một khóa học."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reports",
+			"item": [
+				{
+					"name": "Get Overview",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/overview",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"overview"
+							]
+						},
+						"description": "Tổng quan thống kê: số khóa học, số sinh viên, số bài học và số học viên mỗi khóa."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Course Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/courses/:courseId/statistics",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"courses",
+								":courseId",
+								"statistics"
+							],
+							"variable": [
+								{
+									"key": "courseId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Thống kê khóa học: số sinh viên, số bài học, tổng thời lượng."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Course Students",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/courses/:courseId/students?search=&progress_min=&progress_max=&is_completed=&sort_by=user_id&order_by=asc&per_page=15&page=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"courses",
+								":courseId",
+								"students"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Tìm kiếm theo email hoặc fullname"
+								},
+								{
+									"key": "progress_min",
+									"value": "",
+									"description": "Tiến độ tối thiểu (%)"
+								},
+								{
+									"key": "progress_max",
+									"value": "",
+									"description": "Tiến độ tối đa (%)"
+								},
+								{
+									"key": "is_completed",
+									"value": "",
+									"description": "Lọc theo trạng thái hoàn thành (true/false)"
+								},
+								{
+									"key": "sort_by",
+									"value": "user_id",
+									"description": "Sắp xếp theo (user_id, email, fullname, overall_percentage, total_watched_duration)"
+								},
+								{
+									"key": "order_by",
+									"value": "asc",
+									"description": "Thứ tự sắp xếp"
+								},
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Số lượng phần tử mỗi trang"
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Trang hiện tại"
+								}
+							],
+							"variable": [
+								{
+									"key": "courseId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Danh sách học viên trong khóa học cùng tiến độ học và hỗ trợ lọc/sắp xếp."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Student Course Progress",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/courses/:courseId/students/:userId/progress",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"courses",
+								":courseId",
+								"students",
+								":userId",
+								"progress"
+							],
+							"variable": [
+								{
+									"key": "courseId",
+									"value": "1"
+								},
+								{
+									"key": "userId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Chi tiết tiến độ học của một sinh viên trong một khóa học cụ thể."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Student Login History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/students/:userId/login-history",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"students",
+								":userId",
+								"login-history"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Lịch sử đăng nhập của sinh viên dựa trên bảng refresh_tokens."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "string"
+		}
+	]
 }

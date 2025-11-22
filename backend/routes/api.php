@@ -252,37 +252,39 @@ Route::middleware('auth:api')->group(function () {
             'name' => 'Stream video Bài học',
             'description' => 'Cho phép stream video bài học với hỗ trợ HTTP range để ứng dụng Flutter có thể phát mà không cần tải toàn bộ file'
         ]);
-    });
 
-    // Lesson video uploads - upload bất đồng bộ
-    Route::middleware('check.permission')->prefix('lesson-video-uploads')->group(function () {
-        routeWithPermission('post', '/sessions', [LessonVideoUploadController::class, 'createSession'], [
-            'group' => 'Upload video bài học',
-            'name' => 'Khởi tạo phiên upload video',
-            'description' => 'Tạo phiên upload chunk cho video bài học dung lượng lớn'
-        ]);
-        routeWithPermission('post', '/{IdLessonVideoUpload}/chunks', [LessonVideoUploadController::class, 'uploadChunk'], [
-            'group' => 'Upload video bài học',
-            'name' => 'Upload chunk video',
-            'description' => 'Gửi từng chunk video lên máy chủ (có thể resume)'
-        ])
-            ->withoutMiddleware(['check.permission', \Illuminate\Session\Middleware\StartSession::class])
-            ->middleware('throttle:upload-chunks'); // Không giới hạn rate limit và tắt session
-        routeWithPermission('post', '/{IdLessonVideoUpload}/complete', [LessonVideoUploadController::class, 'complete'], [
-            'group' => 'Upload video bài học',
-            'name' => 'Hoàn tất upload video',
-            'description' => 'Gửi yêu cầu ghép các chunk và cập nhật bài học'
-        ]);
-        routeWithPermission('get', '/{IdLessonVideoUpload}', [LessonVideoUploadController::class, 'show'], [
-            'group' => 'Upload video bài học',
-            'name' => 'Theo dõi trạng thái upload video',
-            'description' => 'Lấy tiến độ, trạng thái xử lý video bất đồng bộ'
-        ])->withoutMiddleware('check.permission');
-        routeWithPermission('delete', '/{IdLessonVideoUpload}', [LessonVideoUploadController::class, 'cancel'], [
-            'group' => 'Upload video bài học',
-            'name' => 'Hủy upload video',
-            'description' => 'Hủy phiên upload và xóa dữ liệu tạm thời'
-        ]);
+
+        // Lesson video uploads - upload bất đồng bộ
+        Route::prefix('video-uploads')->group(function () {
+            routeWithPermission('post', '/sessions', [LessonVideoUploadController::class, 'createSession'], [
+                'group' => 'Upload video bài học',
+                'name' => 'Khởi tạo phiên upload video',
+                'description' => 'Tạo phiên upload chunk cho video bài học dung lượng lớn'
+            ]);
+            routeWithPermission('post', '/{IdLessonVideoUpload}/chunks', [LessonVideoUploadController::class, 'uploadChunk'], [
+                'group' => 'Upload video bài học',
+                'name' => 'Upload chunk video',
+                'description' => 'Gửi từng chunk video lên máy chủ (có thể resume)'
+            ])
+                ->withoutMiddleware(['check.permission', \Illuminate\Session\Middleware\StartSession::class])
+                ->middleware('throttle:upload-chunks'); // Không giới hạn rate limit và tắt session
+            routeWithPermission('post', '/{IdLessonVideoUpload}/complete', [LessonVideoUploadController::class, 'complete'], [
+                'group' => 'Upload video bài học',
+                'name' => 'Hoàn tất upload video',
+                'description' => 'Gửi yêu cầu ghép các chunk và cập nhật bài học'
+            ]);
+            routeWithPermission('get', '/{IdLessonVideoUpload}', [LessonVideoUploadController::class, 'show'], [
+                'group' => 'Upload video bài học',
+                'name' => 'Theo dõi trạng thái upload video',
+                'description' => 'Lấy tiến độ, trạng thái xử lý video bất đồng bộ'
+            ])->withoutMiddleware('check.permission');
+            routeWithPermission('delete', '/{IdLessonVideoUpload}', [LessonVideoUploadController::class, 'cancel'], [
+                'group' => 'Upload video bài học',
+                'name' => 'Hủy upload video',
+                'description' => 'Hủy phiên upload và xóa dữ liệu tạm thời'
+            ]);
+        });
+
     });
 
     // Student routes - yêu cầu permission

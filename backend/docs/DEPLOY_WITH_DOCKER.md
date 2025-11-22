@@ -163,7 +163,13 @@ docker-compose exec app composer install --optimize-autoloader --no-dev
 docker-compose exec app php artisan key:generate
 ```
 
-#### Bước 7: Chạy database migrations
+### Bước 7: Tạo symplink
+Tạo symlink để ánh xạ thư mục `public/storage` -> `storage/app/public`
+```bash
+docker-compose exec app php artisan storage:link
+```
+
+#### Bước 8: Chạy database migrations
 ```bash
 # Tạo tables trong database
 docker-compose exec app php artisan migrate --force
@@ -172,7 +178,7 @@ docker-compose exec app php artisan migrate --force
 docker-compose exec app php artisan db:seed --force
 ```
 
-#### Bước 8: Cache configurations
+#### Bước 9: Cache configurations
 ```bash
 # Cache config để tăng performance
 docker-compose exec app php artisan config:cache
@@ -184,7 +190,7 @@ docker-compose exec app php artisan route:cache
 docker-compose exec app php artisan view:cache
 ```
 
-#### Bước 9: Set permissions
+#### Bước 10: Set permissions
 ```bash
 # Cấp quyền cho thư mục storage và cache
 docker-compose exec app chown -R www-data:www-data /home/ducmanh/rdi/storage
@@ -193,7 +199,7 @@ docker-compose exec app chmod -R 775 /home/ducmanh/rdi/storage
 docker-compose exec app chmod -R 775 /home/ducmanh/rdi/bootstrap/cache
 ```
 
-#### Bước 10: Restart để áp dụng changes
+#### Bước 11: Restart để áp dụng changes
 ```bash
 docker-compose restart
 ```

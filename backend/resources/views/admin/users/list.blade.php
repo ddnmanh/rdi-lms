@@ -318,41 +318,45 @@
     function renderUsersTable(users = []) {
         const tableContainer = document.getElementById('usersTable');
 
+        const headTable = `
+            <colgroup>
+                <col class="w-[40px] 2xl:w-[80px]">
+                <col class="w-[80px] 2xl:w-[110px]">
+                <col class="w-[80px] 2xl:w-[150px]">
+                <col class="w-[250px] 2xl:w-[400px]">
+                <col class="w-[350px] 2xl:w-[500px]">
+                <col class="">
+                <col class="w-[120px] 2xl:w-[180px]">
+                <col class="w-[130px] 2xl:w-[230px]">
+            </colgroup>
+            <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
+                <tr>
+                    <th class="px-4 py-3 text-center sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm">
+                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                    </th>
+                    <th onclick="handleSort('id')" class="${getHeaderClass('id')}">
+                        ID${getSortIcon('id')}
+                    </th>
+                    <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Avatar</th>
+                    <th onclick="handleSort('fullname')" class="${getHeaderClass('fullname')}">
+                        Tên${getSortIcon('fullname')}
+                    </th>
+                    <th onclick="handleSort('email')" class="${getHeaderClass('email')}">
+                        Email${getSortIcon('email')}
+                    </th>
+                    <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Vai trò</th>
+                    <th onclick="handleSort('created_at')" class="${getHeaderClass('created_at')}">
+                        Ngày tạo${getSortIcon('created_at')}
+                    </th>
+                    <th class="px-4 py-3 text-right sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Thao tác</th>
+                </tr>
+            </thead>
+        `;
+
         if (users.length === 0) {
             tableContainer.innerHTML = `
                 <table class="w-full table-fixed border-separate border-spacing-0 ">
-                    <colgroup>
-                        <col class="w-[40px] 2xl:w-[80px]">
-                        <col class="w-[80px] 2xl:w-[110px]">
-                        <col class="w-[80px] 2xl:w-[150px]">
-                        <col class="w-[250px] 2xl:w-[400px]">
-                        <col class="w-[350px] 2xl:w-[500px]">
-                        <col class="">
-                        <col class="w-[120px] 2xl:w-[180px]">
-                        <col class="w-[130px] 2xl:w-[230px]">
-                    </colgroup>
-                    <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
-                        <tr>
-                            <th class="px-4 py-3 text-center sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm">
-                                <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                            </th>
-                            <th onclick="handleSort('id')" class="${getHeaderClass('id')}">
-                                ID${getSortIcon('id')}
-                            </th>
-                            <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Avatar</th>
-                            <th onclick="handleSort('fullname')" class="${getHeaderClass('fullname')}">
-                                Tên${getSortIcon('fullname')}
-                            </th>
-                            <th onclick="handleSort('email')" class="${getHeaderClass('email')}">
-                                Email${getSortIcon('email')}
-                            </th>
-                            <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Vai trò</th>
-                            <th onclick="handleSort('created_at')" class="${getHeaderClass('created_at')}">
-                                Ngày tạo${getSortIcon('created_at')}
-                            </th>
-                            <th class="px-4 py-3 text-right sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Thao tác</th>
-                        </tr>
-                    </thead>
+                    ${headTable}
                     <tbody class="[&>tr:not(:first-child)>td]:border-t [&>tr:not(:first-child)>td]:border-gray-200 dark:[&>tr:not(:first-child)>td]:border-gray-700">
                         <tr>
                             <td colspan="8" class="pt-40 text-center">
@@ -373,38 +377,7 @@
 
         let html = `
             <table class="w-full table-fixed border-separate border-spacing-0">
-                <colgroup>
-                    <col class="w-[40px] 2xl:w-[80px]">
-                    <col class="w-[80px] 2xl:w-[110px]">
-                    <col class="w-[80px] 2xl:w-[150px]">
-                    <col class="w-[250px] 2xl:w-[400px]">
-                    <col class="w-[350px] 2xl:w-[500px]">
-                    <col class="">
-                    <col class="w-[120px] 2xl:w-[180px]">
-                    <col class="w-[130px] 2xl:w-[230px]">
-                </colgroup>
-                <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
-                    <tr>
-                        <th class="px-4 py-3 text-center sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm">
-                            <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                        </th>
-                        <th onclick="handleSort('id')" class="${getHeaderClass('id')}">
-                            ID${getSortIcon('id')}
-                        </th>
-                        <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Avatar</th>
-                        <th onclick="handleSort('fullname')" class="${getHeaderClass('fullname')}">
-                            Tên${getSortIcon('fullname')}
-                        </th>
-                        <th onclick="handleSort('email')" class="${getHeaderClass('email')}">
-                            Email${getSortIcon('email')}
-                        </th>
-                        <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Vai trò</th>
-                        <th onclick="handleSort('created_at')" class="${getHeaderClass('created_at')}">
-                            Ngày tạo${getSortIcon('created_at')}
-                        </th>
-                        <th class="px-4 py-3 text-right sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Thao tác</th>
-                    </tr>
-                </thead>
+                ${headTable}
                 <tbody class="[&>tr:not(:first-child)>td]:border-t [&>tr:not(:first-child)>td]:border-gray-200 dark:[&>tr:not(:first-child)>td]:border-gray-700">
         `;
 
@@ -437,7 +410,7 @@
                         <span class="text-gray-600 dark:text-gray-300">${user.id}</span>
                     </td>
                     <td class="px-4 py-3 align-center whitespace-normal break-words">
-                        <img src="${user.avatar_path ?? ''}" alt="Avatar" class="m-auto w-10 aspect-square object-cover rounded-full">
+                        <img src="${user.avatar_path ?? ''}" alt="" class="m-auto w-10 aspect-square object-cover rounded-full bg-gray-200 dark:bg-gray-700">
                     </td>
                     <td class="${getCellClass('fullname')} text-gray-600 dark:text-gray-300">
                         ${user.fullname || '-'}

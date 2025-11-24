@@ -196,7 +196,26 @@
             toggleLoading(false);
         });
 
-        document.addEventListener("DOMContentLoaded", () => {
+        async function handleCheckLoggedIn() {
+            try {
+                const res = await fetch("/api/auth/me", {
+                    method: "GET",
+                    headers: { "Accept": "application/json" },
+                    credentials: "include",
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    window.location.href = "/admin/";
+                }
+            } catch (err) {
+                console.error("Lỗi kiểm tra đăng nhập:", err);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            await handleCheckLoggedIn();
             document.getElementById("currentYear").textContent = new Date().getFullYear();
         });
     </script>

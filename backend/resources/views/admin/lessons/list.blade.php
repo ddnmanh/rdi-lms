@@ -375,7 +375,7 @@
                         <span class="text-gray-600 dark:text-gray-300">${lesson.id}</span>
                     </td>
                     <td class="px-4 py-3 text-gray-600 dark:text-gray-300">
-                        <img src="${lesson.thumbnail_path}" class="w-[60px] 2xl:w-[70px] aspect-video m-auto object-cover rounded-lg">
+                        <img src="${lesson.thumbnail_path}" class="w-[60px] 2xl:w-[70px] aspect-video m-auto object-cover rounded-lg bg-gray-200 dark:bg-gray-700" >
                     </td>
                     <td class="${getCellClass('title')} text-gray-600 dark:text-gray-300">
                         <span class="text-gray-600 dark:text-gray-300 break-all overflow-hidden text-ellipsis line-clamp-2">

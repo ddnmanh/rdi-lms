@@ -31,7 +31,7 @@
             <div class="flex flex-col lg:flex-row justify-start flex-wrap gap-4 flex-1">
                 {{-- Course Filter --}}
                 <div class="min-w-32 flex flex-col items-stretch justify-start gap-0.5">
-                    <label for="courseFilter" class="block ml-3 text-sm font-medium text-gray-300 dark:text-gray-300 ml-2">
+                    <label for="courseFilter" class="block ml-3  font-medium text-gray-300 dark:text-gray-300 ml-2">
                         Khóa học
                     </label>
                     <select id="courseFilter"
@@ -42,7 +42,7 @@
 
                 {{-- Search Filter --}}
                 <div class="flex-1 min-w-40 max-w-80 flex flex-col items-stretch justify-start gap-0.5">
-                    <label for="searchFilter" class="block ml-3 text-sm font-medium text-gray-300 dark:text-gray-300">
+                    <label for="searchFilter" class="block ml-3  font-medium text-gray-300 dark:text-gray-300">
                         Tìm kiếm
                     </label>
                     <input type="text" id="searchFilter" placeholder="Tìm theo tiêu đề, mô tả..."
@@ -51,7 +51,7 @@
 
                 {{-- Duration Range Filter --}}
                 <div class="flex flex-col items-stretch justify-start gap-0.5">
-                    <label for="durationMin" class="block ml-3 text-sm font-medium text-gray-300 dark:text-gray-300">
+                    <label for="durationMin" class="block ml-3  font-medium text-gray-300 dark:text-gray-300">
                         Thời lượng từ (giây)
                     </label>
                     <div class="flex items-center gap-1">
@@ -66,12 +66,12 @@
 
             <div class="flex items-end gap-3">
                 <button onclick="resetFilters()"
-                    class="px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300">
+                    class="px-4 py-2.5  font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300">
                     <i class="fas fa-redo"></i>
                 </button>
                 <button
                     type="submit"
-                    class="px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all duration-300 flex items-center gap-2">
+                    class="px-4 py-2.5  font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all duration-300 flex items-center gap-2">
                     <i class="fas fa-filter"></i>
                     <span>Lọc</span>
                 </button>
@@ -103,13 +103,13 @@
         <div class="px-3.5 py-2 border-t border-gray-200 dark:border-gray-700">
             <div class="grid grid-cols-1 sm:grid-cols-3 justify-between items-center gap-4">
                 {{-- Info --}}
-                <span id="paginationInfo" class="text-sm text-gray-600 dark:text-gray-400 text-left"></span>
+                <span id="paginationInfo" class=" text-gray-600 dark:text-gray-400 text-left"></span>
 
                 {{-- Items per page selector --}}
                 <div class="flex items-center justify-center gap-2">
-                    <label for="itemPerPage" class="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">Số mục mỗi trang</label>
+                    <label for="itemPerPage" class=" text-gray-600 dark:text-gray-400 whitespace-nowrap">Số mục mỗi trang</label>
                     <select id="itemPerPage" onchange="loadLessons(1)"
-                        class="px-2 py-0.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        class="px-2 py-0.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100  focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="10">10</option>
                         <option value="15" selected>15</option>
                         <option value="25">25</option>
@@ -119,116 +119,7 @@
                 </div>
 
                 {{-- Custom Pagination --}}
-                <div id="pagination" class="flex items-center justify-end gap-1 text-sm  "></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-{{-- Delete Confirmation Modal --}}
-<div id="deleteModal" class="fixed inset-0 z-[100] overflow-y-auto overflow-x-hidden" style="display: none;">
-    {{-- Backdrop --}}
-    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="closeOneDeleteModal()"></div>
-
-    {{-- Modal Container --}}
-    <div class="relative flex min-h-full items-center justify-center p-4 z-10">
-        <div class="relative w-full max-w-xl p-5 flex flex-col items-stretch justify-start gap-4 transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700 transition-all"
-            onclick="event.stopPropagation()">
-            {{-- Modal Header --}}
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-red-100 dark:bg-red-900/20">
-                        <i class="fas fa-exclamation-triangle text-xl text-red-600 dark:text-red-400"></i>
-                    </div>
-                    <div>
-                        <h3 id="deleteModalTitle" class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                            Xác nhận xóa bài học
-                        </h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">
-                            Hành động này không thể hoàn tác
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <hr class="border-gray-200 dark:border-gray-700">
-
-            {{-- Modal Body --}}
-            <div class="">
-                <p id="deleteModalMessage" class="text-gray-700 dark:text-gray-300 mb-4">
-                    Bạn có chắc chắn muốn xóa bài học này không?
-                </p>
-                <div id="deleteLessonInfo" class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 space-y-2">
-                    <div class="flex items-center gap-2">
-                        <span class="text-sm font-medium text-gray-600 dark:text-gray-400 w-24">Tiêu đề:</span>
-                        <span class="text-sm text-gray-900 dark:text-gray-100" id="deleteLessonTitle"></span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-sm font-medium text-gray-600 dark:text-gray-400 w-24">Khóa học:</span>
-                        <span class="text-sm text-gray-900 dark:text-gray-100" id="deleteLessonCourse"></span>
-                    </div>
-                </div>
-            </div>
-
-            <hr class="border-gray-200 dark:border-gray-700">
-
-            {{-- Modal Footer --}}
-            <div class="flex items-center justify-end gap-3">
-                <button type="button" onclick="closeOneDeleteModal()"
-                    class="px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300">
-                    Hủy
-                </button>
-                <button type="button" onclick="confirmOneDelete()"
-                    class="px-4 py-2.5 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-all duration-300 flex items-center gap-2">
-                    <i class="fas fa-trash"></i>
-                    <span>Xác nhận xóa</span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-{{-- Alert Notification Modal --}}
-<div id="alertModal" class="fixed inset-0 z-[100] overflow-y-auto overflow-x-hidden" style="display: none;">
-    {{-- Backdrop --}}
-    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="closeAlertModal()"></div>
-
-    {{-- Modal Container --}}
-    <div class="relative flex min-h-full items-center justify-center p-4 z-10">
-        <div class="relative w-full max-w-xl p-5 flex flex-col items-stretch justify-start gap-4 transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700 transition-all"
-            onclick="event.stopPropagation()">
-            {{-- Modal Header --}}
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div id="alertIcon" class="flex h-12 w-12 items-center justify-center rounded-xl">
-                        <i id="alertIconClass" class="text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 id="alertTitle" class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                            Thông báo
-                        </h3>
-                    </div>
-                </div>
-            </div>
-
-            <hr class="border-gray-200 dark:border-gray-700">
-
-            {{-- Modal Body --}}
-            <div class="">
-                <p id="alertMessage" class="text-gray-700 dark:text-gray-300">
-                </p>
-            </div>
-
-            <hr class="border-gray-200 dark:border-gray-700">
-
-            {{-- Modal Footer --}}
-            <div class="flex items-center justify-end gap-3">
-                <button type="button" onclick="closeAlertModal()"
-                    id="alertButton"
-                    class="px-4 py-2.5 text-sm font-semibold text-white rounded-xl transition-all duration-300 flex items-center gap-2">
-                    <span>Đóng</span>
-                </button>
+                <div id="pagination" class="flex items-center justify-end gap-1   "></div>
             </div>
         </div>
     </div>
@@ -316,13 +207,13 @@
     function getSortIcon(column) {
         if (sortBy !== column) {
             // Not sorted by this column - show neutral icon
-            return '<i class="fas fa-sort text-gray-300 dark:text-gray-500 text-sm ml-1"></i>';
+            return '<i class="fas fa-sort text-gray-300 dark:text-gray-500  ml-1"></i>';
         } else if (sortOrder === 'asc') {
             // Sorted ascending
-            return '<i class="fas fa-sort-up text-white text-sm ml-1"></i>';
+            return '<i class="fas fa-sort-up text-white  ml-1"></i>';
         } else {
             // Sorted descending
-            return '<i class="fas fa-sort-down text-white text-sm ml-1"></i>';
+            return '<i class="fas fa-sort-down text-white  ml-1"></i>';
         }
     }
 
@@ -408,52 +299,52 @@
     function renderLessonsTable(lessons = []) {
         const tableContainer = document.getElementById('lessonsTable');
 
+        const headTable = `
+            <colgroup>
+                <col class="w-[40px] 2xl:w-[60px]">
+                <col class="w-[70px] 2xl:w-[100px]">
+                <col class="w-[120px] 2xl:w-[140px]">
+                <col class="">
+                <col class="">
+                <col class="">
+                <col class="w-[120px] 2xl:w-[140px]">
+                <col class="w-[110px] 2xl:w-[140px]">
+            </colgroup>
+            <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
+                <tr>
+                    <th class="px-4 py-3 text-center sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm">
+                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                    </th>
+                    <th onclick="handleSort('id')" class="${getHeaderClass('id')}">
+                        ID${getSortIcon('id')}
+                    </th>
+                    <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Thumbnail</th>
+                    <th onclick="handleSort('title')" class="${getHeaderClass('title')}">
+                        Tiêu đề${getSortIcon('title')}
+                    </th>
+                    <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Mô tả</th>
+                    <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Khóa học</th>
+                    <th onclick="handleSort('duration')" class="${getHeaderClass('duration')}">
+                        Thời lượng${getSortIcon('duration')}
+                    </th>
+                    <th class="px-4 py-3 text-right sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Thao tác</th>
+                </tr>
+            </thead>
+        `;
+
         if (lessons.length === 0) {
             tableContainer.innerHTML = `
-                <table class="w-full table-fixed border-separate border-spacing-0 text-sm">
-                    <colgroup>
-                        <col class="w-[40px] 2xl:w-[60px]">
-                        <col class="w-[70px] 2xl:w-[100px]">
-                        <col class="w-[120px] 2xl:w-[140px]">
-                        <col class="">
-                        <col class="">
-                        <col class="">
-                        <col class="w-[120px] 2xl:w-[140px]">
-                        <col class="w-[80px] 2xl:w-[100px]">
-                        <col class="w-[110px] 2xl:w-[140px]">
-                    </colgroup>
-                    <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
-                        <tr>
-                            <th class="px-4 py-3 text-center sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm">
-                                <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                            </th>
-                            <th onclick="handleSort('id')" class="${getHeaderClass('id')}">
-                                ID${getSortIcon('id')}
-                            </th>
-                            <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Thumbnail</th>
-                            <th onclick="handleSort('title')" class="${getHeaderClass('title')}">
-                                Tiêu đề${getSortIcon('title')}
-                            </th>
-                            <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Mô tảc</th>
-                            <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Khóa học</th>
-                            <th onclick="handleSort('duration')" class="${getHeaderClass('duration')}">
-                                Thời lượng${getSortIcon('duration')}
-                            </th>
-                            <th onclick="handleSort('display_order')" class="${getHeaderClass('display_order')}">
-                                Thứ tự${getSortIcon('display_order')}
-                            </th>
-                            <th class="px-4 py-3 text-right sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Thao tác</th>
-                        </tr>
-                    </thead>
+                <table class="w-full table-fixed border-separate border-spacing-0 ">
+                    ${headTable}
                     <tbody class="[&>tr:not(:first-child)>td]:border-t [&>tr:not(:first-child)>td]:border-gray-200 dark:[&>tr:not(:first-child)>td]:border-gray-700">
                         <tr>
-                            <td colspan="9" class="pt-40 text-center">
+                            <td colspan="8" class="pt-40 text-center">
                                 <div class="flex flex-col items-center justify-center">
                                     <div class="h-20 w-20 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center mb-4 shadow-lg">
                                         <i class="fas fa-inbox text-3xl text-gray-400 dark:text-gray-500"></i>
                                     </div>
-                                    <p class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-1">Không tìm thấy bài học</p>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Hãy thử lại với các điều kiện lọc khác</p>
+                                    <p class=" font-semibold text-gray-700 dark:text-gray-300 mb-1">Không tìm thấy bài học</p>
+                                    <p class=" text-gray-500 dark:text-gray-400">Hãy thử lại với các điều kiện lọc khác</p>
                                 </div>
                             </td>
                         </tr>
@@ -464,50 +355,12 @@
         }
 
         let html = `
-            <table class="w-full table-fixed border-separate border-spacing-0 text-sm">
-                <colgroup>
-                    <col class="w-[40px] 2xl:w-[60px]">
-                    <col class="w-[70px] 2xl:w-[100px]">
-                    <col class="w-[120px] 2xl:w-[140px]">
-                    <col class="">
-                    <col class="">
-                    <col class="">
-                    <col class="w-[120px] 2xl:w-[140px]">
-                    <col class="w-[80px] 2xl:w-[100px]">
-                    <col class="w-[110px] 2xl:w-[140px]">
-                </colgroup>
-                <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
-                    <tr>
-                        <th class="px-4 py-3 text-center sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm">
-                            <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                        </th>
-                        <th onclick="handleSort('id')" class="${getHeaderClass('id')}">
-                            ID${getSortIcon('id')}
-                        </th>
-                        <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Thumbnail</th>
-                        <th onclick="handleSort('title')" class="${getHeaderClass('title')}">
-                            Tiêu đề${getSortIcon('title')}
-                        </th>
-                        <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Mô tả</th>
-                        <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Khóa học</th>
-                        <th onclick="handleSort('duration')" class="${getHeaderClass('duration')}">
-                            Thời lượng${getSortIcon('duration')}
-                        </th>
-                        <th onclick="handleSort('display_order')" class="${getHeaderClass('display_order')}">
-                            Thứ tự${getSortIcon('display_order')}
-                        </th>
-                        <th class="px-4 py-3 text-right sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Thao tác</th>
-                    </tr>
-                </thead>
+            <table class="w-full table-fixed border-separate border-spacing-0 ">
+                ${headTable}
                 <tbody class="[&>tr:not(:first-child)>td]:border-t [&>tr:not(:first-child)>td]:border-gray-200 dark:[&>tr:not(:first-child)>td]:border-gray-700">
         `;
 
-        lessons.forEach(lesson => {
-            const courseName = lesson.course ? lesson.course.title : '-';
-            const durationMinutes = Math.floor(lesson.duration / 60);
-            const durationSeconds = lesson.duration % 60;
-            const durationFormatted = `${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`;
-
+        lessons.forEach(lesson => { 
             const isChecked = selectedLessonIds.has(lesson.id);
             html += `
                 <tr class="border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
@@ -522,41 +375,44 @@
                         <span class="text-gray-600 dark:text-gray-300">${lesson.id}</span>
                     </td>
                     <td class="px-4 py-3 text-gray-600 dark:text-gray-300">
-                        <img src="${lesson.thumbnail_path}" alt="${lesson.title?.slice(0, 10) ?? 'Thumbnail'}" class="w-[60px] 2xl:w-[70px] aspect-video m-auto object-cover rounded-lg">
+                        <img src="${lesson.thumbnail_path}" class="w-[60px] 2xl:w-[70px] aspect-video m-auto object-cover rounded-lg">
                     </td>
                     <td class="${getCellClass('title')} text-gray-600 dark:text-gray-300">
-                        ${lesson.title || '-'}
+                        <span class="text-gray-600 dark:text-gray-300 break-all overflow-hidden text-ellipsis line-clamp-2">
+                            ${lesson.title ? lesson.title : '-'}
+                        </span>
                     </td>
                     <td class="px-4 py-3 text-gray-600 dark:text-gray-300">
-                        ${lesson.description || '-'}
+                        <span class="text-gray-600 dark:text-gray-300 break-all overflow-hidden text-ellipsis line-clamp-2">
+                            ${lesson.course ? lesson.course.title : '-'}
+                        </span>
                     </td>
                     <td class="px-4 py-3 text-gray-600 dark:text-gray-300">
-                        ${courseName}
+                        <span class="text-gray-600 dark:text-gray-300 break-all overflow-hidden text-ellipsis line-clamp-2">
+                            ${lesson.course ? lesson.course.title : '-'}
+                        </span>
                     </td>
                     <td class="${getCellClass('duration')} text-gray-600 dark:text-gray-300">
-                        ${durationFormatted}
-                    </td>
-                    <td class="${getCellClass('display_order')} text-center text-gray-600 dark:text-gray-300">
-                        ${lesson.display_order || 0}
+                        ${formatSecondsToHHMMSS_Global(lesson.duration || 0, false)}
                     </td>
                     <td class="px-4 py-3 align-top">
                         <div class="flex flex-nowrap items-center justify-end gap-2 overflow-x-auto">
                             <a href="/admin/lessons/${lesson.id}"
                                 class="inline-flex shrink-0 size-7 2xl:size-8 items-center justify-center rounded-md border border-blue-500 hover:border-blue-600 text-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300"
                                 title="Xem chi tiết">
-                                <i class="fas fa-eye text-sm 2xl:text-sm"></i>
+                                <i class="fas fa-eye  2xl:"></i>
                             </a>
                             <a href="/admin/lessons/${lesson.id}/edit"
                                 class="inline-flex shrink-0 size-7 2xl:size-8 items-center justify-center rounded-md border border-amber-500 hover:border-amber-600 text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-300"
                                 title="Chỉnh sửa">
-                                <i class="fa-solid fa-pen text-sm 2xl:text-sm"></i>
+                                <i class="fa-solid fa-pen  2xl:"></i>
                             </a>
-                            <button onclick="openSingleDeleteModal(${lesson.id}, '${(lesson.title || '').replace(/'/g, "\\'")}', '${(courseName || '').replace(/'/g, "\\'")}')"
+                            <button onclick="openSingleDeleteModal(${lesson.id}, '${(lesson.title || '').replace(/'/g, "\\'")}', '${(lesson.course ? lesson.course.title : '-').replace(/'/g, "\\'")}')"
                                 ${lesson.course_id !== null ? 'disabled' : ''}
                                 class="inline-flex shrink-0 size-7 2xl:size-8 items-center justify-center rounded-md transition-all duration-300 ${lesson.course_id !== null ? 'border border-gray-200 dark:border-gray-500 text-gray-200 dark:text-gray-500 cursor-not-allowed' : 'border border-red-500 hover:border-red-600 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'}"
                                 title="Xóa"
                             >
-                                <i class="fas fa-trash text-sm 2xl:text-sm"></i>
+                                <i class="fas fa-trash  2xl:"></i>
                             </button>
                         </div>
                     </td>

@@ -5,7 +5,7 @@
 }
 
 #sidebar.collapsed {
-    width: 60px;
+    width: fit-content;
 }
 
 #sidebar.collapsed .sidebar-text {

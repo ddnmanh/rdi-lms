@@ -5,17 +5,17 @@
 @section('description', $mode === 'CREATE' ? 'Thêm bài học mới vào hệ thống' : 'Chỉnh sửa thông tin bài học')
 
 @section('content')
-<div class="h-full flex flex-col items-stretch justify-start gap-4 2xl:gap-6">
+<div class="w-full max-w-[1600px] mx-auto flex flex-col items-stretch justify-start gap-4 2xl:gap-6">
 
     {{-- Form Card --}}
-    <form id="lessonForm" onsubmit="saveLesson(event)" class="w-full max-w-[1400px] mx-auto bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+    <form id="lessonForm" onsubmit="saveLesson(event)" class="w-full bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <input type="hidden" id="lessonId" value="{{ $mode === 'EDIT' ? ($lessonId ?? '') : '' }}">
         <input type="hidden" id="thumbnail_path" value="">
         <div class="flex flex-col gap-6">
 
             {{-- Thumbnail Upload Section --}}
             <div class="flex flex-col gap-0.5">
-                <label class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Ảnh thumbnail</label>
+                <label class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Ảnh thumbnail</label>
                 <div
                     id="thumbnailDropZone"
                     class="flex items-center gap-4 p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg"
@@ -26,15 +26,15 @@
                     </div>
 
                     <div class="flex-1">
-                        <div class="text-sm text-gray-600 dark:text-gray-300">Kéo & thả ảnh vào đây, hoặc</div>
+                        <div class=" text-gray-600 dark:text-gray-300">Kéo & thả ảnh vào đây, hoặc</div>
                         <div class="mt-2 flex items-center gap-3">
-                            <label for="thumbnail" class="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 text-sm">
+                            <label for="thumbnail" class="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 ">
                                 Chọn ảnh
                             </label>
                             <button
                                 id="btnClearNewThumbnail"
                                 type="button"
-                                class="hidden px-3 py-2 rounded-md border border-red-300 text-red-600 hover:bg-red-50 dark:border-red-600 dark:hover:bg-gray-700 text-sm"
+                                class="hidden px-3 py-2 rounded-md border border-red-300 text-red-600 hover:bg-red-50 dark:border-red-600 dark:hover:bg-gray-700 "
                             >
                                 Xóa ảnh mới
                             </button>
@@ -45,24 +45,24 @@
                                 class="hidden"
                             />
                         </div>
-                        <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">Hỗ trợ PNG, JPG, WEBP, GIF — Tối đa 2MB</div>
+                        <div class="mt-2  text-gray-500 dark:text-gray-400">Hỗ trợ PNG, JPG, WEBP, GIF — Tối đa 2MB</div>
                     </div>
                 </div>
             </div>
 
             {{-- Video Upload Section --}}
             <div class="flex flex-col gap-0.5">
-                <label class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">
+                <label class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">
                     Video <span class="text-red-500">*</span>
                 </label>
                 <div class="flex items-center gap-2 mb-2">
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="radio" name="video_type" value="file" id="video_type_file" checked class="w-4 h-4 text-blue-600">
-                        <span class="text-sm text-gray-700 dark:text-gray-300">Video file</span>
+                        <span class=" text-gray-700 dark:text-gray-300">Video file</span>
                     </label>
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="radio" name="video_type" value="url" id="video_type_url" class="w-4 h-4 text-blue-600">
-                        <span class="text-sm text-gray-700 dark:text-gray-300">URL Video</span>
+                        <span class=" text-gray-700 dark:text-gray-300">URL Video</span>
                     </label>
                 </div>
 
@@ -83,22 +83,22 @@
                             </div>
 
                             <div class="flex-1">
-                                <div id="videoDirectUploadHint" class="text-sm text-gray-600 dark:text-gray-300">Kéo & thả video vào đây, hoặc</div>
+                                <div id="videoDirectUploadHint" class=" text-gray-600 dark:text-gray-300">Kéo & thả video vào đây, hoặc</div>
                                 <div class="mt-2 flex items-center gap-3">
-                                    <label for="video_file" class="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 text-sm">
+                                    <label for="video_file" class="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 ">
                                         Chọn video
                                     </label>
                                     <button
                                         id="btnClearNewVideo"
                                         type="button"
-                                        class="hidden px-3 py-2 rounded-md border border-red-300 text-red-600 hover:bg-red-50 dark:border-red-600 dark:hover:bg-gray-700 text-sm transition"
+                                        class="hidden px-3 py-2 rounded-md border border-red-300 text-red-600 hover:bg-red-50 dark:border-red-600 dark:hover:bg-gray-700  transition"
                                     >
                                         <span id="btnClearVideoText">Xóa video</span>
                                     </button>
                                     <button
                                         id="btnRetryBackgroundUpload"
                                         type="button"
-                                        class="hidden px-3 py-2 rounded-md border border-amber-300 text-amber-600 hover:bg-amber-50 dark:border-amber-600 dark:hover:bg-gray-700 text-sm transition"
+                                        class="hidden px-3 py-2 rounded-md border border-amber-300 text-amber-600 hover:bg-amber-50 dark:border-amber-600 dark:hover:bg-gray-700  transition"
                                     >
                                         Thử tải lại video
                                     </button>
@@ -110,8 +110,8 @@
                                         class="hidden"
                                     />
                                 </div>
-                                <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">Hỗ trợ MP4, AVI, MOV, WEBM — Tối đa 10GB</div>
-                                <div id="videoFileName" class="mt-2 text-sm text-gray-700 dark:text-gray-300 hidden"></div>
+                                <div class="mt-2  text-gray-500 dark:text-gray-400">Hỗ trợ MP4, AVI, MOV, WEBM — Tối đa 10GB</div>
+                                <div id="videoFileName" class="mt-2  text-gray-700 dark:text-gray-300 hidden"></div>
 
                             </div>
                         </div>
@@ -119,21 +119,21 @@
                         <div id="backgroundUploadPanel" class="hidden p-4 rounded-lg border border-blue-200 dark:border-blue-500/40 bg-blue-50/80 dark:bg-slate-800/60">
                             <div class="flex items-start justify-between gap-4">
                                 <div>
-                                    <p class="text-sm font-semibold text-blue-700 dark:text-blue-200">Tải video lên máy chủ</p>
-                                    {{-- <p id="backgroundUploadFileInfo" class="text-xs text-gray-600 dark:text-gray-300 mt-1">Chưa chọn video</p> --}}
+                                    <p class=" font-semibold text-blue-700 dark:text-blue-200">Tải video lên máy chủ</p>
+                                    {{-- <p id="backgroundUploadFileInfo" class=" text-gray-600 dark:text-gray-300 mt-1">Chưa chọn video</p> --}}
                                 </div>
-                                <span id="backgroundUploadStatusBadge" class="px-2 py-1 text-xs rounded-full bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-100 whitespace-nowrap">Chưa khởi tạo</span>
+                                <span id="backgroundUploadStatusBadge" class="px-2 py-1  rounded-full bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-100 whitespace-nowrap">Chưa khởi tạo</span>
                             </div>
                             <div class="mt-3">
                                 <div class="w-full h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
                                     <div id="backgroundUploadProgressBar" class="h-2 bg-blue-500 rounded-full transition-all duration-300" style="width: 0%;"></div>
                                 </div>
-                                <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300 mt-1">
+                                <div class="flex items-center justify-between  text-gray-600 dark:text-gray-300 mt-1">
                                     <span id="backgroundUploadProgressText">0%</span>
                                     <span id="backgroundUploadChunkText">0 / 0 chunks</span>
                                 </div>
                             </div>
-                            <p class="mt-3 text-xs text-blue-700 dark:text-blue-200">Vui lòng đợi cho đến khi quá trình tải video hoàn tất trước khi nhấn lưu. Trong lúc đó bạn có thể điền các thông tin khác.</p>
+                            <p class="mt-3  text-blue-700 dark:text-blue-200">Vui lòng đợi cho đến khi quá trình tải video hoàn tất trước khi nhấn lưu. Trong lúc đó bạn có thể điền các thông tin khác.</p>
                         </div>
 
                     </div>
@@ -144,60 +144,68 @@
                 <div id="videoUrlSection" class="flex flex-col gap-2 hidden">
                     <input type="url" id="video_url" placeholder="https://example.com/video.mp4"
                         class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 ml-3">Đường dẫn đến video bài học</p>
+                    {{-- <p class=" text-gray-500 dark:text-gray-400 ml-3">Đường dẫn đến video bài học</p> --}}
                 </div>
-
 
             </div>
 
+            <div id="videoDurationInputCluster" class="flex flex-col gap-0.5 hidden">
+                <label name="duration_LABEL" for="duration" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">
+                    Thời lượng (giây) <span class="text-red-500">*</span>
+                </label>
+                <input type="number" id="duration" min="0" value="0"
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
+                <span id="duration_MSG" class="ml-4 text-sm mt-1 italic hidden"></span>
+            </div>
+
             <div class="flex flex-col gap-0.5 hidden">
-                <label for="course_id" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">
+                <label for="course_id" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">
                     Khóa học <span class="text-red-500">*</span>
                 </label>
                 <select id="course_id"
                     class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700/50 text-gray-900 dark:text-gray-100 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 outline-none">
                     <option value="">Chọn khóa học</option>
                 </select>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-3">Chọn khóa học mà bài học này thuộc về</p>
+                <p class=" text-gray-500 dark:text-gray-400 mt-1 ml-3">Chọn khóa học mà bài học này thuộc về</p>
             </div>
 
             <div class="flex flex-col gap-0.5">
-                <label for="title" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">
+                <label name="title_LABEL" for="title" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">
                     Tiêu đề <span class="text-red-500">*</span>
                 </label>
                 <input type="text" id="title" required
                     class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-3">Tiêu đề bài học sẽ hiển thị trong danh sách</p>
+                <span id="title_MSG" class="ml-4 text-sm mt-1 italic hidden"></span>
             </div>
 
             <div class="flex flex-col gap-0.5">
-                <label for="description" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Mô tả</label>
+                <label for="description" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Mô tả</label>
                 <textarea id="description" rows="4"
                     class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none resize-none"></textarea>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-3">Mô tả chi tiết về bài học</p>
+                <p class=" text-gray-500 dark:text-gray-400 mt-1 ml-3">Mô tả chi tiết về bài học</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="flex flex-col gap-0.5 hidden">
-                    <label for="duration" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">
+                    <label for="duration" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">
                         Thời lượng (giây)
                     </label>
                     <input type="number" id="duration" min="0" value="0"
                         class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-3">Thời lượng bài học tính bằng giây</p>
+                    <p class=" text-gray-500 dark:text-gray-400 mt-1 ml-3">Thời lượng bài học tính bằng giây</p>
                 </div>
 
                 <div class="flex flex-col gap-0.5 hidden">
-                    <label for="display_order" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Thứ tự hiển thị</label>
+                    <label for="display_order" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Thứ tự hiển thị</label>
                     <input type="number" id="display_order" min="0" value="0"
                         class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-3">Thứ tự hiển thị bài học trong khóa học</p>
+                    <p class=" text-gray-500 dark:text-gray-400 mt-1 ml-3">Thứ tự hiển thị bài học trong khóa học</p>
                 </div>
             </div>
 
         </div>
 
-        <div class="flex items-center justify-end gap-3 mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
             <button type="button"
                 id="lessonFormCancelButton"
                 class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">
@@ -345,6 +353,7 @@
                 document.getElementById('video_url').value = lessonData.video_path;
                 document.getElementById('videoUrlSection').classList.remove('hidden');
                 document.getElementById('videoFileSection').classList.add('hidden');
+                document.getElementById('videoDurationInputCluster').classList.remove('hidden');
                 existingVideoSource = lessonData.video_path;
                 handleVideoUrlInput(true);
             } else {
@@ -355,6 +364,7 @@
                 document.getElementById('videoFileSection').classList.remove('hidden');
                 document.getElementById('videoFileName').textContent = lessonData.video_path.split('/').pop();
                 document.getElementById('videoFileName').classList.remove('hidden');
+                document.getElementById('videoDurationInputCluster').classList.add('hidden');
                 existingVideoSource = lessonData.video_path;
                 showVideoFilePreview(lessonData.video_path);
             }
@@ -676,15 +686,15 @@
         chunkText.textContent = `${uploadedChunks} / ${totalChunks} chunks`;
 
         const badgeStyles = {
-            idle: { text: 'Chưa khởi tạo', className: 'px-2 py-1 text-xs rounded-full bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-100' },
-            creating_session: { text: 'Đang tạo phiên', className: 'px-2 py-1 text-xs rounded-full bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-200' },
-            uploading: { text: 'Đang upload', className: 'px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-200' },
-            uploaded: { text: 'Đã upload', className: 'px-2 py-1 text-xs rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-200' },
-            completing: { text: 'Đang gửi xử lý', className: 'px-2 py-1 text-xs rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-200' },
-            processing: { text: 'Đang ghép video', className: 'px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-200' },
-            completed: { text: 'Hoàn tất', className: 'px-2 py-1 text-xs rounded-full bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-200' },
-            failed: { text: 'Lỗi upload', className: 'px-2 py-1 text-xs rounded-full bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-200' },
-            cancelled: { text: 'Đã hủy', className: 'px-2 py-1 text-xs rounded-full bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-200' }
+            idle: { text: 'Chưa khởi tạo', className: 'px-2 py-1  rounded-full bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-100' },
+            creating_session: { text: 'Đang tạo phiên', className: 'px-2 py-1  rounded-full bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-200' },
+            uploading: { text: 'Đang upload', className: 'px-2 py-1  rounded-full bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-200' },
+            uploaded: { text: 'Đã upload', className: 'px-2 py-1  rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-200' },
+            completing: { text: 'Đang gửi xử lý', className: 'px-2 py-1  rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-200' },
+            processing: { text: 'Đang ghép video', className: 'px-2 py-1  rounded-full bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-200' },
+            completed: { text: 'Hoàn tất', className: 'px-2 py-1  rounded-full bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-200' },
+            failed: { text: 'Lỗi upload', className: 'px-2 py-1  rounded-full bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-200' },
+            cancelled: { text: 'Đã hủy', className: 'px-2 py-1  rounded-full bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-200' }
         };
 
         const badge = badgeStyles[status] || badgeStyles.idle;
@@ -1163,6 +1173,7 @@
                     videoUrlInput.required = true;
                     if (input) input.required = false;
                     handleVideoUrlInput(true);
+                    document.getElementById('videoDurationInputCluster').classList.remove('hidden');
                 }
             });
         }
@@ -1181,6 +1192,7 @@
                     } else {
                         resetVideoPreview();
                     }
+                    document.getElementById('videoDurationInputCluster').classList.add('hidden');
                 }
             });
         }
@@ -1320,13 +1332,12 @@
         handleChangeStateButtonSubmitting(true);
 
 
-        const isEdit = Boolean(lessonIdValue);
-        const url = isEdit ? `/lessons/${lessonIdValue}` : '/lessons';
+        const url = mode === 'EDIT' ? `/lessons/${lessonIdValue}` : '/lessons';
 
         try {
             const fd = new FormData();
             // Laravel/Symfony không parse multipart cho PUT/PATCH -> dùng POST + _method
-            if (isEdit) {
+            if (mode === 'EDIT') {
                 fd.append('_method', 'PUT');
             }
             fd.append('title', title || '');
@@ -1361,16 +1372,22 @@
                 }
             });
             const data = await response.json();
+            
             if (!response.ok) {
-                throw new Error(data.message || 'Có lỗi xảy ra');
+                if (response.status === 422) {
+                    let errorsField = data.errors || null;
+                    renderInputErrors_Global(errorsField);
+                } else {
+                    throw new Error(data.message || 'Có lỗi xảy ra');
+                } 
             }
 
             if (data.success) {
-                const savedLessonId = isEdit
+                const savedLessonId = mode === 'EDIT'
                     ? parseInt(lessonIdValue, 10)
                     : (data?.data?.id || data?.data?.data?.id || null);
 
-                if (!isEdit && savedLessonId) {
+                if (!(mode === 'EDIT') && savedLessonId) {
                     document.getElementById('lessonId').value = savedLessonId;
                 }
 

@@ -29,7 +29,7 @@
                 <div class="flex flex-col lg:flex-row justify-start flex-wrap gap-4 flex-1">
                     {{-- Title Filter --}}
                     <div class="flex-1 min-w-40 max-w-80 flex flex-col items-stretch justify-start gap-0.5">
-                        <label for="titleFilter" class="block ml-3 text-sm font-medium text-gray-300 dark:text-gray-300">
+                        <label for="titleFilter" class="block ml-3  font-medium text-gray-300 dark:text-gray-300">
                             Tiêu đề
                         </label>
                         <input type="text" id="titleFilter" placeholder="Tìm theo tiêu đề..."
@@ -39,7 +39,7 @@
                     {{-- Date Range Filter --}}
                     <div class="flex flex-col items-stretch justify-start gap-0.5">
                         <label for="dateRangeFilter"
-                            class="block ml-3 text-sm font-medium text-gray-300 dark:text-gray-300 ml-2">
+                            class="block ml-3  font-medium text-gray-300 dark:text-gray-300 ml-2">
                             Trạng thái
                         </label>
                         <select id="dateRangeFilter"
@@ -53,7 +53,7 @@
 
                     {{-- Date From Filter --}}
                     <div class="flex flex-col items-stretch justify-start gap-0.5">
-                        <label for="startDateFrom" class="block ml-3 text-sm font-medium text-gray-300 dark:text-gray-300">
+                        <label for="startDateFrom" class="block ml-3  font-medium text-gray-300 dark:text-gray-300">
                             Ngày bắt đầu
                         </label>
                         <div class="flex items-center gap-1">
@@ -371,57 +371,61 @@
         function renderCoursesTable(courses = []) {
             const tableContainer = document.getElementById('coursesTable');
 
+            const headTable =`
+                <colgroup>
+                    <col class="w-[40px] 2xl:w-[60px]">
+                    <col class="w-[60px] 2xl:w-[80px]">
+                    <col class="w-auto">
+                    <col class="w-auto">
+                    <col class="w-[120px] 2xl:w-[160px]">
+                    <col class="w-[120px] 2xl:w-[170px]">
+                    <col class="w-[100px] 2xl:w-[150px]">
+                    <col class="w-[110px] 2xl:w-[150px]">
+                    <col class="w-[100px] 2xl:w-[140px]">
+                    <col class="w-[100px] 2xl:w-[180px]">
+                </colgroup>
+                <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
+                    <tr>
+                        <th class="px-3.5 py-2.5 text-center sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm">
+                            <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        </th>
+                        <th onclick="handleSort('id')" class="${getHeaderClass('id')}">
+                            ID${getSortIcon('id')}
+                        </th>
+                        <th onclick="handleSort('title')" class="${getHeaderClass('title')}">
+                            Tiêu đề${getSortIcon('title')}
+                        </th>
+                        <th class="px-3.5 py-2.5 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Mô tả</th>
+                        <th onclick="handleSort('start_date')" class="${getHeaderClass('start_date')}">
+                            Ngày bắt đầu${getSortIcon('start_date')}
+                        </th>
+                        <th onclick="handleSort('end_date')" class="${getHeaderClass('end_date')}">
+                            Ngày kết thúc${getSortIcon('end_date')}
+                        </th>
+                        <th class="px-3.5 py-2.5 text-center sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Trạng Thái</th>
+                        <th onclick="handleSort('users_count')" class="${getHeaderClass('users_count')}">
+                            Số sinh viên${getSortIcon('users_count')}
+                        </th>
+                        <th onclick="handleSort('lessons_count')" class="${getHeaderClass('lessons_count')}">
+                            Số bài học${getSortIcon('lessons_count')}
+                        </th>
+                        <th class="px-3.5 py-2.5 text-right sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Thao tác</th>
+                    </tr>
+                </thead>
+            `;
+
             if (courses.length === 0) {
                 tableContainer.innerHTML = `
                     <table class="w-full table-fixed border-separate border-spacing-0 ">
-                        <colgroup>
-                            <col class="w-[40px] 2xl:w-[60px]">
-                            <col class="w-[60px] 2xl:w-[80px]">
-                            <col class="w-auto">
-                            <col class="w-auto">
-                            <col class="w-[120px] 2xl:w-[140px]">
-                            <col class="w-[120px] 2xl:w-[150px]">
-                            <col class="w-[100px] 2xl:w-[120px]">
-                            <col class="w-[110px] 2xl:w-[130px]">
-                            <col class="w-[100px] 2xl:w-[120px]">
-                            <col class="w-[100px] 2xl:w-[130px]">
-                        </colgroup>
-                        <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
-                            <tr>
-                                <th class="px-3.5 py-2.5 text-center sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm">
-                                    <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                </th>
-                                <th onclick="handleSort('id')" class="${getHeaderClass('id')}">
-                                    ID${getSortIcon('id')}
-                                </th>
-                                <th onclick="handleSort('title')" class="${getHeaderClass('title')}">
-                                    Tiêu đề${getSortIcon('title')}
-                                </th>
-                                <th class="px-3.5 py-2.5 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Mô tả</th>
-                                <th onclick="handleSort('start_date')" class="${getHeaderClass('start_date')}">
-                                    Ngày bắt đầu${getSortIcon('start_date')}
-                                </th>
-                                <th onclick="handleSort('end_date')" class="${getHeaderClass('end_date')}">
-                                    Ngày kết thúc${getSortIcon('end_date')}
-                                </th>
-                                <th class="px-3.5 py-2.5 text-center sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Trạng Thái</th>
-                                <th onclick="handleSort('users_count')" class="${getHeaderClass('users_count')}">
-                                    Số sinh viên${getSortIcon('users_count')}
-                                </th>
-                                <th onclick="handleSort('lessons_count')" class="${getHeaderClass('lessons_count')}">
-                                    Số bài học${getSortIcon('lessons_count')}
-                                </th>
-                                <th class="px-3.5 py-2.5 text-right sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Thao tác</th>
-                            </tr>
-                        </thead>
+                        ${headTable}
                         <tbody class="[&>tr:not(:first-child)>td]:border-t [&>tr:not(:first-child)>td]:border-gray-200 dark:[&>tr:not(:first-child)>td]:border-gray-700">
                             <tr>
                                 <td colspan="10" class="pt-40 text-center">
                                     <div class="flex flex-col items-center justify-center">
                                         <div class="h-20 w-20 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center mb-4 shadow-lg">
-                                            <i class="fas fa-inbox text-gray-400 dark:text-gray-500"></i>
+                                            <i class="fas fa-inbox text-3xl text-gray-400 dark:text-gray-500"></i>
                                         </div>
-                                        <p class=" font-semibold text-gray-700 dark:text-gray-300 mb-1">Không tìm thấy khóa học</p>
+                                        <p class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-1">Không tìm thấy khóa học</p>
                                         <p class=" text-gray-500 dark:text-gray-400">Hãy thử lại với các điều kiện lọc khác</p>
                                     </div>
                                 </td>
@@ -434,46 +438,7 @@
 
             let html = `
                 <table class="w-full table-fixed border-separate border-spacing-0">
-                    <colgroup>
-                        <col class="w-[40px] 2xl:w-[60px]">
-                        <col class="w-[60px] 2xl:w-[80px]">
-                        <col class="w-auto">
-                        <col class="w-auto">
-                        <col class="w-[120px] 2xl:w-[140px]">
-                        <col class="w-[120px] 2xl:w-[150px]">
-                        <col class="w-[100px] 2xl:w-[120px]">
-                        <col class="w-[110px] 2xl:w-[130px]">
-                        <col class="w-[100px] 2xl:w-[120px]">
-                        <col class="w-[100px] 2xl:w-[130px]">
-                    </colgroup>
-                    <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
-                        <tr>
-                            <th class="px-3.5 py-2.5 text-center sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm">
-                                <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                            </th>
-                            <th onclick="handleSort('id')" class="${getHeaderClass('id')}">
-                                ID${getSortIcon('id')}
-                            </th>
-                            <th onclick="handleSort('title')" class="${getHeaderClass('title')}">
-                                Tiêu đề${getSortIcon('title')}
-                            </th>
-                            <th class="px-3.5 py-2.5 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Mô tả</th>
-                            <th onclick="handleSort('start_date')" class="${getHeaderClass('start_date')}">
-                                Ngày bắt đầu${getSortIcon('start_date')}
-                            </th>
-                            <th onclick="handleSort('end_date')" class="${getHeaderClass('end_date')}">
-                                Ngày kết thúc${getSortIcon('end_date')}
-                            </th>
-                            <th class="px-3.5 py-2.5 text-center sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Trạng Thái</th>
-                            <th onclick="handleSort('users_count')" class="${getHeaderClass('users_count')}">
-                                Số sinh viên${getSortIcon('users_count')}
-                            </th>
-                            <th onclick="handleSort('lessons_count')" class="${getHeaderClass('lessons_count')}">
-                                Số bài học${getSortIcon('lessons_count')}
-                            </th>
-                            <th class="px-3.5 py-2.5 text-right sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Thao tác</th>
-                        </tr>
-                    </thead>
+                    ${headTable}
                     <tbody class="[&>tr:not(:first-child)>td]:border-t [&>tr:not(:first-child)>td]:border-gray-200 dark:[&>tr:not(:first-child)>td]:border-gray-700">
             `;
 
@@ -521,10 +486,14 @@
                             <span class="text-gray-600 dark:text-gray-300">${course.id}</span>
                         </td>
                         <td class="${getCellClass('title')} text-gray-600 dark:text-gray-300">
-                            ${course.title || '-'}
+                            <span class="text-gray-600 dark:text-gray-300 break-all overflow-hidden text-ellipsis line-clamp-2">
+                                ${course.title ? course.title : '-'}
+                            </span>
                         </td>
-                        <td class="px-3.5 py-2.5 text-gray-600 dark:text-gray-300 break-all [overflow-wrap:anywhere]">
-                            ${course.description ? (course.description.substring(0, 75) + (course.description.length > 75 ? '...' : '')) : '-'}
+                        <td class="px-3.5 py-2.5">
+                            <span class="text-gray-600 dark:text-gray-300 break-all overflow-hidden text-ellipsis line-clamp-2">
+                                ${course.description ? course.description : '-'}
+                            </span>
                         </td>
                         <td class="${getCellClass('start_date')} text-gray-600 dark:text-gray-300">
                             ${formatDate_Global(course.start_date)}

@@ -143,9 +143,9 @@ class RoleController extends Controller
             $body = $request->validated();
 
             $role = Role::create([
-                'name' => $body['name'] ?? '',
+                'name' => $body['name'],
                 'description' => $body['description'] ?? null,
-                'level' => $body['level'] ?? 255,
+                'level' => $body['level'],
             ]);
 
             // Gán permissions

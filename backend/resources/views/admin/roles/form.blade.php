@@ -1,17 +1,17 @@
 @extends('admin.layout')
 
-@section('title', $mode === 'create' ? 'Thêm vai trò' : 'Chỉnh sửa vai trò')
+@section('title', $mode === 'CREATE' ? 'Thêm vai trò' : 'Chỉnh sửa vai trò')
 
-@section('description', $mode === 'create' ? 'Thêm vai trò mới vào hệ thống' : 'Chỉnh sửa thông tin vai trò')
+@section('description', $mode === 'CREATE' ? 'Thêm vai trò mới vào hệ thống' : 'Chỉnh sửa thông tin vai trò')
 
 @section('content')
 <div class="h-full flex flex-col items-stretch justify-start gap-4 2xl:gap-6">
 
     {{-- Form Card --}}
     <form id="roleForm" onsubmit="saveRole(event)"
-        class="w-full max-w-[1400px] h-full mx-auto p-6 flex flex-col justify-start gap-3 2xl:gap-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+        class="w-full max-w-[1800px] h-full mx-auto p-6 flex flex-col justify-start gap-3 2xl:gap-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
 
-        <input type="hidden" id="roleId" value="{{ $mode === 'edit' ? ($roleId ?? '') : '' }}">
+        <input type="hidden" id="roleId" value="{{ $mode === 'EDIT' ? ($roleId ?? '') : '' }}">
 
         <!-- MAIN FORM WRAPPER -->
         <div class="flex-1 flex flex-col items-stretch justify-start gap-3 2xl:gap-4 min-h-0">
@@ -19,25 +19,25 @@
             <div class="flex flex-row justify-between items-start gap-4 2xl:gap-6">
                 <!-- field: name -->
                 <div class="flex-1 ">
-                    <label for="name" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Tên *</label>
+                    <label name="name_LABEL" for="name" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Tên <span class="text-red-500">*</span></label>
                     <input type="text" id="name" required
                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
-                    {{-- <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-3">Tên vai trò sẽ được sử dụng để phân quyền</p> --}}
+                    <span id="name_MSG" class="ml-4 text-sm mt-1 italic hidden"></span>
                 </div>
 
                 <!-- field: level -->
                 <div class="flex-1 ">
-                    <label for="level" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Level * (1-255)</label>
+                    <label name="level_LABEL" for="level" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Level <span class="text-red-500">*</span> (1-255) <span class="text-xs font-normal text-gray-500 dark:text-gray-400">Level càng thấp thì quyền hạn càng lớn, 1-20 có thể vào trang quản lý</span></label>
                     <input type="number" id="level" min="1" max="255" required
                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-3">Level càng thấp thì quyền hạn càng lớn, 1-20 có thể vào trang quản lý</p>
+                    <span id="level_MSG" class="ml-4 text-sm mt-1 italic hidden"></span>
                 </div>
             </div>
 
 
             <!-- field: description -->
             <div class="">
-                <label for="description" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Mô tả</label>
+                <label for="description" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Mô tả</label>
                 <input type="text" id="description"
                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
             </div>
@@ -50,14 +50,17 @@
                     <div class="flex items-center justify-between gap-3">
                         <div class="hidden">
                             <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Danh sách permissions</h2>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Hiển thị chi tiết từng API/đường dẫn đã được gán
+                            <p class=" text-gray-500 dark:text-gray-400">Hiển thị chi tiết từng API/đường dẫn đã được gán
                             </p>
                         </div>
-                        <div class="relative w-full max-w-[350px]">
-                            <input type="text" id="permissionSearch" placeholder="Tìm theo tên, mô tả ..."
-                                class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
-                            <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                        <div class="relative w-full max-w-[450px]">
+                            <span class="absolute top-[50%] left-3 translate-y-[-50%] flex items-center text-gray-400">
                                 <i class="fa-solid fa-magnifying-glass"></i>
+                            </span>
+                            <input type="text" id="permissionSearch" placeholder="Tìm theo tên, mô tả ..."
+                                class="w-full px-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
+                            <span id="permissionSearchClearBtn" class="w-[15px] 2xl:w-[20px] aspect-square rounded-full absolute top-[50%] right-3 translate-y-[-50%] flex items-center text-gray-400 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 cursor-pointer flex justify-center">
+                                <i class="fa-solid fa-times text-sm text-white dark:text-gray-700"></i>
                             </span>
                         </div>
                     </div>
@@ -93,11 +96,11 @@
         <!-- footer -->
         <div class="flex items-center justify-end gap-3">
             <a href="{{ route('admin.roles.list') }}"
-                class="px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300">
+                class="px-4 py-2.5  font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300">
                 Hủy
             </a>
-            <button type="submit"
-                class="px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all duration-300 flex items-center gap-2">
+            <button type="submit" id="submitBtn"
+                class="px-4 py-2.5  font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all duration-300 flex items-center gap-2">
                 <i class="fas fa-save"></i>
                 <span>Lưu</span>
             </button>
@@ -111,25 +114,44 @@
 <script>
     let permissionsList = [];
     const mode = '{{ $mode }}';
-    const roleId = @if($mode === 'edit' && isset($roleId)) {{ $roleId }} @else null @endif;
+    const roleId = @if($mode === 'EDIT' && isset($roleId)) {{ $roleId }} @else null @endif;
     let permissionFilterText = '';
+    let selectedPermissionIds = new Set();
 
     document.addEventListener('DOMContentLoaded', async function() {
         await loadPermissions();
-        if (mode === 'edit' && roleId) {
+        if (mode === 'EDIT' && roleId) {
             await loadRoleData(roleId);
         }
         const searchInput = document.getElementById('permissionSearch');
         if (searchInput) {
             searchInput.addEventListener('input', function(e) {
                 permissionFilterText = (e.target.value || '').toLowerCase().trim();
-                renderPermissionsCheckboxes(getSelectedPermissionIds(), permissionFilterText);
+                renderPermissionsCheckboxes(Array.from(selectedPermissionIds), permissionFilterText);
             });
         }
 
-        // Listen for checkbox changes to update select all state
+        const permissionSearchClearBtn = document.getElementById('permissionSearchClearBtn');
+        if (permissionSearchClearBtn) {
+            permissionSearchClearBtn.addEventListener('click', function() {
+                const searchInput = document.getElementById('permissionSearch');
+                if (searchInput) {
+                    searchInput.value = '';
+                    permissionFilterText = '';
+                    renderPermissionsCheckboxes(Array.from(selectedPermissionIds), permissionFilterText);
+                }
+            });
+        }
+
+        // Listen for checkbox changes to update select all state and selectedPermissionIds
         document.addEventListener('change', function(e) {
             if (e.target && e.target.name === 'permission_ids[]') {
+                const permissionId = parseInt(e.target.value);
+                if (e.target.checked) {
+                    selectedPermissionIds.add(permissionId);
+                } else {
+                    selectedPermissionIds.delete(permissionId);
+                }
                 updateSelectAllCheckbox();
             }
         });
@@ -189,7 +211,7 @@
         if (permissionsList.length === 0) {
             container.innerHTML = `
                 <div class="flex items-center justify-center py-8">
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Không có permissions nào</p>
+                    <p class=" text-gray-600 dark:text-gray-400">Không có permissions nào</p>
                 </div>
             `;
             return;
@@ -208,7 +230,7 @@
         if (filtered.length === 0) {
             container.innerHTML = `
                 <div class="flex items-center justify-center py-8">
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Không tìm thấy permission phù hợp</p>
+                    <p class=" text-gray-600 dark:text-gray-400">Không tìm thấy permission phù hợp</p>
                 </div>
             `;
             return;
@@ -236,11 +258,11 @@
             <div class="overflow-x-auto h-full">
                 <table class="w-full table-fixed border-separate border-spacing-0">
                     <colgroup>
-                        <col class="w-[40px]">
-                        <col class="w-[60px]">
+                        <col class="w-[40px] 2xl:w-[60px]">
+                        <col class="w-[60px] 2xl:w-[80px]">
                         <col class="">
                         <col class="">
-                        <col class="w-[80px]">
+                        <col class="w-[80px] 2xl:w-[100px]">
                         <col class="">
                     </colgroup>
                     <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
@@ -270,8 +292,8 @@
                     <td colspan="6" class="px-4 py-2.5">
                         <div class="flex items-center gap-2">
                             <span class="inline-block w-2 h-2 rounded-full ${color.badge}"></span>
-                            <span class="text-sm font-semibold ${color.text}">${groupName}</span>
-                            <span class="text-xs ${color.text} opacity-70"></span>
+                            <span class=" font-semibold ${color.text}">${groupName}</span>
+                            <span class=" ${color.text} opacity-70"></span>
                         </div>
                     </td>
                 </tr>
@@ -303,7 +325,7 @@
                             <span class="text-gray-600 dark:text-gray-400 truncate block" title="${(permDescription || '-').replace(/"/g, '&quot;')}">${permDescription || '-'}</span>
                         </td>
                         <td class="px-4 py-3 w-[100px]">
-                            <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded ${
+                            <span class="inline-flex items-center px-2 py-1  font-semibold rounded text-xs ${
                                 permMethod === 'GET' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' :
                                 permMethod === 'POST' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' :
                                 permMethod === 'PUT' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' :
@@ -313,7 +335,7 @@
                             }">${permMethod}</span>
                         </td>
                         <td class="px-4 py-3 w-[270px]">
-                            <code class="text-xs text-gray-600 dark:text-gray-400 font-mono truncate block" title="${permPath}">${permPath}</code>
+                            <code class=" text-gray-600 dark:text-gray-400 font-mono truncate block" title="${permPath}">${permPath}</code>
                         </td>
                     </tr>
                 `;
@@ -336,6 +358,12 @@
         const checkboxes = document.querySelectorAll('input[name="permission_ids[]"]');
         checkboxes.forEach(checkbox => {
             checkbox.checked = checked;
+            const permissionId = parseInt(checkbox.value);
+            if (checked) {
+                selectedPermissionIds.add(permissionId);
+            } else {
+                selectedPermissionIds.delete(permissionId);
+            }
         });
     }
 
@@ -368,6 +396,8 @@
                 document.getElementById('level').value = role.level || '';
 
                 const rolePermissionIds = (role.permissions || []).map(p => p.id);
+                // Update selectedPermissionIds Set
+                selectedPermissionIds = new Set(rolePermissionIds);
                 renderPermissionsCheckboxes(rolePermissionIds, permissionFilterText);
             }
         } catch (error) {
@@ -375,13 +405,18 @@
         }
     }
 
-    function getSelectedPermissionIds() {
-        const permissionCheckboxes = document.querySelectorAll('input[name="permission_ids[]"]:checked');
-        return Array.from(permissionCheckboxes).map(cb => parseInt(cb.value));
-    }
-
     async function saveRole(event) {
         event.preventDefault();
+
+        renderInputErrors_Global(null, true); // Clear previous errors
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Disable submit button
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Đang xử lý...';
+        }
+
         const roleIdValue = document.getElementById('roleId').value;
         const formData = {
             name: document.getElementById('name').value,
@@ -393,26 +428,35 @@
         formData.permission_ids = Array.from(permissionCheckboxes).map(cb => parseInt(cb.value));
 
         try {
-            let data;
-            if (roleIdValue) {
-                // Edit mode
-                data = await apiRequest(`/roles/${roleIdValue}`, {
-                    method: 'PUT',
-                    body: JSON.stringify(formData)
-                });
-            } else {
-                // Create mode
-                data = await apiRequest('/roles', {
-                    method: 'POST',
-                    body: JSON.stringify(formData)
-                });
-            }
+            let method = roleIdValue ? 'PUT' : 'POST';
+            let url = roleIdValue ? `/api/roles/${roleIdValue}` : '/api/roles';
+            let response = await fetch(url, {
+                method: method,
+                credentials: 'include',
+                body: JSON.stringify(formData),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            }); 
 
-            if (data.success) {
-                showNotificationModel_Global(data.message || 'Lưu thành công', 'success', handleBackPrevPage);
+            const data = await response.json();
+
+            if (response.ok) {
+                showNotificationModel_Global(mode === 'EDIT' ? 'Cập nhật thông tin vai trò thành công' : 'Tạo vai trò thành công', 'success', handleBackPrevPage);
+            } else if (response.status === 422) {
+                let errorsField = data.errors || null; 
+                renderInputErrors_Global(errorsField);
+            } else {
+                throw new Error(data.message || 'Có lỗi xảy ra');
             }
         } catch (error) {
-            showNotificationModel_Global(error.message, 'error', handleBackPrevPage);
+            showNotificationModel_Global(error.message || 'Thao tác thất bại', 'error');
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = mode === 'CREATE' ? 'Tạo' : 'Cập nhật';
+            }
         }
     }
 

@@ -36,11 +36,11 @@
                     <div class="flex flex-col items-start justify-center gap-2">
                         <span class="userEmail text-xl text-gray-500 dark:text-white text-center">-</span>
                         <h2 class="userFullname text-2xl font-bold text-gray-900 dark:text-white text-center">-</h2>
-                        <span class="userRoles px-4 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 text-sm font-bold border border-blue-100 dark:border-blue-800">-</span>
+                        <span class="userRoles px-4 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300  font-bold border border-blue-100 dark:border-blue-800">-</span>
                     </div>
                 </div>
                 <a id="editButton" href="/admin/profile/edit"
-                    class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
+                    class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5  font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
                     <i class="fa-solid fa-pen"></i>
                     <span>Cập nhật</span>
                 </a>
@@ -53,9 +53,9 @@
                     $infoField = function($label, $id) {
                         return <<<HTML
                         <div>
-                            <label class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">{$label}</label>
+                            <label class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">{$label}</label>
                             <div class="px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-                                <p class="{$id} text-sm text-gray-900 dark:text-gray-100 break-all">-</p>
+                                <p class="{$id}  text-gray-900 dark:text-gray-100 break-all">-</p>
                             </div>
                         </div>
                         HTML;
@@ -157,7 +157,7 @@
         }
 
         if (!courses.length) {
-            coursesList.innerHTML = `<p class="text-sm text-gray-500 dark:text-gray-400 italic">Bạn chưa tham gia khóa học nào</p>`;
+            coursesList.innerHTML = `<p class=" text-gray-500 dark:text-gray-400 italic">Bạn chưa tham gia khóa học nào</p>`;
         } else {
             coursesList.innerHTML = courses.map(c => `
                 <div class="group flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 p-4 hover:bg-gray-100 dark:hover:bg-gray-800">
@@ -168,13 +168,13 @@
                             </svg>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(c.title ?? 'Không có tên')}</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">ID: ${escapeHtml_Global(String(c.id ?? '-'))}</p>
+                            <h4 class=" font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(c.title ?? 'Không có tên')}</h4>
+                            <p class=" text-gray-500 dark:text-gray-400 mt-1">ID: ${escapeHtml_Global(String(c.id ?? '-'))}</p>
                         </div>
                     </div>
                     ${c.description ? `
                         <div class="hidden md:block ml-4 max-w-xs">
-                            <span class="text-xs text-gray-500 dark:text-gray-400 truncate block">${escapeHtml_Global(String(c.description)).slice(0, 80)}${String(c.description).length > 80 ? '…' : ''}</span>
+                            <span class=" text-gray-500 dark:text-gray-400 truncate block">${escapeHtml_Global(String(c.description)).slice(0, 80)}${String(c.description).length > 80 ? '…' : ''}</span>
                         </div>` : ''
                     }
                 </div>

@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\users\DestroyRequest;
+use App\Http\Requests\users\StoreRequest;
+use App\Http\Requests\users\UpdateRequest;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
@@ -124,226 +128,197 @@ class UserController extends Controller
     /**
      * Tạo người dùng mới
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
-            'fullname' => 'nullable|string|max:150',
-            'birthday' => 'nullable|date',
-            'avatar_path' => 'nullable|string',
-            'role_ids' => 'nullable|array',
-            'role_ids.*' => 'exists:roles,id',
-        ]);
+        try {
+            $body = $request->validated();
 
-        if ($validator->fails()) {
+            $user = User::create([
+                'email' => $body['email'] ?? null,
+                'password' => bcrypt($body['password'] ?? ''),
+                'fullname' => $body['fullname'] ?? null,
+                'birthday' => $body['birthday'] ?? null
+            ]);
+
+            // Gán roles
+            if ($body['role_ids'] ?? false) {
+                $user->roles()->sync($body['role_ids']);
+            }
+
+            // Xử lý upload avatar nếu có
+            if (isset($body['avatar']) && $body['avatar']) {
+                // Xóa avatar cũ nếu có
+                if ($user->avatar_path) {
+                    $oldPath = str_replace('/storage/', '', $user->avatar_path);
+                    Storage::disk('public')->delete($oldPath);
+                }
+
+                // Lưu avatar mới
+                $extension = $body['avatar']->getClientOriginalExtension();
+                $slugTitle = $this->createSlug($user->fullname);
+                $customFileName = 'user_' . $user->id . '_' . $slugTitle . '_' . time() . '.' . $extension;
+                $storedPath = $body['avatar']->storeAs('avatars', $customFileName, 'public');
+                $publicUrl = Storage::url($storedPath); // ví dụ: /storage/avatars/user_1_<slug fullname>_1697059200.jpg
+
+                $user->update(['avatar_path' => $publicUrl]);
+
+            }
+
+            $user->refresh();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Tạo người dùng thành công',
+                'data' => $user->load('roles')
+            ], 201);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
+                'message' => 'Lỗi khi tạo người dùng: ' . $e->getMessage()
+            ], 500);
         }
-
-        $user = User::create([
-            'email' => $request->email,
-            'password' => $request->password,
-            'fullname' => $request->fullname,
-            'birthday' => $request->birthday,
-            'avatar_path' => $request->avatar_path,
-        ]);
-
-        // Gán roles
-        if ($request->has('role_ids')) {
-            $user->roles()->sync($request->role_ids);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Tạo người dùng thành công',
-            'data' => $user->load('roles')
-        ], 201);
     }
 
     /**
      * Cập nhật người dùng
      */
-    public function update(Request $request, $id)
+    public function update(UpdateRequest $request, $id): JsonResponse
     {
-        $authUser = $request->user();
-        $user = User::find($id);
+        try {
+            $body = $request->validated();
 
-        if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Không tìm thấy người dùng'
-            ], 404);
-        }
+            $authUser = $request->user();
+            $user = User::find($id);
 
-        // Kiểm tra quyền: chỉ cho phép cập nhật chính mình hoặc user có level cao hơn
-        if ($authUser->id != $id) {
-            // Lấy level thấp nhất (quyền cao nhất) của auth user
-            $authUserMinLevel = $authUser->roles()->min('level');
-
-            // Lấy level thấp nhất (quyền cao nhất) của user bị cập nhật
-            $targetUserMinLevel = $user->roles()->min('level');
-
-            // Chỉ cho phép nếu level của auth user < level của user bị cập nhật
-            // (level thấp hơn = quyền cao hơn)
-            if ($authUserMinLevel === null || $targetUserMinLevel === null || $authUserMinLevel >= $targetUserMinLevel) {
+            if (!$user) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Bạn không có quyền cập nhật người dùng này'
-                ], 403);
+                    'message' => 'Không tìm thấy người dùng'
+                ], 404);
             }
-        }
 
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email|unique:users,email,' . $id,
-            'password' => 'nullable|string|min:6',
-            'fullname' => 'nullable|string|max:150',
-            'birthday' => 'nullable|date',
-            'avatar_path' => 'nullable|string',
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'role_ids' => 'nullable|array',
-            'role_ids.*' => 'exists:roles,id',
-        ]);
+            // Kiểm tra quyền: chỉ cho phép cập nhật chính mình hoặc user có level cao hơn
+            if ($authUser->id != $id) {
+                // Lấy level thấp nhất (quyền cao nhất) của auth user
+                $authUserMinLevel = $authUser->roles()->min('level');
 
-        if ($validator->fails()) {
+                // Lấy level thấp nhất (quyền cao nhất) của user bị cập nhật
+                $targetUserMinLevel = $user->roles()->min('level');
+
+                // Chỉ cho phép nếu level của auth user < level của user bị cập nhật
+                // (level thấp hơn = quyền cao hơn)
+                if ($authUserMinLevel === null || $targetUserMinLevel === null || $authUserMinLevel >= $targetUserMinLevel) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Bạn không có quyền cập nhật người dùng này'
+                    ], 403);
+                }
+            } 
+
+            $updateData = [
+                'email' => $body['email'] ?? null,
+                'fullname' => $body['fullname'] ?? null,
+                'birthday' => $body['birthday'] ?? null,
+            ];
+
+            
+            if (isset($body['avatar']) && $body['avatar']) {
+                // Xóa avatar cũ nếu có
+                if ($user->avatar_path) {
+                    $oldPath = str_replace('/storage/', '', $user->avatar_path);
+                    Storage::disk('public')->delete($oldPath);
+                }
+
+                // Lưu avatar mới
+                $extension = $body['avatar']->getClientOriginalExtension();
+                $slugTitle = $this->createSlug($user->fullname);
+                $customFileName = 'user_' . $user->id . '_' . $slugTitle . '_' . time() . '.' . $extension;
+                $storedPath = $body['avatar']->storeAs('avatars', $customFileName, 'public');
+                $publicUrl = Storage::url($storedPath); // ví dụ: /storage/avatars/user_1_<slug fullname>_1697059200.jpg
+
+                $user->update(['avatar_path' => $publicUrl]);
+
+            }
+
+            if (isset($body['password']) && $body['password']) {
+                $updateData['password'] = bcrypt($body['password'] ?? '');
+            }
+
+            $user->update($updateData);
+
+            // Cập nhật roles
+            if (isset($body['role_ids']) && $body['role_ids']) {
+                $user->roles()->sync($body['role_ids']);
+            }
+
+            $user->refresh();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cập nhật người dùng thành công',
+                'data' => $user->load('roles')
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
+                'message' => 'Lỗi khi cập nhật người dùng: ' . $e->getMessage()
+            ], 500);
         }
-
-        $updateData = [
-            'email' => $request->email,
-            'fullname' => $request->fullname,
-            'birthday' => $request->birthday,
-        ];
-
-        // Cập nhật avatar_path nếu client gửi URL
-        if ($request->has('avatar_path')) {
-            $updateData['avatar_path'] = $request->avatar_path;
-        }
-
-        // Xử lý upload file avatar nếu có
-        if ($request->hasFile('avatar')) {
-            $storedPath = $request->file('avatar')->store('avatars', 'public');
-            $publicUrl = Storage::url($storedPath); // ví dụ: /storage/avatars/xxx.jpg
-            $updateData['avatar_path'] = $publicUrl;
-        }
-
-        if ($request->has('password')) {
-            $updateData['password'] = $request->password;
-        }
-
-        $user->update($updateData);
-
-        // Cập nhật roles
-        if ($request->has('role_ids')) {
-            $user->roles()->sync($request->role_ids);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Cập nhật người dùng thành công',
-            'data' => $user->load('roles')
-        ]);
     }
 
     /**
      * Xóa người dùng (soft delete)
      */
-    public function destroyUsers(Request $request)
+    public function destroyUsers(DestroyRequest $request): JsonResponse
     {
-        $authUser = $request->user();
+        try {
 
-        if (!$authUser) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Không được phép truy cập'
-            ], 401);
-        }
+            $body = $request->validated();
 
-        $validator = Validator::make($request->all(), [
-            'user_ids' => 'required|array',
-            'user_ids.*' => 'exists:users,id',
-        ]);
+            $authUser = $request->user();
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $users = User::with('roles')->whereIn('id', $request->user_ids)->get();
-
-        // Lấy level thấp nhất (quyền cao nhất) của user yêu cầu xóa
-        $authUserMinLevel = $authUser?->roles()->min('level');
-
-        $userWillDelete = [];
-
-        foreach ($users as $user) {
-            $targetUserMinLevel = $user->roles->min('level');
-
-            // Level thấp hơn = quyền cao hơn, chỉ cho phép khi authUser < targetUser
-            if ($authUserMinLevel === null || $targetUserMinLevel === null || $authUserMinLevel >= $targetUserMinLevel) {
+            if (!$authUser) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Bạn không có quyền xóa người dùng: ' . ($user->email ?? $user->id)
-                ], 403);
+                    'message' => 'Không được phép truy cập'
+                ], 401);
+            } 
+            
+            $users = User::with('roles')->whereIn('id', $body['user_ids'])->get();
+
+            // Lấy level thấp nhất (quyền cao nhất) của user yêu cầu xóa
+            $authUserMinLevel = $authUser?->roles()->min('level');
+
+            $userWillDelete = [];
+
+            foreach ($users as $user) {
+                $targetUserMinLevel = $user->roles->min('level');
+
+                // Level thấp hơn = quyền cao hơn, chỉ cho phép khi authUser < targetUser
+                if ($authUserMinLevel === null || $targetUserMinLevel === null || $authUserMinLevel >= $targetUserMinLevel) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Bạn không có quyền xóa người dùng: ' . ($user->email ?? $user->id)
+                    ], 403);
+                }
+
+                $userWillDelete[] = $user;
             }
 
-            $userWillDelete[] = $user;
-        }
+            foreach ($userWillDelete as $user) {
+                $user->delete();
+            }
 
-        foreach ($userWillDelete as $user) {
-            $user->delete();
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Xóa người dùng thành công'
-        ]);
-    }
-
-    /**
-     * Gán roles cho user
-     */
-    public function assignRoles(Request $request, $id)
-    {
-        $user = User::find($id);
-
-        if (!$user) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Xóa người dùng thành công'
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy người dùng'
-            ], 404);
+                'message' => 'Lỗi khi xóa người dùng: ' . $e->getMessage()
+            ], 500);
         }
-
-        $validator = Validator::make($request->all(), [
-            'role_ids' => 'required|array',
-            'role_ids.*' => 'exists:roles,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $user->roles()->sync($request->role_ids);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Phân quyền thành công',
-            'data' => $user->load('roles')
-        ]);
-    }
+    } 
 }
 

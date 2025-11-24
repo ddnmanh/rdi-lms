@@ -13,6 +13,28 @@ class StoreRequest extends FormRequest
         return true; // Cho phép request này được sử dụng
     }
 
+    /**
+     * Get the validated data from the request.
+     */
+    public function validationData()
+    {
+        // Ensure we get data from JSON body if content-type is application/json
+        return $this->all();
+    }
+
+    /**
+     * Prepare data for validation
+     */
+    protected function prepareForValidation()
+    {
+        // Trim whitespace from name if it exists
+        if ($this->has('name') && is_string($this->input('name'))) {
+            $this->merge([
+                'name' => trim($this->input('name'))
+            ]);
+        }
+    }
+
     public function rules(): array
     {
         return [

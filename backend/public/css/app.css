@@ -1,6 +1,7 @@
 
 html,
 body,
+input,
 main {
     overflow-x: hidden;
     max-width: 100%;
@@ -12,7 +13,17 @@ main {
 @media (min-width: 1536px) {
     html,
     body,
+    input,
     main {
         font-size: 14px;
+    }
+} 
+
+@media (min-width: 2000px) {
+    html,
+    body,
+    input,
+    main {
+        font-size: 16px;
     }
 } 

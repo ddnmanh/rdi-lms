@@ -9,7 +9,7 @@
     <form class="space-y-6" onsubmit="handleUpdateUser(event)">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="md:col-span-2">
-                    <label class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Ảnh đại diện</label>
+                    <label class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Ảnh đại diện</label>
                     <div
                         id="avatarDropZone"
                         class="flex items-center gap-4 p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg"
@@ -22,15 +22,15 @@
                         </div>
 
                         <div class="flex-1">
-                            <div class="text-sm text-gray-600 dark:text-gray-300">Kéo & thả ảnh vào đây, hoặc</div>
+                            <div class=" text-gray-600 dark:text-gray-300">Kéo & thả ảnh vào đây, hoặc</div>
                             <div class="mt-2 flex items-center gap-3">
-                                <label for="avatar" class="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 text-sm">
+                                <label for="avatar" class="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 ">
                                     Chọn ảnh
                                 </label>
                                 <button
                                     id="btnClearNewAvatar"
                                     type="button"
-                                    class="hidden px-3 py-2 rounded-md border border-red-300 text-red-600 hover:bg-red-50 dark:border-red-600 dark:hover:bg-gray-700 text-sm"
+                                    class="hidden px-3 py-2 rounded-md border border-red-300 text-red-600 hover:bg-red-50 dark:border-red-600 dark:hover:bg-gray-700 "
                                 >
                                     Xóa ảnh mới
                                 </button>
@@ -41,20 +41,20 @@
                                     class="hidden"
                                 />
                             </div>
-                            <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">Hỗ trợ PNG, JPG, WEBP, GIF — Tối đa 2MB</div>
+                            <div class="mt-2 text-gray-500 dark:text-gray-400">Hỗ trợ PNG, JPG, WEBP, GIF — Tối đa 2MB</div>
                         </div>
                     </div>
                 </div>
             <div class="col-span-2">
-                <label class="block ml-4 text-sm font-semibold text-blue-700 dark:text-gray-300 mb-2">Email</label>
+                <label class="block ml-4  font-semibold text-blue-700 dark:text-gray-300 mb-2">Email</label>
                 <input disabled name="email" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none opacity-50" placeholder="Nhập email" type="email" >
             </div>
             <div class="">
-                <label class="block ml-4 text-sm font-semibold text-blue-700 dark:text-gray-300 mb-2">Họ tên</label>
+                <label class="block ml-4  font-semibold text-blue-700 dark:text-gray-300 mb-2">Họ tên</label>
                 <input name="fullname" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none" placeholder="Nhập họ tên" type="text" >
             </div>
             <div>
-                <label class="block ml-4 text-sm font-semibold text-blue-700 dark:text-gray-300 mb-2">Ngày sinh</label>
+                <label class="block ml-4  font-semibold text-blue-700 dark:text-gray-300 mb-2">Ngày sinh</label>
                 <input name="birthday" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none" placeholder="Nhập ngày sinh" type="date" >
             </div>
         </div>
@@ -70,6 +70,7 @@
     let userData = null;
     let existingUserAvatar = null;
     let avatarPreview = null;
+    let isDragActive = false;
 
     document.addEventListener('DOMContentLoaded', async function() {
         userData = await loadUserData();
@@ -191,8 +192,8 @@
         const avatarEl = document.getElementById('avatarPreview');
         const placeholderEl = document.getElementById('avatarPlaceholder');
 
-        // Default preview for create mode
-        if (!existingUserAvatar && mode === 'create') {
+        // Default preview if no existing avatar
+        if (!existingUserAvatar) {
             avatarEl.classList.add('hidden');
             placeholderEl.classList.remove('hidden');
         }
@@ -218,10 +219,14 @@
                 dropZone.classList.remove('border-blue-500', 'bg-blue-50', 'dark:bg-gray-700');
                 dropZone.classList.add('border-gray-300', 'dark:border-gray-600');
 
-                const file = e.dataTransfer.files && e.dataTransfer.files[0] ? e.dataTransfer.files[0] : null;
-                if (file) {
+                const files = e.dataTransfer.files;
+                const file = files && files[0] ? files[0] : null;
+                if (file && input) {
+                    // Create a new DataTransfer to assign files to input
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    input.files = dataTransfer.files;
                     handleChoiceAvatarFile(file);
-                    if (input) input.files = e.dataTransfer.files;
                 }
             });
         }
@@ -264,16 +269,17 @@
             });
             const data = await response.json();
             if (data.success) {
-                showNotificationModel_Global('Cập nhật hồ sơ thành công!', 'success');
-                userData = data.data;
-                existingUserAvatar = userData.avatar_path || null;
-                renderUserData();
+                showNotificationModel_Global('Cập nhật hồ sơ thành công!', 'success', handleBackPrevPage); 
             } else {
                 showNotificationModel_Global('Cập nhật hồ sơ thất bại. Vui lòng thử lại.', 'error');
             }
         } catch (error) {
             console.error('Error updating user profile:', error);
         }
+    }
+
+    function handleBackPrevPage() {
+        window.location.href = '/admin/profile';
     }
     
 </script>

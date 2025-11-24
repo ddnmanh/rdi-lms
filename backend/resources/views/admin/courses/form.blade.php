@@ -96,35 +96,17 @@
         }
     }
 </style>
-<div class=" flex flex-col items-stretch justify-start gap-4 2xl:gap-6">
-    {{-- Top Bar / Breadcrumbs + Actions (Flat) --}}
-    {{-- <div class="sticky top-0 z-20">
-        <div class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-3 sm:px-4 py-2">
-            <div class="flex items-center justify-between gap-3">
-                <div class="flex items-center gap-2">
-                    <a href="{{ route('admin.courses.list') }}"
-                       class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">
-                        <svg class="h-4 w-4 -ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                        </svg>
-                        <span>Quay lại</span>
-                    </a>
-                </div>
-                <div class="flex items-center gap-2">
-                </div>
-            </div>
-        </div>
-    </div> --}}
+<div class="max-w-[1600px] mx-auto flex flex-col items-stretch justify-start gap-4 2xl:gap-6"> 
 
     {{-- Form Card --}}
-    <form id="courseForm" onsubmit="saveCourse(event)" class="h-full w-full max-w-[1400px] mx-auto p-4 md:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+    <form id="courseForm" onsubmit="saveCourse(event)" class="h-full w-full p-4 md:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
         <input type="hidden" id="courseId" value="{{ $mode === 'EDIT_COURSE' ? ($courseId ?? '') : '' }}">
 
         <div class="h-full flex flex-col items-stretch justify-between gap-4 2xl:gap-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 2xl:gap-6">
                 {{-- Thumbnail Preview + Upload --}}
-                <div class="col-span-1 row-span-3">
-                    <label class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Ảnh thumbnail</label>
+                <div class="col-span-1 md:col-span-2">
+                    <label class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Ảnh thumbnail</label>
                     <div
                         id="thumbnailDropZone"
                         class="flex flex-row flex-wrap items-center gap-4 p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg"
@@ -137,15 +119,15 @@
                         </div>
 
                         <div class="flex-1">
-                            <div class="text-sm text-gray-600 dark:text-gray-300">Kéo & thả ảnh vào đây, hoặc</div>
+                            <div class=" text-gray-600 dark:text-gray-300">Kéo & thả ảnh vào đây, hoặc</div>
                             <div class="mt-2 flex items-center gap-3">
-                                <label for="thumbnail" class="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 text-sm">
+                                <label for="thumbnail" class="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 ">
                                     Chọn ảnh
                                 </label>
                                 <button
                                     id="btnClearNewThumbnail"
                                     type="button"
-                                    class="hidden px-3 py-2 rounded-md border border-red-300 text-red-600 hover:bg-red-50 dark:border-red-600 dark:hover:bg-gray-700 text-sm"
+                                    class="hidden px-3 py-2 rounded-md border border-red-300 text-red-600 hover:bg-red-50 dark:border-red-600 dark:hover:bg-gray-700 "
                                 >
                                     Xóa ảnh mới
                                 </button>
@@ -156,37 +138,40 @@
                                     class="hidden"
                                 />
                             </div>
-                            <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">Hỗ trợ PNG, JPG, WEBP, GIF — Tối đa 2MB</div>
+                            <div class="mt-2  text-gray-500 dark:text-gray-400">Hỗ trợ PNG, JPG, WEBP, GIF — Tối đa 2MB</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-span-1">
-                    <label for="title" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Tiêu đề *</label>
+                <div class="col-span-1 md:col-span-2">
+                    <label name="title_LABEL" for="title" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Tiêu đề <span class="text-red-500">*</span></label>
                     <input type="text" id="title" required
                         class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none"
                         placeholder="Nhập tiêu đề khóa học">
+                    <span id="title_MSG" class="ml-4 text-sm mt-1 italic hidden"></span>
                 </div>
 
                 <div class="col-span-1">
-                    <label for="start_date" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Ngày bắt đầu</label>
+                    <label name="start_date_LABEL" for="start_date" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Ngày bắt đầu</label>
                     <input type="datetime-local" id="start_date"
                         class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-3">
+                    <span id="start_date_MSG" class="ml-4 text-sm mt-1 italic hidden"></span>
+                    {{-- <p class=" text-gray-500 dark:text-gray-400 mt-1 ml-3">
                         Ngày và giờ bắt đầu khóa học
                         <span id="timezoneIndicator" class="text-blue-600 dark:text-blue-400 font-medium"></span>
-                    </p>
+                    </p> --}}
                 </div>
 
                 <div class="col-span-1">
-                    <label for="end_date" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Ngày kết thúc</label>
+                    <label name="end_date_LABEL" for="end_date" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Ngày kết thúc</label>
                     <input type="datetime-local" id="end_date"
                         class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-3">Ngày và giờ kết thúc khóa học (phải sau ngày bắt đầu)</p>
+                    {{-- <p class=" text-gray-500 dark:text-gray-400 mt-1 ml-3">Ngày và giờ kết thúc khóa học (phải sau ngày bắt đầu)</p> --}}
+                    <span id="end_date_MSG" class="ml-4 text-sm mt-1 italic hidden"></span>
                 </div>
 
                 <div class="md:col-span-2">
-                    <label for="description" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Mô tả</label>
+                    <label for="description" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Mô tả</label>
                     <textarea id="description" rows="3"
                         class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none resize-none"
                         placeholder="Nhập mô tả khóa học"></textarea>
@@ -197,7 +182,7 @@
                 <div class="h-full min-h-0 rounded-lg relative table-scroll-container flex flex-row items-stretch gap-4">
 
                     <div class="flex-1 min-h-0 flex flex-col items-stretch justify-start">
-                        <label for="description" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Bài học tự do</label>
+                        <label for="description" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Bài học tự do</label>
                         <div id="orphanedLessonsListBox" class="flex-1 min-h-0 p-2 space-y-2 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 drop-zone" data-drop-zone="orphaned">
                             <div class="w-fit mx-auto mt-[100px]">
                                 <div id="SPINNER_LOADING">
@@ -221,13 +206,13 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-col items-center justify-center w-[100px] 2xl:w-[120px]">
+                    <div class="flex flex-col items-center justify-center w-[60px] 2xl:w-[80px]">
                         <i class="fa-solid fa-arrow-left"></i>
                         <i class="fa-solid fa-arrow-right"></i>
                     </div>
 
                     <div class="flex-1 min-h-0 flex flex-col items-stretch justify-start">
-                        <label for="description" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Bài học của khóa học</label>
+                        <label for="description" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Bài học của khóa học</label>
                         <div id="parentedLessonsListBox" class="flex-1 min-h-0 p-2 space-y-2 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 drop-zone" data-drop-zone="parented">
 
                         </div>
@@ -239,57 +224,57 @@
             <div class="mt-[30px] h-[420px] flex-shrink-0 overflow-hidden">
                 <div class="h-full min-h-0 rounded-lg relative flex flex-col gap-4 overflow-hidden">
                     <div class="grid h-full min-h-0 grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4">
-                        <div class="flex flex-col min-h-0 h-full">
+                        <div class="pt-1 flex flex-col min-h-0 h-full">
                             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-1 px-2">
-                                <label class="ml-2 text-sm font-semibold text-blue-700 dark:text-gray-300">Danh sách sinh viên</label>
+                                <label class="ml-2  font-semibold text-blue-700 dark:text-gray-300">Danh sách sinh viên</label>
                                 <input
                                     id="availableStudentsSearch"
                                     type="text"
-                                    class="w-full sm:w-64 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    class="w-full sm:w-64 px-3 py-2  border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                                     placeholder="Tìm kiếm theo tên hoặc email"
                                 >
                             </div>
                             <div id="availableStudentsListBox" class="flex-1 min-h-0 p-2 space-y-2 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800">
                                 <div class="flex items-center justify-center h-full text-gray-400 dark:text-gray-500">
-                                    <p class="text-sm">Đang tải danh sách sinh viên...</p>
+                                    <p class="">Đang tải danh sách sinh viên...</p>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="flex flex-col items-center justify-center gap-3 w-[100px] 2xl:w-[120px] h-full">
+                        <div class="flex flex-col items-stretch justify-center gap-3 w-[60px] 2xl:w-[80px] h-full">
                             <button
                                 type="button"
                                 id="moveStudentsToCourseBtn"
-                                class="px-3 py-2 w-full sm:w-auto rounded-md text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed transition"
+                                class="px-3 py-2 w-full sm:w-auto rounded-md  font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed transition"
                                 onclick="moveSelectedStudentsToEnrolled()"
                                 disabled
                             >
-                                Thêm vào khóa
+                                Thêm
                             </button>
                             <button
                                 type="button"
                                 id="removeStudentsFromCourseBtn"
-                                class="px-3 py-2 w-full sm:w-auto rounded-md text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/30 disabled:bg-gray-200 disabled:text-gray-400 disabled:dark:bg-gray-700/40 disabled:dark:text-gray-500 disabled:cursor-not-allowed transition"
+                                class="px-3 py-2 w-full sm:w-auto rounded-md  font-semibold text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/30 disabled:bg-gray-200 disabled:text-gray-400 disabled:dark:bg-gray-700/40 disabled:dark:text-gray-500 disabled:cursor-not-allowed transition"
                                 onclick="moveSelectedStudentsToAvailable()"
                                 disabled
                             >
-                                Gỡ khỏi khóa
+                                Gỡ
                             </button>
                         </div>
 
-                        <div class="flex flex-col min-h-0 h-full">
+                        <div class="pt-1 flex flex-col min-h-0 h-full">
                             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-1 px-2">
-                                <label class="ml-2 text-sm font-semibold text-blue-700 dark:text-gray-300">Học viên của khóa học</label>
+                                <label class="ml-2  font-semibold text-blue-700 dark:text-gray-300">Học viên của khóa học</label>
                                 <input
                                     id="enrolledStudentsSearch"
                                     type="text"
-                                    class="w-full sm:w-64 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    class="w-full sm:w-64 px-3 py-2  border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                                     placeholder="Lọc học viên đã chọn"
                                 >
                             </div>
                             <div id="enrolledStudentsListBox" class="flex-1 min-h-0 p-2 space-y-2 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800">
                                 <div class="flex items-center justify-center h-full text-gray-400 dark:text-gray-500">
-                                    <p class="text-sm">Chưa có học viên trong khóa học</p>
+                                    <p class="">Chưa có học viên trong khóa học</p>
                                 </div>
                             </div>
                         </div>
@@ -341,11 +326,11 @@
 
     document.addEventListener('DOMContentLoaded', async function() {
         // Hiển thị timezone của client
-        const timezoneIndicator = document.getElementById('timezoneIndicator');
-        if (timezoneIndicator) {
-            const clientTimezone = getClientTimezone_Global();
-            timezoneIndicator.textContent = `(Múi giờ: ${clientTimezone})`;
-        }
+        // const timezoneIndicator = document.getElementById('timezoneIndicator');
+        // if (timezoneIndicator) {
+        //     const clientTimezone = getClientTimezone_Global();
+        //     timezoneIndicator.textContent = `(Múi giờ: ${clientTimezone})`;
+        // }
 
         if (mode === 'EDIT_COURSE' && courseId) {
             await Promise.all([
@@ -533,7 +518,7 @@
             if (orphanedLessonsList.length === 0) {
                 orphanedLessonsListBox.innerHTML = `
                     <div class="flex items-center justify-center h-full text-gray-400 dark:text-gray-500">
-                        <p class="text-sm">Không có bài học tự do</p>
+                        <p class="">Không có bài học tự do</p>
                     </div>
                 `;
                 return;
@@ -551,13 +536,13 @@
                             <img src="${orphanedLesson.thumbnail_path}" alt="" class="w-[70px] aspect-video object-cover rounded-lg">
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(orphanedLesson.title ?? 'Không có tên')}</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">ID: ${orphanedLesson.id ?? '-'}</p>
+                            <h4 class=" font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(orphanedLesson.title ?? 'Không có tên')}</h4>
+                            <p class=" text-gray-500 dark:text-gray-400 mt-1">ID: ${orphanedLesson.id ?? '-'}</p>
                         </div>
                     </div>
                     <div class="flex flex-row items-center gap-4">
                         <div class="hidden md:block ml-4 max-w-xs">
-                            <span class="text-xs text-gray-500 dark:text-gray-400 truncate block">${orphanedLesson.description ? escapeHtml_Global(orphanedLesson.description.slice(0, 40) + (orphanedLesson.description.length > 40 ? '…' : '')) : ''}</span>
+                            <span class=" text-gray-500 dark:text-gray-400 truncate block">${orphanedLesson.description ? escapeHtml_Global(orphanedLesson.description.slice(0, 40) + (orphanedLesson.description.length > 40 ? '…' : '')) : ''}</span>
                         </div>
                         <div class="flex flex-row items-center gap-0.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer">
                             <i class="fa-solid fa-grip-vertical"></i>
@@ -583,7 +568,7 @@
             if (parentedLessonsList.length === 0) {
                 parentedLessonsListBox.innerHTML = `
                     <div class="flex items-center justify-center h-full text-gray-400 dark:text-gray-500">
-                        <p class="text-sm">Không có bài học trong khóa học</p>
+                        <p class="">Không có bài học trong khóa học</p>
                     </div>
                 `;
                 return;
@@ -601,13 +586,13 @@
                             <img src="${parentedLesson.thumbnail_path}" alt="" class="w-[70px] aspect-video object-cover rounded-lg">
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(parentedLesson.title ?? 'Không có tên')}</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">ID: ${parentedLesson.id ?? '-'} | Thứ tự: ${parentedLesson.display_order ?? '-'}</p>
+                            <h4 class=" font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(parentedLesson.title ?? 'Không có tên')}</h4>
+                            <p class=" text-gray-500 dark:text-gray-400 mt-1">ID: ${parentedLesson.id ?? '-'} | Thứ tự: ${parentedLesson.display_order ?? '-'}</p>
                         </div>
                     </div>
                     <div class="flex flex-row items-center gap-4">
                         <div class="hidden md:block ml-4 max-w-xs">
-                            <span class="text-xs text-gray-500 dark:text-gray-400 truncate block">${parentedLesson.description ? escapeHtml_Global(parentedLesson.description.slice(0, 80) + (parentedLesson.description.length > 80 ? '…' : '')) : ''}</span>
+                            <span class=" text-gray-500 dark:text-gray-400 truncate block">${parentedLesson.description ? escapeHtml_Global(parentedLesson.description.slice(0, 80) + (parentedLesson.description.length > 80 ? '…' : '')) : ''}</span>
                         </div>
                         <div class="flex flex-row items-center gap-0.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer">
                             <i class="fa-solid fa-grip-vertical"></i>
@@ -635,7 +620,7 @@
             const container = document.getElementById('availableStudentsListBox');
             if (container) {
                 container.innerHTML = `
-                    <div class="flex items-center justify-center h-full text-sm text-red-500 dark:text-red-400 text-center px-4">
+                    <div class="flex items-center justify-center h-full  text-red-500 dark:text-red-400 text-center px-4">
                         ${escapeHtml_Global(error.message || 'Không thể tải danh sách sinh viên')}
                     </div>
                 `;
@@ -714,7 +699,7 @@
 
         if (filteredStudents.length === 0) {
             container.innerHTML = `
-                <div class="flex items-center justify-center h-full text-gray-400 dark:text-gray-500 text-sm text-center px-4">
+                <div class="flex items-center justify-center h-full text-gray-400 dark:text-gray-500  text-center px-4">
                     ${searchTerm ? 'Không tìm thấy sinh viên phù hợp' : 'Không còn sinh viên nào để thêm'}
                 </div>
             `;
@@ -736,12 +721,12 @@
                         ${isSelected ? 'checked' : ''}
                     >
                     <div class="flex items-center gap-3 flex-1 min-w-0">
-                        <div class="h-9 w-9 overflow-hidden flex-shrink-0 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300 grid place-items-center text-sm font-semibold uppercase">
+                        <div class="h-9 w-9 overflow-hidden flex-shrink-0 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300 grid place-items-center  font-semibold uppercase">
                             <img src="${student.avatar_path}" alt="" class="w-full h-full object-cover">
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(student.fullname || student.email || 'Không có tên')}</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate">${escapeHtml_Global(student.email || '')}</p>
+                            <p class=" font-semibold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(student.fullname || student.email || 'Không có tên')}</p>
+                            <p class=" text-gray-500 dark:text-gray-400 truncate">${escapeHtml_Global(student.email || '')}</p>
                         </div>
                     </div>
                 </label>
@@ -758,7 +743,7 @@
 
         if (filteredStudents.length === 0) {
             container.innerHTML = `
-                <div class="flex items-center justify-center h-full text-gray-400 dark:text-gray-500 text-sm text-center px-4">
+                <div class="flex items-center justify-center h-full text-gray-400 dark:text-gray-500  text-center px-4">
                     ${enrolledStudentsList.length === 0 ? 'Chưa có học viên trong khóa học' : 'Không tìm thấy học viên phù hợp'}
                 </div>
             `;
@@ -780,12 +765,12 @@
                         ${isSelected ? 'checked' : ''}
                     >
                     <div class="flex items-center gap-3 flex-1 min-w-0">
-                        <div class="h-9 w-9 overflow-hidden flex-shrink-0 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300 grid place-items-center text-sm font-semibold uppercase">
+                        <div class="h-9 w-9 overflow-hidden flex-shrink-0 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300 grid place-items-center  font-semibold uppercase">
                             <img src="${student.avatar_path}" alt="" class="w-full h-full object-cover">
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(student.fullname || student.email || 'Không có tên')}</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate">${escapeHtml_Global(student.email || '')}</p>
+                            <p class=" font-semibold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(student.fullname || student.email || 'Không có tên')}</p>
+                            <p class=" text-gray-500 dark:text-gray-400 truncate">${escapeHtml_Global(student.email || '')}</p>
                         </div>
                     </div>
                 </label>
@@ -1376,6 +1361,8 @@
     async function saveCourse(event) {
         event.preventDefault();
 
+        renderInputErrors_Global(null, true); // Clear previous errors
+
         const submitBtn = document.getElementById('submitBtn');
 
         // Disable submit button
@@ -1393,7 +1380,9 @@
 
         // Validation
         if (!title) {
-            showNotificationModel_Global('Vui lòng nhập tiêu đề khóa học', 'error');
+            renderInputErrors_Global({
+                title: ['Vui lòng nhập tiêu đề khóa học']
+            });
             if (submitBtn) {
                 submitBtn.disabled = false;
                 submitBtn.textContent = mode === 'CREATE_COURSE' ? 'Tạo' : 'Cập nhật';
@@ -1405,7 +1394,9 @@
             const start = new Date(startDate);
             const end = new Date(endDate);
             if (end < start) {
-                showNotificationModel_Global('Ngày kết thúc phải sau ngày bắt đầu', 'error');
+                renderInputErrors_Global({
+                    end_date: ['Ngày kết thúc phải sau ngày bắt đầu']
+                });
                 if (submitBtn) {
                     submitBtn.disabled = false;
                     submitBtn.textContent = mode === 'CREATE_COURSE' ? 'Tạo' : 'Cập nhật';
@@ -1417,7 +1408,6 @@
         const clientTimezone = getClientTimezone_Global();
 
         try {
-            let data;
             const fd = new FormData();
             // Laravel/Symfony không parse multipart cho PUT/PATCH -> dùng POST + _method
             if (mode == 'EDIT_COURSE') {
@@ -1440,14 +1430,9 @@
                     'Accept': 'application/json'
                     // DO NOT set Content-Type here; browser will set with boundary
                 }
-            });
-            const json = await response.json();
-            if (!response.ok) {
-                throw new Error(json.message || 'Có lỗi xảy ra');
-            }
-            data = json;
+            }); 
 
-
+            const data = await response.json();
             if (data.success) {
                 courseId = data.data?.id ?? courseId;
                 if (data.data) {
@@ -1456,13 +1441,22 @@
                 await handleUpdateLessonsForCourse();
                 await handleUpdateStudentsForCourse();
                 showNotificationModel_Global(mode == 'EDIT_COURSE' ? 'Cập nhật khóa học thành công' : 'Tạo khóa học thành công', 'success', handleBackToPrevPage);
-            }
+            } else if (response.status === 422) {
+                let errorsField = data.errors || null;
+                console.log(errorsField);
+                renderInputErrors_Global(errorsField);
+            } else {
+                throw new Error(data.message || 'Có lỗi xảy ra');
+            } 
+
         } catch (error) {
+            showNotificationModel_Global(error.message || 'Thao tác thất bại', 'error', handleBackToPrevPage);
+        } finally {
+            // Re-enable submit button
             if (submitBtn) {
                 submitBtn.disabled = false;
                 submitBtn.textContent = mode === 'CREATE_COURSE' ? 'Tạo' : 'Cập nhật';
             }
-            showNotificationModel_Global(error.message || 'Thao tác thất bại', 'error', handleBackToPrevPage);
         }
     }
 

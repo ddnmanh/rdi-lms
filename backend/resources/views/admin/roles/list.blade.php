@@ -319,7 +319,7 @@
                                         <i class="fas fa-inbox text-3xl text-gray-400 dark:text-gray-500"></i>
                                     </div>
                                     <p class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-1">Không tìm thấy vai trò</p>
-                                    <p class=" text-gray-500 dark:text-gray-400">Hãy thử lại với các điều kiện lọc khác</p>
+                                    <p class="text-gray-500 dark:text-gray-400">Hãy thử lại với các điều kiện lọc khác</p>
                                 </div>
                             </td>
                         </tr>
@@ -386,8 +386,8 @@
                     <td class="${getCellClass('name')} text-gray-600 dark:text-gray-300 font-medium">
                         ${role.name}
                     </td>
-                    <td class="px-4 py-3 text-gray-600 dark:text-gray-300 break-all [overflow-wrap:anywhere]">
-                        ${role.description || '<span class="text-gray-400 dark:text-gray-500">-</span>'}
+                    <td class="px-4 py-3">
+                        <span class="text-gray-600 dark:text-gray-300 overflow-hidden text-ellipsis line-clamp-2">${role.description || '<span class="text-gray-400 dark:text-gray-500">-</span>'}</span>
                     </td>
                     <td class="${getCellClass('level')} text-center">
                         <span class="inline-flex items-center gap-1.5 px-3 py-1  font-bold rounded-xl bg-gradient-to-r from-purple-500 to-purple-500 text-white">${role.level}</span>
@@ -407,7 +407,7 @@
                                 title="Chỉnh sửa">
                                 <i class="fa-solid fa-pen  "></i>
                             </a>
-                            <button onclick="openSingleDeleteModal(${role.id}, '${role.name}', '${role.description.slice(0,30)}')"
+                            <button onclick="openSingleDeleteModal(${role.id}, '${role.name}', '${role.description?.slice(0,30)}')"
                                 class="inline-flex shrink-0 size-7 2xl:size-8 items-center justify-center rounded-md border border-red-500 hover:border-red-600 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300"
                                 title="Xóa">
                                 <i class="fas fa-trash  "></i>

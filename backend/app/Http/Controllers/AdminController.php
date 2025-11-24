@@ -35,7 +35,7 @@ class AdminController extends Controller
      */
     public function createUser()
     {
-        return view('admin.users.form', ['mode' => 'create']);
+        return view('admin.users.form', ['mode' => 'CREATE']);
     }
 
     /**
@@ -51,7 +51,7 @@ class AdminController extends Controller
      */
     public function editUser($id)
     {
-        return view('admin.users.form', ['mode' => 'edit', 'userId' => $id]);
+        return view('admin.users.form', ['mode' => 'EDIT', 'userId' => $id]);
     }
 
     /**
@@ -67,7 +67,7 @@ class AdminController extends Controller
      */
     public function createRole()
     {
-        return view('admin.roles.form', ['mode' => 'create']);
+        return view('admin.roles.form', ['mode' => 'CREATE']);
     }
 
     /**
@@ -75,7 +75,7 @@ class AdminController extends Controller
      */
     public function editRole($id)
     {
-        return view('admin.roles.form', ['mode' => 'edit', 'roleId' => $id]);
+        return view('admin.roles.form', ['mode' => 'EDIT', 'roleId' => $id]);
     }
 
     /**
@@ -115,23 +115,7 @@ class AdminController extends Controller
     public function editCourse($id)
     {
         return view('admin.courses.form', ['mode' => 'EDIT_COURSE', 'courseId' => $id]);
-    }
-
-    /**
-     * Trang quản lý lessons của course
-     */
-    public function manageCourseLessons($id)
-    {
-        return view('admin.courses.lessons', ['courseId' => $id]);
-    }
-
-    /**
-     * Trang quản lý users của course
-     */
-    public function manageCourseUsers($id)
-    {
-        return view('admin.courses.users', ['courseId' => $id]);
-    }
+    } 
 
     /**
      * Trang quản lý lessons

@@ -4,32 +4,7 @@
 @section('description', 'Xem thông tin chi tiết của bài học')
 
 @section('content')
-<div class="min-h-full flex flex-col gap-4 2xl:gap-6">
-    {{-- Top Bar / Breadcrumbs + Actions (Flat) --}}
-    {{-- <div class="sticky top-0 z-20">
-        <div class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-3 sm:px-4 py-2">
-            <div class="flex items-center justify-between gap-3">
-                <div class="flex items-center gap-2">
-                    <a href="{{ route('admin.lessons.list') }}"
-                       class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">
-                        <svg class="h-4 w-4 -ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                        </svg>
-                        <span>Quay lại</span>
-                    </a>
-                </div>
-                <div class="flex items-center gap-2">
-                    <a id="editButton" href="#"
-                       class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-3.5 py-2 text-sm font-semibold text-white hover:bg-amber-600 focus:outline-none">
-                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 3.487a2.25 2.25 0 113.182 3.182L7.5 19.313 3 21l1.687-4.5L16.862 3.487z"/>
-                        </svg>
-                        <span>Chỉnh sửa</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div> --}}
+<div class="w-full max-w-[1600px] mx-auto flex flex-col gap-4 2xl:gap-6"> 
 
     {{-- Loading State (Flat Skeleton) --}}
     <div id="loadingState" class="flex-1 p-6 sm:p-8">
@@ -54,7 +29,7 @@
         <div class="flex items-center justify-between mb-6">
             <div></div>
             <a id="editButton" href="#"
-                class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
+                class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5  font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 3.487a2.25 2.25 0 113.182 3.182L7.5 19.313 3 21l1.687-4.5L16.862 3.487z"/>
                 </svg>
@@ -68,7 +43,7 @@
                 {{-- Avatar Section --}}
                 <div class="md:col-span-2 flex flex-row items-stretch gap-4">
                     <div class="flex-1">
-                        <label class="block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-2">Thumbnail</label>
+                        <label class="block  font-semibold text-blue-700 dark:text-gray-300 mb-2">Thumbnail</label>
                         <div class="px-4 py-3 flex items-center gap-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900/40">
                             <div class="w-full aspect-video rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
                                 <img id="userAvatar" src="" alt="Avatar" class="h-full w-full object-cover hidden">
@@ -77,12 +52,12 @@
                                 </svg>
                             </div>
                             <div class="flex-1">
-                                {{-- <div class="text-sm text-gray-600 dark:text-gray-300">Thumbnail của người dùng</div> --}}
+                                {{-- <div class=" text-gray-600 dark:text-gray-300">Thumbnail của người dùng</div> --}}
                             </div>
                         </div>
                     </div>
                     <div class="flex-1">
-                        <label class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Video</label>
+                        <label class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Video</label>
                         <div class="px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40">
                             <div id="videoContainer" class="w-full">
                                 <video id="lessonVideo" controls class="w-full aspect-video rounded-lg" style="display: none;">
@@ -102,9 +77,9 @@
                     $infoField = function($label, $id) {
                         return <<<HTML
                         <div>
-                            <label class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">{$label}</label>
+                            <label class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">{$label}</label>
                             <div class="px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-                                <p class="{$id} text-sm text-gray-900 dark:text-gray-100 break-all">-</p>
+                                <p class="{$id}  text-gray-900 dark:text-gray-100 break-all">-</p>
                             </div>
                         </div>
                         HTML;
@@ -123,9 +98,9 @@
 
             {{-- Description --}}
             <div class="">
-                <label class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Mô tả</label>
+                <label class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Mô tả</label>
                 <div class="px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-                    <p class="lessonDescription text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">-</p>
+                    <p class="lessonDescription  text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">-</p>
                 </div>
             </div>
         </div>
@@ -143,9 +118,9 @@
                 </div>
             </div>
             <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">Xảy ra lỗi khi lấy thông tin</h3>
-            <p id="errorMessage" class="errorMessage text-sm text-gray-600 dark:text-gray-400 mb-6">-</p>
+            <p id="errorMessage" class="errorMessage  text-gray-600 dark:text-gray-400 mb-6">-</p>
             <a href="{{ route('admin.lessons.list') }}"
-               class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700">
+               class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5  font-semibold text-white hover:bg-blue-700">
                 <svg class="h-4 w-4 -ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
@@ -214,23 +189,8 @@
         } else {
             setText('lessonCourse', '-');
         }
-
-        // Duration formatting
-        const duration = lesson.duration || 0;
-        const hours = Math.floor(duration / 3600);
-        const minutes = Math.floor((duration % 3600) / 60);
-        const seconds = duration % 60;
-        let durationText = '';
-        if (hours > 0) {
-            durationText += `${hours} giờ `;
-        }
-        if (minutes > 0) {
-            durationText += `${minutes} phút `;
-        }
-        if (seconds > 0 || durationText === '') {
-            durationText += `${seconds} giây`;
-        }
-        setText('lessonDuration', durationText.trim() || '0 giây');
+ 
+        setText('lessonDuration', formatSecondsToHHMMSS_Global(lesson.duration || 0, true) || '0 giây');
 
         // // Video Path
         const videoUrl = lesson.video_path || '';

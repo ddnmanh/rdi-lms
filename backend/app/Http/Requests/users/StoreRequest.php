@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\courses;
+namespace App\Http\Requests\users;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdateRequest extends FormRequest
+class StoreRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -15,24 +15,24 @@ class UpdateRequest extends FormRequest
 
     public function rules(): array
     {
-
         $rules = [
-            'title' => 'nullable|string|max:255',
-            'description' => 'nullable|string',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-            'timezone' => 'nullable|string',
+            'email' => 'required|email:rfc,dns|unique:users,email',
+            'password' => 'required|string|min:6',
+            'fullname' => 'required|string|max:150',
+            'birthday' => 'nullable|date',
+            'role_ids' => 'nullable|array',
+            'role_ids.*' => 'exists:roles,id',
         ];
 
-        // Kiểm tra xem có file thumbnail trong request không
+        // Kiểm tra xem có file avatar trong request không
         // Có thể được set từ middleware HandlePutFormData
-        $hasThumbnail = $this->hasFile('thumbnail') ||
-                       ($this->files->has('thumbnail') && $this->files->get('thumbnail') !== null);
+        $hasAvatar = $this->hasFile('avatar') ||
+                       ($this->files->has('avatar') && $this->files->get('avatar') !== null);
 
-        // Chỉ validate thumbnail nếu có file được upload
-        if ($hasThumbnail) {
+        // Chỉ validate avatar nếu có file được upload
+        if ($hasAvatar) {
             // Validate file với custom rule (không dùng rule 'required' vì nó sẽ check isValid())
-            $rules['thumbnail'] = [
+            $rules['avatar'] = [
                 function ($attribute, $value, $fail) {
                     if (!$value) {
                         $fail('Ảnh đại diện là bắt buộc.');
@@ -61,16 +61,16 @@ class UpdateRequest extends FormRequest
                         return;
                     }
 
-                    // Kiểm tra kích thước (max 2048 KB = 2MB)
+                    // Kiểm tra kích thước (max 10240 KB = 10MB)
                     $sizeInKB = $value->getSize() / 1024;
-                    if ($sizeInKB > 2048) {
-                        $fail('Ảnh đại diện không được vượt quá 2048 kilobytes.');
+                    if ($sizeInKB > 10240) {
+                        $fail('Ảnh đại diện không được vượt quá 10240 kilobytes.');
                         return;
                     }
                 },
             ];
         } else {
-            $rules['thumbnail'] = 'nullable';
+            $rules['avatar'] = 'nullable';
         }
 
         return $rules;
@@ -79,34 +79,33 @@ class UpdateRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'title.required'            => 'Tiêu đề là bắt buộc.',
-            'title.string'              => 'Tiêu đề phải là chuỗi.',
-            'title.max'                 => 'Tiêu đề không được vượt quá :max ký tự',
-
-            'description.string'      => 'Mô tả phải là chuỗi.',
-
-            'start_date.date'         => 'Ngày bắt đầu không đúng định dạng.',
-
-            'end_date.date'           => 'Ngày kết thúc không đúng định dạng.',
-            'end_date.after_or_equal' => 'Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu.',
-
-            'timezone.string'         => 'Múi giờ phải là chuỗi.',
-
-            'thumbnail.image'         => 'Ảnh đại diện phải là một tệp hình ảnh.',
-            'thumbnail.mimes'         => 'Ảnh đại diện phải có định dạng: :values.',
-            'thumbnail.max'           => 'Ảnh đại diện không được vượt quá :max kilobytes.',
+            'email.required' => 'Email là bắt buộc.',
+            'email.email' => 'Email không đúng định dạng.',
+            'email.unique' => 'Email đã được sử dụng.',
+            'password.required' => 'Mật khẩu là bắt buộc.',
+            'password.string' => 'Mật khẩu phải là chuỗi ký tự.',
+            'password.min' => 'Mật khẩu phải có ít nhất :min ký tự.',
+            'fullname.required' => 'Họ và tên là bắt buộc.',
+            'fullname.string' => 'Họ và tên phải là chuỗi ký tự.',
+            'fullname.max' => 'Họ và tên không được vượt quá :max ký tự.',
+            'birthday.date'         => 'Ngày sinh không hợp lệ.',
+            'avatar.image'          => 'Ảnh đại diện phải là một tệp hình ảnh.',
+            'avatar.mimes'          => 'Ảnh đại diện phải có định dạng: :values.',
+            'avatar.max'            => 'Ảnh đại diện không được vượt quá :max kilobytes.',
+            'role_ids.array' => 'Danh sách vai trò không hợp lệ.',
+            'role_ids.*.exists' => 'Vai trò không tồn tại.',
         ];
     }
 
     public function attributes(): array
     {
         return [
-            'title'       => 'Tiêu đề',
-            'description' => 'Mô tả',
-            'start_date'  => 'Ngày bắt đầu',
-            'end_date'    => 'Ngày kết thúc',
-            'timezone'    => 'Múi giờ',
-            'thumbnail'   => 'Ảnh đại diện',
+            'email' => 'Email',
+            'password' => 'Mật khẩu',
+            'fullname' => 'Họ và tên',
+            'birthday' => 'Ngày sinh',
+            'avatar_path' => 'Đường dẫn ảnh đại diện',
+            'role_ids' => 'Danh sách vai trò',
         ];
     }
 

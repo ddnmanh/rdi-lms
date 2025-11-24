@@ -5,12 +5,12 @@
 @section('description', 'Xem thông tin chi tiết và phân quyền của một vai trò')
 
 @section('content')
-<div class="flex flex-col items-stretch justify-start gap-4 2xl:gap-6">
+<div class="w-full max-w-[1800px] max-h-full mx-auto flex flex-col items-stretch justify-start gap-4 2xl:gap-6">
     <input type="hidden" id="roleId" value="{{ $roleId ?? '' }}">
 
     {{-- Header Card --}}
     <div
-        class="w-full max-w-[1400px] mx-auto p-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+        class="w-full mx-auto p-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
         <div class="space-y-1.5">
             <div class="flex items-center gap-2">
                 <span
@@ -18,12 +18,12 @@
                     <i class="fa-solid fa-shield-halved"></i>
                 </span>
                 <div>
-                    <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Vai trò</p>
+                    <p class=" uppercase tracking-wide text-gray-500 dark:text-gray-400">Vai trò</p>
                     <h1 id="roleNameHeading" class="text-2xl font-semibold text-gray-900 dark:text-white">Đang tải...</h1>
                 </div>
             </div>
-            <p id="roleDescriptionHeading" class="text-sm text-gray-600 dark:text-gray-400 max-w-2xl">-</p>
-            <div class="flex flex-wrap items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+            <p id="roleDescriptionHeading" class=" text-gray-600 dark:text-gray-400 max-w-2xl">-</p>
+            <div class="flex flex-wrap items-center gap-3  text-gray-500 dark:text-gray-400">
                 <div class="flex items-center gap-1.5">
                     <i class="fa-regular fa-circle-dot text-blue-500"></i>
                     <span>ID: <span id="roleIdLabel">-</span></span>
@@ -45,86 +45,27 @@
 
         <div class="flex items-center gap-2 w-full lg:w-auto">
             <a href="{{ route('admin.roles.list') }}"
-                class="flex-1 lg:flex-none px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300 text-center">
+                class="flex-1 lg:flex-none px-4 py-2.5  font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300 text-center">
                 <i class="fas fa-arrow-left mr-2"></i>
                 Quay lại
             </a>
             <a id="roleEditButton" href="#"
-                class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
+                class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5  font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
                 <i class="fas fa-pen me-2"></i>
                 Chỉnh sửa
             </a>
         </div>
     </div>
 
-    <div class="w-full max-w-[1400px] mx-auto grid grid-cols-1 xl:grid-cols-4 gap-4 2xl:gap-6">
-        {{-- Tổng quan --}}
-        <div class="col-span-1 flex flex-col gap-4 hidden">
-            <div
-                class="p-5 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col gap-4">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Thông tin cơ bản</h2>
-                    <span
-                        class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-300">
-                        <i class="fa-solid fa-circle-info"></i>
-                        Chi tiết
-                    </span>
-                </div>
-                <dl class="space-y-4">
-                    <div>
-                        <dt class="text-xs uppercase text-gray-500 dark:text-gray-400 mb-1">Tên vai trò</dt>
-                        <dd id="roleNameValue" class="text-base font-semibold text-gray-900 dark:text-white">-</dd>
-                    </div>
-                    <div>
-                        <dt class="text-xs uppercase text-gray-500 dark:text-gray-400 mb-1">Mô tả</dt>
-                        <dd id="roleDescriptionValue" class="text-sm text-gray-700 dark:text-gray-300">-</dd>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <dt class="text-xs uppercase text-gray-500 dark:text-gray-400 mb-1">Level</dt>
-                            <dd id="roleLevelValue"
-                                class="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-bold rounded-xl bg-gradient-to-r from-purple-500 to-purple-500 text-white">-
-                            </dd>
-                        </div>
-                        <div>
-                            <dt class="text-xs uppercase text-gray-500 dark:text-gray-400 mb-1">Số permissions</dt>
-                            <dd id="rolePermissionCount"
-                                class="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-bold rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300">-
-                            </dd>
-                        </div>
-                    </div>
-                    <div>
-                        <dt class="text-xs uppercase text-gray-500 dark:text-gray-400 mb-1">Ghi chú</dt>
-                        <dd class="text-xs text-gray-500 dark:text-gray-400">Level càng nhỏ quyền càng cao (1-20 có thể truy cập
-                            trang quản trị)</dd>
-                    </div>
-                </dl>
-            </div>
-
-            {{-- Người dùng --}}
-            <div
-                class="p-5 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col gap-4">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Người dùng sở hữu</h2>
-                    <span id="roleUserCount"
-                        class="text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full">0</span>
-                </div>
-                <div id="roleUsersContainer" class="flex flex-wrap gap-2 min-h-[60px]">
-                    <div class="w-full text-center text-sm text-gray-500 dark:text-gray-400 py-4">
-                        Đang tải...
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="flex-1 flex flex-row items-stretch gap-4 2xl:gap-6 min-h-0 overflow-hidden"> 
 
         {{-- Permissions --}}
-        <div class="w-full h-[600px] col-span-1 xl:col-span-2 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col">
-            <div class="px-6 py-5 flex flex-col gap-2">
+        <div class="flex-1 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col flex-shrink-0 min-h-0 overflow-hidden">
+            <div class="px-6 py-5 flex flex-col gap-2 flex-shrink-0">
                 <div class="flex items-center justify-between gap-3">
                     <div>
-                        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Danh sách permissions</h2>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Hiển thị chi tiết từng API/đường dẫn đã được gán
-                        </p>
+                        {{-- <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Danh sách permissions</h2> --}}
+                        <p class=" text-gray-500 dark:text-gray-400">Các quyền chi tiết của role</p>
                     </div>
                     <div class="relative w-full max-w-[250px]">
                         <input type="text" id="permissionSearchInput" placeholder="Tìm theo tên, mô tả hoặc group..."
@@ -136,8 +77,8 @@
                 </div>
             </div>
 
-            <div class="flex-1 p-4 pt-0 min-h-0 rounded-lg relative table-scroll-container">
-                <div id="permissionsTableContainer" class="flex-1 h-full overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800">
+            <div class="flex-1 px-4 pb-4 min-h-0 overflow-hidden">
+                <div id="permissionsTableContainer" class="h-full overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 table-scroll-container">
                     <div class="w-fit mx-auto mt-[20dvh]">
                         <div id="SPINNER_LOADING">
                             <div id="SPINNER_LOADING_CONTAINER">
@@ -162,12 +103,12 @@
         </div>
 
         {{-- Users List --}}
-        <div class="w-full h-[600px] col-span-2 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col">
-            <div class="px-6 py-5 flex flex-col gap-2">
+        <div class="flex-1 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col min-h-0 overflow-hidden">
+            <div class="px-6 py-5 flex flex-col gap-2 flex-shrink-0">
                 <div class="flex items-center justify-between gap-3">
                     <div>
-                        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Danh sách người dùng</h2>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Người dùng được gán vai trò này
+                        {{-- <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Danh sách người dùng</h2> --}}
+                        <p class=" text-gray-500 dark:text-gray-400">Người dùng được gán vai trò này
                         </p>
                     </div>
                     <div class="relative w-full max-w-[250px]">
@@ -180,8 +121,8 @@
                 </div>
             </div>
 
-            <div class="flex-1 p-4 pt-0 min-h-0 rounded-lg relative table-scroll-container">
-                <div id="usersTableContainer" class="flex-1 h-full overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800">
+            <div class="flex-1 px-4 pb-4 min-h-0 overflow-hidden">
+                <div id="usersTableContainer" class="h-full overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 table-scroll-container">
                     <div class="w-fit mx-auto mt-[20dvh]">
                         <div id="SPINNER_LOADING">
                             <div id="SPINNER_LOADING_CONTAINER">
@@ -210,6 +151,7 @@
 
 <script>
     const roleId = {{ $roleId }};
+    let roleData = null;
     let rolePermissions = [];
     let roleUsers = [];
 
@@ -221,93 +163,67 @@
 
         document.getElementById('roleEditButton').setAttribute('href', `/admin/roles/${roleId}/edit`);
 
-        await loadRoleDetail(roleId);
+        roleData = await loadRoleDetail();
+
+        roleUsers = roleData?.users || []; 
+
+        if (!roleData) {
+            return;
+        } else {
+            renderRoleInfo();
+            renderPermissionsTable();
+            renderUsersTable();
+        }
+
 
         const permissionSearchInput = document.getElementById('permissionSearchInput');
         if (permissionSearchInput) {
             permissionSearchInput.addEventListener('input', function (event) {
-                renderPermissionsTable(rolePermissions, (event.target.value || '').trim().toLowerCase());
+                renderPermissionsTable((event.target.value || '').trim().toLowerCase());
             });
         }
 
         const userSearchInput = document.getElementById('userSearchInput');
         if (userSearchInput) {
             userSearchInput.addEventListener('input', function (event) {
-                renderUsersTable(roleUsers, (event.target.value || '').trim().toLowerCase());
+                renderUsersTable((event.target.value || '').trim().toLowerCase());
             });
         }
     });
 
-    async function loadRoleDetail(id) {
+    async function loadRoleDetail() {
         try {
-            const response = await apiRequest(`/roles/${id}`);
+            const response = await apiRequest(`/roles/${roleId}`);
             if (!response.success) {
                 throw new Error(response.message || 'Không thể lấy dữ liệu vai trò');
             }
 
-            const role = response.data || {};
-            rolePermissions = role.permissions || [];
-            roleUsers = role.users || [];
-
-            renderRoleInfo(role);
-            renderRoleUsers(roleUsers);
-            renderPermissionsTable(rolePermissions);
-            renderUsersTable(roleUsers);
+            return response.data || {};
         } catch (error) {
             showNotificationModel_Global(error.message, 'error', handleBackToList);
+            return null;
         }
-    }
+    } 
 
-    function renderRoleInfo(role) {
-        const name = role.name || '-';
-        const description = role.description || '-';
-        const level = role.level ?? '-';
-        const permissionCount = (role.permissions || []).length;
+
+    function renderRoleInfo() {
+        const name = roleData.name || '-';
+        const description = roleData.description || '-';
+        const level = roleData.level ?? '-';
+        const permissionCount = (roleData.permissions || []).length;
 
         document.getElementById('roleNameHeading').textContent = name;
         document.getElementById('roleDescriptionHeading').textContent = description;
-        document.getElementById('roleIdLabel').textContent = role.id ?? '-';
+        document.getElementById('roleIdLabel').textContent = roleData.id ?? '-';
         document.getElementById('roleLevelLabel').textContent = level;
-        document.getElementById('roleCreatedAtLabel').textContent = formatDate_Global(role.created_at);
-        document.getElementById('roleUpdatedAtLabel').textContent = formatDate_Global(role.updated_at);
-        document.getElementById('roleNameValue').textContent = name;
-        document.getElementById('roleDescriptionValue').textContent = description;
-        document.getElementById('roleLevelValue').textContent = level;
-        document.getElementById('rolePermissionCount').textContent = permissionCount;
+        document.getElementById('roleCreatedAtLabel').textContent = formatDate_Global(roleData.created_at);
+        document.getElementById('roleUpdatedAtLabel').textContent = formatDate_Global(roleData.updated_at); 
     }
 
-    function renderRoleUsers(users = []) {
-        const container = document.getElementById('roleUsersContainer');
-        const badge = document.getElementById('roleUserCount');
-        badge.textContent = users.length;
-
-        if (!users.length) {
-            container.innerHTML = `
-                <div class="w-full text-center text-sm text-gray-500 dark:text-gray-400 py-4">
-                    Chưa có người dùng nào được gán
-                </div>
-            `;
-            return;
-        }
-
-        const items = users.map(user => {
-            const name = user.name || user.full_name || user.email || `ID ${user.id}`;
-            const description = user.email ? `Email: ${user.email}` : `ID: ${user.id}`;
-            return `
-                <div class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm flex flex-col">
-                    <span class="font-semibold">${name}</span>
-                    <span class="text-xs text-gray-500 dark:text-gray-400">${description}</span>
-                </div>
-            `;
-        }).join('');
-
-        container.innerHTML = items;
-    }
-
-    function renderPermissionsTable(permissions = [], filterText = '') {
+    function renderPermissionsTable(filterText = '') {
         const container = document.getElementById('permissionsTableContainer');
 
-        if (!permissions.length) {
+        if (!roleData?.permissions?.length) {
             container.innerHTML = `
                 <div class="flex flex-col items-center justify-center h-full py-12 text-center">
                     <div class="h-16 w-16 rounded-2xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-4">
@@ -322,13 +238,13 @@
 
         const normalizedFilter = (filterText || '').trim().toLowerCase();
         const filteredPermissions = normalizedFilter
-            ? permissions.filter(perm => {
+            ? roleData?.permissions?.filter(perm => {
                 const name = (perm.name || `${perm.method} ${perm.path}` || '').toLowerCase();
                 const description = (perm.description || '').toLowerCase();
                 const group = (perm.group || 'khác').toLowerCase();
                 return name.includes(normalizedFilter) || description.includes(normalizedFilter) || group.includes(normalizedFilter);
             })
-            : permissions;
+            : roleData?.permissions;
 
         if (!filteredPermissions.length) {
             container.innerHTML = `
@@ -440,7 +356,7 @@
             DELETE: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
         };
         const cls = mapColor[methodUpper] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
-        return `<span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded ${cls}">${methodUpper}</span>`;
+        return `<span class="inline-flex items-center px-2 py-1  font-semibold rounded ${cls}">${methodUpper}</span>`;
     }
 
     function getGroupColor(groupName) {
@@ -475,17 +391,17 @@
         return colors[index];
     }
 
-    function renderUsersTable(users = [], filterText = '') {
+    function renderUsersTable(filterText = '') {
         const container = document.getElementById('usersTableContainer');
 
-        if (!users.length) {
+        if (!roleData?.users?.length) {
             container.innerHTML = `
                 <div class="flex flex-col items-center justify-center h-full py-12 text-center">
                     <div class="h-16 w-16 rounded-2xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-4">
                         <i class="fas fa-users text-2xl text-gray-400 dark:text-gray-500"></i>
                     </div>
                     <p class="text-base font-semibold text-gray-700 dark:text-gray-300 mb-1">Chưa có người dùng nào</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Vai trò này chưa được gán cho người dùng nào</p>
+                    <p class=" text-gray-500 dark:text-gray-400">Vai trò này chưa được gán cho người dùng nào</p>
                 </div>
             `;
             return;
@@ -493,12 +409,12 @@
 
         const normalizedFilter = (filterText || '').trim().toLowerCase();
         const filteredUsers = normalizedFilter
-            ? users.filter(user => {
+            ? roleData?.users?.filter(user => {
                 const name = (user.name || user.full_name || '').toLowerCase();
                 const email = (user.email || '').toLowerCase();
                 return name.includes(normalizedFilter) || email.includes(normalizedFilter);
             })
-            : users;
+            : roleData?.users;
 
         if (!filteredUsers.length) {
             container.innerHTML = `
@@ -507,7 +423,7 @@
                         <i class="fas fa-search text-2xl text-gray-400 dark:text-gray-500"></i>
                     </div>
                     <p class="text-base font-semibold text-gray-700 dark:text-gray-300 mb-1">Không tìm thấy người dùng</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Thử từ khóa khác hoặc xóa bộ lọc</p>
+                    <p class=" text-gray-500 dark:text-gray-400">Thử từ khóa khác hoặc xóa bộ lọc</p>
                 </div>
             `;
             return;
@@ -517,7 +433,7 @@
             <div class="overflow-x-auto h-full">
                 <table class="w-full table-fixed border-separate border-spacing-0">
                     <colgroup>
-                        <col class="w-[40px] 2xl:w-[80px]">
+                        <col class="w-[40px] 2xl:w-[60px]">
                         <col class="w-[80px] 2xl:w-[110px]">
                         <col class="w-auto">
                         <col class="w-auto">
@@ -554,7 +470,7 @@
                         <span class="text-gray-600 dark:text-gray-400">${userEmail}</span>
                     </td>
                     <td class="px-4 py-3">
-                        <span class="text-xs text-gray-500 dark:text-gray-400">${createdAt}</span>
+                        <span class=" text-gray-500 dark:text-gray-400">${createdAt}</span>
                     </td>
                 </tr>
             `;

@@ -192,7 +192,7 @@
     @include('admin.util')
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="shrink-0 w-[180px] 2xl:w-[230px] h-screen bg-white dark:bg-gray-900 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700/60 overflow-hidden transition-all duration-300 z-40 flex flex-col">
+    <aside id="sidebar" class="shrink-0 w-[180px] 2xl:w-[250px] h-screen bg-white dark:bg-gray-900 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700/60 overflow-hidden transition-all duration-300 z-40 flex flex-col">
         <!-- Sidebar Header -->
         <div class="h-[55px] 2xl:h-[65px] sidebar-item flex flex-col items-center !justify-between flex-shrink-0">
             <div class="w-full"></div>

@@ -129,11 +129,6 @@ Route::middleware('auth:api')->group(function () {
             'name' => 'Xóa Người dùng',
             'description' => 'Cho phép xóa n người dùng khỏi hệ thống'
         ]);
-        // routeWithPermission('post', '/{id}/roles', [UserController::class, 'assignRoles'], [
-        //     'group' => 'Người dùng',
-        //     'name' => 'Gán vai trò cho Người dùng',
-        //     'description' => 'Cho phép gán hoặc thay đổi vai trò của người dùng'
-        // ]);
     });
 
     // Role Management (Admin) - yêu cầu permission

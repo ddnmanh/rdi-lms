@@ -26,26 +26,26 @@
     <div id="courseDetailCard" class="hidden w-full max-w-[1400px] h-full mx-auto min-h-0"> {{-- cho phép co giãn & cuộn --}}
         <div class="h-full flex flex-col items-stretch justify-start">
             {{-- Tabs header --}}
-            <div class="relative bg-transparent">
+            <div class="relative bg-transparent flex flex-row items-end gap-2">
                 <button type="button"
-                    class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-5 py-2.5 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-800/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                    class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-5 py-2.5 font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-800/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                     data-tab-target="tab-course-info">
                     <i class="fa-regular fa-bookmark"></i>
                     <span>Thông tin khóa học</span>
                 </button>
                 <button type="button"
-                        class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-5 py-2.5 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-800/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-                        data-tab-target="tab-lessons">
+                    class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-5 py-2.5 font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-800/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                    data-tab-target="tab-lessons">
                     <i class="fa-regular fa-clipboard"></i>
                     <span>Bài học</span>
-                    <span id="lessonsTabCount" class="hidden rounded-full bg-gray-200 dark:bg-gray-800 px-2 py-0.5 text-xs font-semibold text-gray-600 dark:text-gray-300"></span>
+                    <span id="lessonsTabCount" class="hidden rounded-full bg-gray-200 dark:bg-gray-800 px-2 py-0.5 font-semibold text-gray-600 dark:text-gray-300"></span>
                 </button>
                 <button type="button"
-                        class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-5 py-2.5 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-800/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-                        data-tab-target="tab-users">
+                    class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-5 py-2.5 font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-800/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                    data-tab-target="tab-users">
                     <i class="fa-regular fa-user"></i>
                     <span>Học viên</span>
-                    <span id="usersTabCount" class="hidden rounded-full bg-gray-200 dark:bg-gray-800 px-2 py-0.5 text-xs font-semibold text-gray-600 dark:text-gray-300"></span>
+                    <span id="usersTabCount" class="hidden rounded-full bg-gray-200 dark:bg-gray-800 px-2 py-0.5 font-semibold text-gray-600 dark:text-gray-300"></span>
                 </button>
             </div>
 
@@ -56,7 +56,7 @@
                     <div class="px-6 py-4 flex items-center justify-between gap-3 rounded-t-none rounded-b-none">
                         <div class="flex items-center gap-3"></div>
                         <a id="editButton" href="#"
-                           class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
+                           class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5  font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
                             <i class="fa-solid fa-pen"></i>
                             <span>Chỉnh sửa</span>
                         </a>
@@ -67,13 +67,13 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {{-- Avatar Section --}}
                             <div class="md:col-span-2">
-                                <label class="block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-2">Ảnh đại diện</label>
+                                <label class="block  font-semibold text-blue-700 dark:text-gray-300 mb-2">Ảnh đại diện</label>
                                 <div class="flex items-center gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900/40">
                                     <div class="w-[300px] aspect-video rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
                                         <img id="courseThumbnail" src="" alt="Avatar" class="h-full w-full object-cover hidden">
                                     </div>
                                     <div class="flex-1">
-                                        {{-- <div class="text-sm text-gray-600 dark:text-gray-300">Ảnh đại diện của người dùng</div> --}}
+                                        {{-- <div class=" text-gray-600 dark:text-gray-300">Ảnh đại diện của người dùng</div> --}}
                                     </div>
                                 </div>
                             </div>
@@ -82,9 +82,9 @@
                                 $infoField = function($label, $id) {
                                     return <<<HTML
                                     <div>
-                                        <label class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">{$label}</label>
+                                        <label class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">{$label}</label>
                                         <div class="px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-                                            <p class="{$id} text-sm text-gray-900 dark:text-gray-100 break-all">-</p>
+                                            <p class="{$id}  text-gray-900 dark:text-gray-100 break-all">-</p>
                                         </div>
                                     </div>
                                     HTML;
@@ -104,9 +104,9 @@
 
                     {{-- Description --}}
                     <div class="px-6 pb-6">
-                        <label class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Mô tả</label>
+                        <label class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Mô tả</label>
                         <div class="px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-                            <p class="courseDescription text-sm text-gray-900 dark:text-gray-100 break-all">-</p>
+                            <p class="courseDescription  text-gray-900 dark:text-gray-100 break-all">-</p>
                         </div>
                     </div>
                 </div>
@@ -116,7 +116,7 @@
                     <div class="px-6 py-4 flex items-center justify-between gap-3 rounded-t-none">
                         <div class="flex items-center gap-3"></div>
                         <a id="manageLessonsButton" href="#"
-                            class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
+                            class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5  font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
                             <i class="fa-solid fa-pen"></i>
                             <span>Quản lý bài học</span>
                         </a>
@@ -133,7 +133,7 @@
                     <div class="px-6 py-4 flex items-center justify-between gap-3 rounded-t-none">
                         <div class="flex items-center gap-3"></div>
                         <a id="manageUsersButton" href="#"
-                            class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
+                            class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5  font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
                             <i class="fa-solid fa-pen"></i>
                             <span>Quản lý học viên</span>
                         </a>
@@ -248,7 +248,7 @@
         const lessons = Array.isArray(course.lessons) ? course.lessons : [];
         const lessonsList = document.getElementById('lessonsList');
         if (!lessons.length) {
-            lessonsList.innerHTML = `<p class="text-sm text-gray-500 dark:text-gray-400 italic">Khóa học chưa có bài học nào</p>`;
+            lessonsList.innerHTML = `<p class=" text-gray-500 dark:text-gray-400 italic">Khóa học chưa có bài học nào</p>`;
         } else {
             lessonsList.innerHTML = lessons.map(lesson => `
                 <div class="group flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 p-4 hover:bg-gray-100 dark:hover:bg-gray-800">
@@ -257,13 +257,13 @@
                             <img src="${lesson.thumbnail_path}" alt="" class="w-[70px] aspect-video object-cover rounded-lg">
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(lesson.title ?? 'Không có tên')}</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">ID: ${escapeHtml_Global(String(lesson.id ?? '-'))} | Thứ tự: ${escapeHtml_Global(String(lesson.display_order ?? '-'))}</p>
+                            <h4 class=" font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(lesson.title ?? 'Không có tên')}</h4>
+                            <p class= text-gray-500 dark:text-gray-400 mt-1">ID: ${escapeHtml_Global(String(lesson.id ?? '-'))} | Thứ tự: ${escapeHtml_Global(String(lesson.display_order ?? '-'))}</p>
                         </div>
                     </div>
                     ${lesson.description ? `
                         <div class="hidden md:block ml-4 max-w-xs">
-                            <span class="text-xs text-gray-500 dark:text-gray-400 truncate block">${escapeHtml_Global(String(lesson.description)).slice(0, 80)}${String(lesson.description).length > 80 ? '…' : ''}</span>
+                            <span class= text-gray-500 dark:text-gray-400 truncate block">${escapeHtml_Global(String(lesson.description)).slice(0, 80)}${String(lesson.description).length > 80 ? '…' : ''}</span>
                         </div>` : ''
                     }
                 </div>
@@ -273,7 +273,7 @@
         const users = Array.isArray(course.users) ? course.users : [];
         const usersList = document.getElementById('usersList');
         if (!users.length) {
-            usersList.innerHTML = `<p class="text-sm text-gray-500 dark:text-gray-400 italic">Khóa học chưa có học viên nào</p>`;
+            usersList.innerHTML = `<p class=" text-gray-500 dark:text-gray-400 italic">Khóa học chưa có học viên nào</p>`;
         } else {
             usersList.innerHTML = users.map(user => `
                 <div class="group flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 p-4 hover:bg-gray-100 dark:hover:bg-gray-800">
@@ -282,12 +282,12 @@
                             <img src="${user.avatar_path}" alt="" class="w-[50px] aspect-square object-cover">
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(user.fullname || user.email || 'Không có tên')}</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">${escapeHtml_Global(user.email || '')}</p>
+                            <h4 class=" font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(user.fullname || user.email || 'Không có tên')}</h4>
+                            <p class= text-gray-500 dark:text-gray-400 mt-1">${escapeHtml_Global(user.email || '')}</p>
                         </div>
                     </div>
                     <div class="ml-4">
-                        <span class="text-xs text-gray-500 dark:text-gray-400">ID: ${escapeHtml_Global(String(user.id ?? '-'))}</span>
+                        <span class= text-gray-500 dark:text-gray-400">ID: ${escapeHtml_Global(String(user.id ?? '-'))}</span>
                     </div>
                 </div>
             `).join('');

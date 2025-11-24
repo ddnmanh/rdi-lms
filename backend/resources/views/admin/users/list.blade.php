@@ -355,7 +355,7 @@
                     </thead>
                     <tbody class="[&>tr:not(:first-child)>td]:border-t [&>tr:not(:first-child)>td]:border-gray-200 dark:[&>tr:not(:first-child)>td]:border-gray-700">
                         <tr>
-                            <td colspan="7" class="pt-40 text-center">
+                            <td colspan="8" class="pt-40 text-center">
                                 <div class="flex flex-col items-center justify-center">
                                     <div class="h-20 w-20 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center mb-4 shadow-lg">
                                         <i class="fas fa-inbox text-3xl text-gray-400 dark:text-gray-500"></i>

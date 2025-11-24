@@ -36,8 +36,6 @@ Route::prefix('admin')->middleware('auth.cookie')->group(function () {
     Route::get('/courses/create', [AdminController::class, 'createCourse'])->name('admin.courses.create');
     Route::get('/courses/{id}', [AdminController::class, 'showCourse'])->name('admin.courses.show');
     Route::get('/courses/{id}/edit', [AdminController::class, 'editCourse'])->name('admin.courses.edit');
-    Route::get('/courses/{id}/lessons', [AdminController::class, 'manageCourseLessons'])->name('admin.courses.lessons');
-    Route::get('/courses/{id}/users', [AdminController::class, 'manageCourseUsers'])->name('admin.courses.users');
     Route::get('/lessons', [AdminController::class, 'lessons'])->name('admin.lessons.list');
     Route::get('/lessons/create', [AdminController::class, 'createLesson'])->name('admin.lessons.create');
     Route::get('/lessons/{id}', [AdminController::class, 'showLesson'])->name('admin.lessons.show');

@@ -1,40 +1,22 @@
 @extends('admin.layout')
 
-@section('title', $mode === 'create' ? 'Thêm người dùng' : 'Chỉnh sửa người dùng')
+@section('title', $mode === 'CREATE' ? 'Thêm người dùng' : 'Chỉnh sửa người dùng')
 
-@section('description', $mode === 'create' ? 'Thêm người dùng mới vào hệ thống' : 'Chỉnh sửa thông tin người dùng')
+@section('description', $mode === 'CREATE' ? 'Thêm người dùng mới vào hệ thống' : 'Chỉnh sửa thông tin người dùng')
 
 @section('content')
-<div class="h-full flex flex-col items-stretch justify-start gap-4 2xl:gap-6">
-    {{-- Top Bar / Breadcrumbs + Actions (Flat) --}}
-    {{-- <div class="sticky top-0 z-20">
-        <div class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-3 sm:px-4 py-2">
-            <div class="flex items-center justify-between gap-3">
-                <div class="flex items-center gap-2">
-                    <a href="{{ route('admin.users.list') }}"
-                       class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">
-                        <svg class="h-4 w-4 -ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                        </svg>
-                        <span>Quay lại</span>
-                    </a>
-                </div>
-                <div class="flex items-center gap-2">
-                </div>
-            </div>
-        </div>
-    </div> --}}
+<div class="h-full flex flex-col items-stretch justify-start gap-4 2xl:gap-6"> 
 
     {{-- Form Card --}}
     <form id="userForm" onsubmit="saveUser(event)" class="w-full max-w-[1400px] mx-auto p-4 md:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-        <input type="hidden" id="userId" value="{{ $mode === 'edit' ? ($userId ?? '') : '' }}">
+        <input type="hidden" id="userId" value="{{ $mode === 'EDIT' ? ($userId ?? '') : '' }}">
         <input type="hidden" id="avatar_path" value="">
 
         <div class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {{-- Avatar Section with Drag & Drop --}}
                 <div class="md:col-span-2">
-                    <label class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Ảnh đại diện</label>
+                    <label class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Ảnh đại diện</label>
                     <div
                         id="avatarDropZone"
                         class="flex items-center gap-4 p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg"
@@ -47,15 +29,15 @@
                         </div>
 
                         <div class="flex-1">
-                            <div class="text-sm text-gray-600 dark:text-gray-300">Kéo & thả ảnh vào đây, hoặc</div>
+                            <div class=" text-gray-600 dark:text-gray-300">Kéo & thả ảnh vào đây, hoặc</div>
                             <div class="mt-2 flex items-center gap-3">
-                                <label for="avatar" class="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 text-sm">
+                                <label for="avatar" class="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 ">
                                     Chọn ảnh
                                 </label>
                                 <button
                                     id="btnClearNewAvatar"
                                     type="button"
-                                    class="hidden px-3 py-2 rounded-md border border-red-300 text-red-600 hover:bg-red-50 dark:border-red-600 dark:hover:bg-gray-700 text-sm"
+                                    class="hidden px-3 py-2 rounded-md border border-red-300 text-red-600 hover:bg-red-50 dark:border-red-600 dark:hover:bg-gray-700 "
                                 >
                                     Xóa ảnh mới
                                 </button>
@@ -66,25 +48,26 @@
                                     class="hidden"
                                 />
                             </div>
-                            <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">Hỗ trợ PNG, JPG, WEBP, GIF — Tối đa 2MB</div>
+                            <div class="mt-2  text-gray-500 dark:text-gray-400">Hỗ trợ PNG, JPG, WEBP, GIF — Tối đa 2MB</div>
                         </div>
                     </div>
                 </div>
 
                 {{-- Fullname --}}
                 <div class="">
-                    <label for="fullname" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Họ tên</label>
+                    <label name="fullname_LABEL"  for="fullname" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Họ tên <span class="text-red-500">*</span></label>
                     <input
                         type="text"
                         id="fullname"
                         class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none"
                         placeholder="Nhập họ tên"
                     />
+                    <span id="fullname_MSG" class="ml-4 text-sm mt-1 italic hidden"></span>
                 </div>
 
                 {{-- Email --}}
                 <div>
-                    <label for="email" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Email *</label>
+                    <label name="email_LABEL" for="email" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Email <span class="text-red-500">*</span></label>
                     <input
                         type="email"
                         id="email"
@@ -92,25 +75,27 @@
                         class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none"
                         placeholder="Nhập email"
                     />
+                    <span id="email_MSG" class="ml-4 text-sm mt-1 italic hidden"></span>
                 </div>
 
                 {{-- Password --}}
                 <div>
-                    <label for="password" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">
-                        Password {{ $mode === 'create' ? '*' : '' }}
+                    <label name="password_LABEL" for="password" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">
+                        Password {!! $mode === 'CREATE' ? '<span class="text-red-500">*</span>' : '' !!}
                     </label>
                     <input
                         type="password"
                         id="password"
-                        {{ $mode === 'create' ? 'required' : '' }}
-                        placeholder="{{ $mode === 'edit' ? 'Để trống nếu không đổi mật khẩu' : 'Nhập mật khẩu' }}"
+                        {{ $mode === 'CREATE' ? 'required' : '' }}
+                        placeholder="{{ $mode === 'EDIT' ? 'Để trống nếu không đổi mật khẩu' : 'Nhập mật khẩu' }}"
                         class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none"
                     />
+                    <span id="password_MSG" class="ml-4 text-sm mt-1 italic hidden"></span>
                 </div>
 
                 {{-- Birthday --}}
                 <div>
-                    <label for="birthday" class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Ngày sinh</label>
+                    <label for="birthday" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Ngày sinh</label>
                     <input
                         type="date"
                         id="birthday"
@@ -120,18 +105,18 @@
 
                 {{-- Roles --}}
                 <div class="md:col-span-2">
-                    <label class="ml-4 block text-sm font-semibold text-blue-700 dark:text-gray-300 mb-1">Vai trò *</label>
+                    <label class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Vai trò <span class="text-red-500">*</span></label>
                     <div id="rolesCheckboxes" class="flex flex-row flex-wrap gap-1">
                         <div class="flex items-center justify-center py-8 w-full">
                             <div class="flex flex-col items-center justify-center">
                                 <div class="h-12 w-12 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center mb-3">
                                     <i class="fas fa-spinner fa-spin text-xl text-gray-400 dark:text-gray-500"></i>
                                 </div>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Đang tải vai trò...</p>
+                                <p class=" text-gray-600 dark:text-gray-400">Đang tải vai trò...</p>
                             </div>
                         </div>
                     </div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Chọn ít nhất một vai trò cho người dùng</p>
+                    <p class="ml-4 text-sm text-gray-500 dark:text-gray-400 mt-1">Chọn ít nhất một vai trò cho người dùng</p>
                 </div>
             </div>
 
@@ -148,7 +133,7 @@
                     id="submitBtn"
                     class="px-4 py-2 rounded-md text-white bg-blue-600 hover:bg-blue-700"
                 >
-                    {{ $mode === 'create' ? 'Tạo' : 'Cập nhật' }}
+                    {{ $mode === 'CREATE' ? 'Tạo' : 'Cập nhật' }}
                 </button>
             </div>
         </div>
@@ -158,15 +143,15 @@
 
 <script>
     let rolesList = [];
-    const mode = '{{ $mode }}';
-    const userId = @if($mode === 'edit' && isset($userId)) {{ $userId }} @else null @endif;
+    const mode = '{{ $mode }}'; // CREATE or EDIT
+    const userId = @if($mode === 'EDIT' && isset($userId)) {{ $userId }} @else null @endif;
     let existingThumbnail = null;
     let thumbnailPreview = null;
     let isDragActive = false;
 
     document.addEventListener('DOMContentLoaded', async function() {
         await loadRoles();
-        if (mode === 'edit' && userId) {
+        if (mode === 'EDIT' && userId) {
             await loadUserData(userId);
         }
         initAvatarPreviewForm();
@@ -193,7 +178,7 @@
         if (rolesList.length === 0) {
             container.innerHTML = `
                 <div class="flex items-center justify-center py-8 w-full">
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Không có vai trò nào</p>
+                    <p class=" text-gray-600 dark:text-gray-400">Không có vai trò nào</p>
                 </div>
             `;
             return;
@@ -206,7 +191,7 @@
                 <label class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer transition-colors">
                     <input type="checkbox" name="role_ids[]" value="${role.id}" ${checked}
                         class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">${role.name}</span>
+                    <span class=" font-medium text-gray-700 dark:text-gray-300">${role.name}</span>
                 </label>
             `;
         });
@@ -312,7 +297,7 @@
         const placeholderEl = document.getElementById('avatarPlaceholder');
 
         // Default preview for create mode
-        if (!existingThumbnail && mode === 'create') {
+        if (!existingThumbnail && mode === 'CREATE') {
             avatarEl.classList.add('hidden');
             placeholderEl.classList.remove('hidden');
         }
@@ -366,6 +351,8 @@
 
     async function saveUser(event) {
         event.preventDefault();
+        renderInputErrors_Global(null, true); // Clear previous errors
+
         const userIdValue = document.getElementById('userId').value;
         const submitBtn = document.getElementById('submitBtn');
 
@@ -388,79 +375,57 @@
             showNotificationModel_Global('Vui lòng chọn ít nhất một vai trò', 'error');
             if (submitBtn) {
                 submitBtn.disabled = false;
-                submitBtn.textContent = mode === 'create' ? 'Tạo' : 'Cập nhật';
+                submitBtn.textContent = mode === 'CREATE' ? 'Tạo' : 'Cập nhật';
             }
             return;
         }
         const roleIds = Array.from(roleCheckboxes).map(cb => parseInt(cb.value));
 
-        const isEdit = Boolean(userIdValue);
-        const url = isEdit ? `/users/${userIdValue}` : '/users';
-        const method = isEdit ? 'PUT' : 'POST';
+        const url = mode === 'EDIT' ? `/users/${userIdValue}` : '/users';
+        const method = mode === 'EDIT' ? 'PUT' : 'POST';
 
-        try {
-            let data;
-            if (avatarFile || existingThumbnail) {
-                // Use multipart/form-data when file is selected or existing thumbnail
-                const fd = new FormData();
-                // Laravel/Symfony không parse multipart cho PUT/PATCH -> dùng POST + _method
-                if (isEdit) {
-                    fd.append('_method', 'PUT');
-                }
-                fd.append('email', email);
-                if (fullname) fd.append('fullname', fullname);
-                if (birthday) fd.append('birthday', birthday);
-                if (existingThumbnail) fd.append('existingThumbnail', existingThumbnail);
-                if (avatarPath) fd.append('avatar_path', avatarPath);
-                if (password) fd.append('password', password);
-                roleIds.forEach(id => fd.append('role_ids[]', id));
-                if (avatarFile) fd.append('avatar', avatarFile);
-
-                const response = await fetch(`/api${url}`, {
-                    method: 'POST',
-                    body: fd,
-                    credentials: 'include',
-                    headers: {
-                        'Accept': 'application/json'
-                        // DO NOT set Content-Type here; browser will set with boundary
-                    }
-                });
-                const json = await response.json();
-                if (!response.ok) {
-                    throw new Error(json.message || 'Có lỗi xảy ra');
-                }
-                data = json;
-            } else {
-                // Fallback to JSON request when no file selected
-                const payload = {
-                    email,
-                    fullname,
-                    birthday,
-                    avatar_path: avatarPath,
-                };
-                if (password) payload.password = password;
-                payload.role_ids = roleIds;
-
-                data = await apiRequest(url, {
-                    method,
-                    body: JSON.stringify(payload)
-                });
+        try { 
+            const fd = new FormData();
+            if (mode === 'EDIT') {
+                fd.append('_method', 'PUT');
             }
+            fd.append('email', email);
+            if (fullname) fd.append('fullname', fullname);
+            if (birthday) fd.append('birthday', birthday);
+            if (existingThumbnail) fd.append('existingThumbnail', existingThumbnail);
+            if (avatarPath) fd.append('avatar_path', avatarPath);
+            if (password) fd.append('password', password);
+            roleIds.forEach(id => fd.append('role_ids[]', id));
+            if (avatarFile) fd.append('avatar', avatarFile);
 
+            const response = await fetch(`/api${url}`, {
+                method: 'POST',
+                body: fd,
+                credentials: 'include',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            const data = await response.json();
             if (data.success) {
-                showNotificationModel_Global(isEdit ? 'Cập nhật thông tin người dùng thành công' : 'Tạo người dùng thành công');
-                setTimeout(() => {
-                    handleBack();
-                }, 1500);
-            }
+                showNotificationModel_Global(mode === 'EDIT' ? 'Cập nhật thông tin người dùng thành công' : 'Tạo người dùng thành công', 'success', handleBack);
+            } else if (response.status === 422) {
+                let errorsField = data.errors || null;
+                renderInputErrors_Global(errorsField);
+            } else {
+                throw new Error(data.message || 'Có lỗi xảy ra');
+            } 
+
         } catch (error) {
             showNotificationModel_Global(error.message || 'Thao tác thất bại', 'error');
+        } finally {
             if (submitBtn) {
                 submitBtn.disabled = false;
-                submitBtn.textContent = mode === 'create' ? 'Tạo' : 'Cập nhật';
+                submitBtn.textContent = mode === 'CREATE' ? 'Tạo' : 'Cập nhật';
             }
         }
     }
+
 </script>
 @endsection
 

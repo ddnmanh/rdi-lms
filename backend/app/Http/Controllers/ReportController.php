@@ -155,7 +155,7 @@ class ReportController extends Controller
         }, SORT_REGULAR, $orderBy === 'desc');
 
         $perPage = $request->get('per_page', 15);
-        $perPage = min(max(1, (int)$perPage), 100); // Giới hạn từ 1-100
+        // $perPage = min(max(1, (int)$perPage), 100); // Giới hạn từ 1-100
         $currentPage = $request->get('page', 1);
         $items = $studentsWithProgress->forPage($currentPage, $perPage)->values();
 

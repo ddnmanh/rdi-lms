@@ -94,8 +94,7 @@ class UserController extends Controller
 
         $query->orderBy($sortBy, $orderBy);
 
-        $perPage = $request->get('per_page', 15);
-        $perPage = min(max(1, (int)$perPage), 100); // Giới hạn từ 1-100
+        $perPage = $request->get('per_page', 30);
 
         $users = $query->paginate($perPage);
 

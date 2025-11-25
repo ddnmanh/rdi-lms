@@ -156,7 +156,7 @@ class CourseController extends Controller
             $query->orderBy($sortBy, $orderBy);
 
             $perPage = $body['per_page'] ?? 15;
-            $perPage = min(max(1, (int)$perPage), 100); // Giới hạn từ 1-100
+            // $perPage = min(max(1, (int)$perPage), 100); // Giới hạn từ 1-100
 
             $courses = $query->paginate($perPage);
 

@@ -237,7 +237,7 @@ server {
     server_name rdi.sotech.io.vn;
     
     # Redirect all HTTP requests to HTTPS
-    return 301 https://$server_name$request_uri;
+    return 308 https://$server_name$request_uri;
 }
 
 # HTTPS Server

@@ -113,9 +113,9 @@
                     <select id="itemPerPage" onchange="loadRoles(1)"
                         class="px-2 py-0.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100  focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="10">10</option>
-                        <option value="15" selected>15</option>
+                        <option value="15">15</option>
                         <option value="25">25</option>
-                        <option value="50">50</option>
+                        <option value="50" selected>50</option>
                         <option value="100">100</option>
                     </select>
                 </div>
@@ -247,7 +247,7 @@
         const levelTo = document.getElementById('levelTo').value;
         const createdFrom = document.getElementById('createdFrom').value;
         const createdTo = document.getElementById('createdTo').value;
-        const itemPerPage = document.getElementById('itemPerPage').value || 15;
+        const itemPerPage = document.getElementById('itemPerPage').value || 50;
 
         try {
             let url = `/roles?page=${page}&per_page=${itemPerPage}`;

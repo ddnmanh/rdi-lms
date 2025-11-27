@@ -71,6 +71,7 @@ class UserSeederDev extends Seeder
             'fullname' => 'Root Administrator',
             'birthday' => '1990-01-01',
             'roles' => ['ROOT'],
+            'avatar_path' => '/static/defaults/avatar-not-available.jpg',
         ];
 
         // 5 ADMIN users
@@ -83,7 +84,7 @@ class UserSeederDev extends Seeder
         ];
         foreach ($adminNames as $index => $name) {
             $users[] = [
-                'email' => 'admin' . ($index + 1) . '@lms.test',
+                'email' => 'admin' . ($index + 1) . '@lms.vn',
                 'password' => '123123123',
                 'fullname' => $name[0] . ' ' . $name[1],
                 'birthday' => $this->randomDate('1985-01-01', '1995-12-31'),
@@ -102,11 +103,12 @@ class UserSeederDev extends Seeder
             $middleName = $teacherMiddleNames[($i - 1) % count($teacherMiddleNames)];
             
             $users[] = [
-                'email' => 'teacher' . $i . '@lms.test',
+                'email' => 'teacher' . $i . '@lms.vn',
                 'password' => '123123123',
                 'fullname' => $firstName . ' ' . $lastName . ' ' . $middleName,
                 'birthday' => $this->randomDate('1980-01-01', '1990-12-31'),
                 'roles' => ['TEACHER'],
+                'avatar_path' => '/static/defaults/avatar-not-available.jpg',
             ];
         }
 
@@ -121,11 +123,12 @@ class UserSeederDev extends Seeder
             $middleName = $studentMiddleNames[($i - 1) % count($studentMiddleNames)];
             
             $users[] = [
-                'email' => 'student' . $i . '@lms.test',
+                'email' => 'student' . $i . '@lms.vn',
                 'password' => '123123123',
                 'fullname' => $firstName . ' ' . $lastName . ' ' . $middleName,
                 'birthday' => $this->randomDate('1998-01-01', '2005-12-31'),
                 'roles' => ['STUDENT'],
+                'avatar_path' => '/static/defaults/avatar-not-available.jpg',
             ];
         }
 

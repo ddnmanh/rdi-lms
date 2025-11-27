@@ -25,6 +25,7 @@ class UserSeederProduction extends Seeder
             'fullname' => 'Root Administrator',
             'birthday' => '1990-01-01',
             'roles' => ['ROOT'],
+            'avatar_path' => '/static/defaults/avatar-not-available.jpg',
         ];
 
         $roles = $userData['roles'];

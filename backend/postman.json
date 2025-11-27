@@ -78,7 +78,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "// {\n//   \"email\": \"root@rdi.tvu.vn\",\n//   \"password\": \"123123123\"\n// }\n// {\n//   \"email\": \"admin2@lms.test\",\n//   \"password\": \"123123123\"\n// }\n{\n  \"email\": \"student3@lms.test\",\n  \"password\": \"123123123\"\n}"
+							"raw": "// {\n//   \"email\": \"root@rdi.tvu.vn\",\n//   \"password\": \"123123123\"\n// }\n// {\n//   \"email\": \"admin2@lms.vn\",\n//   \"password\": \"123123123\"\n// }\n{\n  \"email\": \"student3@lms.vn\",\n  \"password\": \"123123123\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/auth/login",

@@ -89,6 +89,7 @@ class UserSeederDev extends Seeder
                 'fullname' => $name[0] . ' ' . $name[1],
                 'birthday' => $this->randomDate('1985-01-01', '1995-12-31'),
                 'roles' => ['ADMIN'],
+                'avatar_path' => '/static/defaults/avatar-not-available.jpg',
             ];
         }
 

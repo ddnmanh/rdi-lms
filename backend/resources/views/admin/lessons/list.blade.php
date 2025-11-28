@@ -307,8 +307,8 @@
                 <col class="">
                 <col class="">
                 <col class="">
-                <col class="w-[120px] 2xl:w-[140px]">
-                <col class="w-[110px] 2xl:w-[140px]">
+                <col class="w-[120px] 2xl:w-[160px]">
+                <col class="w-[110px] 2xl:w-[180px]">
             </colgroup>
             <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
                 <tr>
@@ -363,7 +363,7 @@
         lessons.forEach(lesson => { 
             const isChecked = selectedLessonIds.has(lesson.id);
             html += `
-                <tr class="border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                <tr class="border border-gray-100 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700">
                     <td class="px-4 py-3 text-center">
                         <input type="checkbox"
                             class="lesson-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"

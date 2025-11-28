@@ -42,6 +42,7 @@ Tài liệu này hướng dẫn triển khai dự án lên Ubuntu Server có cà
 | Docker Compose | 1.29+ | Môi trường chạy dự án theo cụm |
 | Nginx | 1.24+ | Web Server cho server ngoài |
 | rdi.sotech.io.vn |  | Domain truy cập dự án (Đã trỏ IP về server) | 
+| FFmpeg | latest | Dùng trong container PHP để tạo HLS |
 
 ## 📁 Cấu trúc files liên quan
 ```
@@ -98,6 +99,23 @@ vim .env
 | `APP_ENV` | `production` | Môi trường sản phẩm |
 | `APP_DEBUG` | `false` | Tắt chế độ debug |
 | `APP_URL` | `http://rdi.sotech.io.vn` | URL của ứng dụng |
+| `FFMPEG_PATH` | `ffmpeg` | Binary ffmpeg bên trong container |
+| `HLS_SECRET_KEY` | `...` | Secret dùng ký URL HLS (phải trùng với Nginx HLS, nếu có) |
+| `HLS_DEFAULT_EXPIRY` | `3600` | Thời gian hết hạn URL HLS (giây) |
+| `HLS_BASE_URL` | `https://rdi.sotech.io.vn/hls` | Base URL cho HLS playlist/segment |
+| `HLS_RESTRICT_BY_IP` | `false` | Bật/tắt ràng buộc IP khi verify URL HLS |
+| `HLS_STORAGE_PATH` | `hls` | Thư mục lưu HLS trong `storage/app` |
+
+**Lưu ý cho FFmpeg/HLS khi chạy trong Docker:**
+
+- Image PHP (xem `Dockerfile`) đã cài sẵn ffmpeg bằng `apt-get`, nên bên trong container lệnh `ffmpeg` đã khả dụng.
+- Trong `.env` trên server bạn nên để:
+
+```env
+FFMPEG_PATH=ffmpeg
+```
+
+- Các biến `HLS_*` cần được set đúng domain thật (`APP_URL`) để signed URL khi trả về cho frontend có thể play được.
 
 **Chuẩn bị MySQL trên Ubuntu Server:**
 
@@ -141,6 +159,22 @@ docker-compose up -d
 
 # Kiểm tra trạng thái
 docker-compose ps
+```
+
+#### Bước 3.1: Kiểm tra FFmpeg trong container
+Đảm bảo binary `ffmpeg` sẵn sàng bên trong container `app`:
+
+```bash
+docker-compose exec app ffmpeg -version
+```
+
+- Nếu lệnh trên in ra version FFmpeg thì OK.
+- Nếu báo `ffmpeg: command not found` thì kiểm tra lại `Dockerfile` (phải có bước `apt-get install -y ffmpeg`) và build lại image:
+
+```bash
+docker-compose down
+docker-compose build --no-cache
+docker-compose up -d
 ```
 
 #### Bước 4: Test kết nối MySQL
@@ -317,6 +351,9 @@ docker-compose ps
 
 # Test kết nối database từ container
 docker-compose exec app php artisan migrate:status
+
+# Test FFmpeg bên trong container
+docker-compose exec app ffmpeg -version
 
 # Test từ host
 curl http://localhost:8080

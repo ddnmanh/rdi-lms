@@ -37,22 +37,26 @@ class StudentController extends Controller
         }
 
         // Sắp xếp
-        $sortBy = $request->get('sort_by', 'id');
+        $sortBy = $request->get('sort_by', 'joined_at');
         $orderBy = $request->get('order_by', 'desc');
-        
-        // Validate sort_by
-        $allowedSortBy = ['id', 'title', 'start_date', 'end_date', 'created_at', 'updated_at'];
-        if (!in_array($sortBy, $allowedSortBy)) {
-            $sortBy = 'id';
-        }
         
         // Validate order_by
         $orderBy = strtolower($orderBy);
         if (!in_array($orderBy, ['asc', 'desc'])) {
             $orderBy = 'desc';
         }
-        
-        $query->orderBy($sortBy, $orderBy);
+
+        // Validate sort_by và sắp xếp
+        if ($sortBy === 'joined_at') {
+            // Sắp xếp theo created_at của course_user (thời điểm sinh viên được gán vào khóa học)
+            $query->orderBy('course_user.created_at', $orderBy);
+        } else {
+            $allowedSortBy = ['id', 'title', 'start_date', 'end_date', 'created_at', 'updated_at'];
+            if (!in_array($sortBy, $allowedSortBy)) {
+                $sortBy = 'id';
+            }
+            $query->orderBy($sortBy, $orderBy);
+        }
 
         $courses = $query->get();
 

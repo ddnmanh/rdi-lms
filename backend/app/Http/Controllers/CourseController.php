@@ -373,7 +373,7 @@ class CourseController extends Controller
             }
 
             $userIds = isset($body['user_ids']) ? $body['user_ids'] : [];
-            $course->users()->sync($userIds);
+            $course->users()->syncWithPivotValues($userIds, ['created_at' => now(), 'updated_at' => now()], true);
 
             return response()->json([
                 'success' => true,

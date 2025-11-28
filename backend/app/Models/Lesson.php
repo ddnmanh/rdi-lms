@@ -17,6 +17,7 @@ class Lesson extends Model
         'thumbnail_path',
         'duration',
         'video_path',
+        'hls_path',
         'display_order',
         'created_by',
         'deleted_by',

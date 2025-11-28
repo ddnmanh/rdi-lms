@@ -63,7 +63,8 @@ class ProcessLessonVideoUpload implements ShouldQueue
         try {
             $this->mergeChunkFiles($tmpDirectory, $mergedTempFile);
             $storagePath = $this->moveToFinalStorage($upload, $mergedTempFile);
-            $this->updateLessonVideo($upload, $storagePath);
+            $hlsPath = $this->generateHLSPlaylist($storagePath);
+            $this->updateLessonVideo($upload, $storagePath, $hlsPath);
 
             $upload->update([
                 'status' => LessonVideoUpload::STATUS_COMPLETED,
@@ -129,7 +130,7 @@ class ProcessLessonVideoUpload implements ShouldQueue
         return $storagePath;
     }
 
-    protected function updateLessonVideo(LessonVideoUpload $upload, string $storagePath): void
+    protected function updateLessonVideo(LessonVideoUpload $upload, string $storagePath, ?string $hlsPath = null): void
     {
         if (!$upload->lesson_id) {
             return;
@@ -143,6 +144,7 @@ class ProcessLessonVideoUpload implements ShouldQueue
 
         // Lưu lại video path cũ để xóa sau
         $oldVideoPath = $lesson->video_path;
+        $oldHlsPath = $lesson->hls_path;
 
         // Cập nhật video path mới
         $publicUrl = Storage::url($storagePath);
@@ -150,11 +152,17 @@ class ProcessLessonVideoUpload implements ShouldQueue
         // Tính toán duration video
         $duration = $this->calculateVideoDuration($storagePath);
         
-        // Cập nhật lesson với video path và duration
-        $lesson->update([
+        // Cập nhật lesson với video path, hls path và duration
+        $updateData = [
             'video_path' => $publicUrl,
             'duration' => $duration,
-        ]);
+        ];
+        
+        if ($hlsPath) {
+            $updateData['hls_path'] = Storage::url($hlsPath);
+        }
+        
+        $lesson->update($updateData);
 
         // Xóa video cũ nếu là file local storage (không phải URL bên ngoài hoặc background upload placeholder)
         // Chỉ xóa sau khi cập nhật thành công
@@ -175,6 +183,139 @@ class ProcessLessonVideoUpload implements ShouldQueue
                 ]);
             }
         }
+        
+        // Xóa HLS playlist cũ nếu có
+        if ($oldHlsPath && $this->isLocalStorageFile($oldHlsPath)) {
+            try {
+                $oldHlsStoragePath = str_replace('/storage/', '', $oldHlsPath);
+                // Lấy thư mục chứa file .m3u8
+                $hlsDirectory = dirname($oldHlsStoragePath);
+                // Xóa toàn bộ thư mục HLS (bao gồm .m3u8 và các .ts segments)
+                Storage::disk('public')->deleteDirectory($hlsDirectory);
+                Log::info('Deleted old HLS directory', [
+                    'lesson_id' => $lesson->id,
+                    'old_hls_directory' => $hlsDirectory
+                ]);
+            } catch (Throwable $exception) {
+                Log::warning('Failed to delete old HLS directory', [
+                    'lesson_id' => $lesson->id,
+                    'old_hls_path' => $oldHlsPath,
+                    'error' => $exception->getMessage()
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Tạo HLS playlist từ video đã merge
+     * Sử dụng FFmpeg để convert video sang định dạng HLS
+     */
+    protected function generateHLSPlaylist(string $storagePath): ?string
+    {
+        try {
+            $fullVideoPath = storage_path('app/public/' . $storagePath);
+
+            if (!file_exists($fullVideoPath)) {
+                Log::warning('Video file not found for HLS generation', [
+                    'path' => $fullVideoPath
+                ]);
+                return null;
+            }
+
+            // Tạo thư mục HLS riêng cho video này
+            $pathInfo = pathinfo($storagePath);
+            $hlsDirectory = $pathInfo['dirname'] . '/hls_' . $pathInfo['filename'];
+            $hlsFullDirectory = storage_path('app/public/' . $hlsDirectory);
+
+            if (!File::isDirectory($hlsFullDirectory)) {
+                File::makeDirectory($hlsFullDirectory, 0755, true);
+            }
+
+            $hlsPlaylistPath = $hlsDirectory . '/playlist.m3u8';
+            $hlsFullPlaylistPath = storage_path('app/public/' . $hlsPlaylistPath);
+
+            // Sử dụng FFmpeg để tạo HLS playlist
+            // -c copy: copy codec (không re-encode) - nhanh nhất
+            // -hls_time 10: mỗi segment 10 giây
+            // -hls_list_size 0: giữ tất cả segments trong playlist
+            // -hls_segment_filename: pattern cho tên file segment
+            // -f hls: output format HLS
+            $segmentPattern = $hlsFullDirectory . '/segment_%03d.ts';
+            
+            // Tìm đường dẫn đến FFmpeg
+            $ffmpegPath = $this->findFFmpegPath();
+            
+            if (!$ffmpegPath) {
+                Log::error('FFmpeg not found in system');
+                return null;
+            }
+            
+            // Sử dụng -c copy để không re-encode, chỉ remux sang HLS
+            // Nếu video đã là H.264/AAC thì sẽ rất nhanh (vài giây)
+            $command = sprintf(
+                '%s -i %s -c copy -bsf:v h264_mp4toannexb -hls_time 10 -hls_list_size 0 -hls_segment_filename %s -f hls %s 2>&1',
+                escapeshellarg($ffmpegPath),
+                escapeshellarg($fullVideoPath),
+                escapeshellarg($segmentPattern),
+                escapeshellarg($hlsFullPlaylistPath)
+            );
+
+            Log::info('Starting HLS conversion', [
+                'command' => $command,
+                'video_path' => $fullVideoPath
+            ]);
+
+            exec($command, $output, $returnCode);
+
+            if ($returnCode !== 0) {
+                Log::error('FFmpeg HLS conversion failed', [
+                    'return_code' => $returnCode,
+                    'output' => implode("\n", $output)
+                ]);
+                return null;
+            }
+
+            Log::info('HLS conversion completed successfully', [
+                'hls_path' => $hlsPlaylistPath,
+                'segments_created' => count(glob($hlsFullDirectory . '/*.ts'))
+            ]);
+
+            return $hlsPlaylistPath;
+        } catch (Throwable $exception) {
+            Log::error('Failed to generate HLS playlist', [
+                'error' => $exception->getMessage(),
+                'trace' => $exception->getTraceAsString()
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Tìm đường dẫn đến FFmpeg
+     */
+    private function findFFmpegPath(): ?string
+    {
+        // Các đường dẫn phổ biến để tìm FFmpeg
+        $possiblePaths = [
+            '/opt/homebrew/bin/ffmpeg',  // Homebrew trên macOS Apple Silicon
+            '/usr/local/bin/ffmpeg',      // Homebrew trên macOS Intel
+            '/usr/bin/ffmpeg',            // Linux
+            '/opt/local/bin/ffmpeg',      // MacPorts
+        ];
+
+        foreach ($possiblePaths as $path) {
+            if (file_exists($path) && is_executable($path)) {
+                return $path;
+            }
+        }
+
+        // Thử tìm trong PATH
+        exec('which ffmpeg 2>/dev/null', $output, $returnCode);
+        if ($returnCode === 0 && !empty($output[0])) {
+            return trim($output[0]);
+        }
+
+        return null;
     }
 
     /**

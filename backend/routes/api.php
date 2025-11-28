@@ -248,8 +248,13 @@ Route::middleware('auth:api')->group(function () {
             'description' => 'Cho phép stream video bài học với hỗ trợ HTTP range để ứng dụng Flutter có thể phát mà không cần tải toàn bộ file'
         ]);
 
+        routeWithPermission('get', '/{lesson}/hls-signature', [LessonVideoStreamController::class, 'getHlsSignature'], [
+            'group' => 'Bài học',
+            'name' => 'Lấy chữ ký HLS video',
+            'description' => 'Cấp chữ ký (signed token) cho video HLS để truy cập qua Nginx secure link'
+        ]);
 
-        // Lesson video uploads - upload bất đồng bộ
+        
         Route::prefix('video-uploads')->group(function () {
             routeWithPermission('post', '/sessions', [LessonVideoUploadController::class, 'createSession'], [
                 'group' => 'Upload video bài học',

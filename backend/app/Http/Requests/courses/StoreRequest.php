@@ -21,7 +21,7 @@ class StoreRequest extends FormRequest
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'timezone' => 'nullable|string',
-            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240', // 10MB
         ];
     }
 
@@ -41,9 +41,9 @@ class StoreRequest extends FormRequest
 
             'timezone.string'         => 'Múi giờ phải là chuỗi.',
 
-            'thumbnail.image'         => 'Ảnh đại diện phải là một tệp hình ảnh.',
-            'thumbnail.mimes'         => 'Ảnh đại diện phải có định dạng: :values.',
-            'thumbnail.max'           => 'Ảnh đại diện không được vượt quá :max kilobytes.',
+            'thumbnail.image'         => 'Ảnh bìa phải là một tệp hình ảnh.',
+            'thumbnail.mimes'         => 'Ảnh bìa phải có định dạng: :values.',
+            'thumbnail.max'           => 'Ảnh bìa không được vượt quá :max Megabyte.',
         ];
     }
 
@@ -55,7 +55,7 @@ class StoreRequest extends FormRequest
             'start_date'  => 'Ngày bắt đầu',
             'end_date'    => 'Ngày kết thúc',
             'timezone'    => 'Múi giờ',
-            'thumbnail'   => 'Ảnh đại diện',
+            'thumbnail'   => 'Ảnh bìa',
         ];
     }
 

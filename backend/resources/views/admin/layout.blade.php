@@ -19,6 +19,21 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 
     <script>
+        tailwind.config = {
+            theme: {
+                screens: {
+                    sm: "640px",
+                    md: "768px",
+                    lg: "1024px",
+                    xl: "1280px",
+                    "3xl": "1900px",
+                }
+            }
+        }
+    </script>
+
+
+    <script>
         // ===== Theme (Light/Dark) =====
         const THEME_KEY = 'lms-theme';
         function applyTheme(theme) {
@@ -192,9 +207,9 @@
     @include('admin.util')
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="shrink-0 w-[180px] 2xl:w-[250px] h-screen bg-white dark:bg-gray-900 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700/60 overflow-hidden transition-all duration-300 z-40 flex flex-col">
+    <aside id="sidebar" class="shrink-0 w-[180px] 3xl:w-[250px] h-screen bg-white dark:bg-gray-900 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700/60 overflow-hidden transition-all duration-300 z-40 flex flex-col">
         <!-- Sidebar Header -->
-        <div class="h-[55px] 2xl:h-[65px] sidebar-item flex flex-col items-center !justify-between flex-shrink-0">
+        <div class="h-[54px] 3xl:h-[71px] sidebar-item flex flex-col items-center !justify-between flex-shrink-0">
             <div class="w-full"></div>
             <a href="{{ route('admin.dashboard') }}"
                 class="group flex items-center gap-3 hover:opacity-90 transition-all duration-300">
@@ -355,11 +370,11 @@
                 <!-- Title Section -->
                 <div class="flex flex-col gap-0 min-w-0 flex-1">
                     <h2
-                        class="text-lg sm:text-xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent truncate">
+                        class="font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent truncate">
                         @yield('title', 'Admin Panel')
                     </h2>
                     @hasSection('description')
-                        <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
+                        <p class="text-xs 3xl:text-sm text-gray-600 dark:text-gray-400 truncate">
                             @yield('description')
                         </p>
                     @endif
@@ -368,7 +383,7 @@
                 <div class="flex items-center gap-2 md:gap-3 flex-shrink-0">
                     <div class="relative" id="user-menu-container">
                         <button type="button" onclick="toggleUserMenu()"
-                            class="flex items-center gap-2.5 cursor-pointer select-none rounded-full p-1 pl-1.5 pr-2.5 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                            class="flex items-center gap-2.5 cursor-pointer select-none rounded-full p-1 pl-1.5 pr-2.5 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500/20">
                             <div class="relative">
                                 <img src="{{ optional(request()->user())->avatar_path }}"
                                     alt="Avatar"
@@ -381,7 +396,7 @@
                                 <span
                                     class="text-sm font-semibold text-gray-700 dark:text-gray-200 leading-none">{{ optional(request()->user())->fullname ?? 'User' }}</span>
                                 <span
-                                    class="text-[10px] font-medium text-gray-500 dark:text-gray-400 leading-none mt-1">{{ optional(request()->user())->roles->first()->name ?? 'Member' }}</span>
+                                    class="text-[10px] font-medium text-gray-500 dark:text-gray-400 leading-none mt-1">{{ optional(request()->user())->email ?? 'Member' }}</span>
                             </div>
                             <i class="fas fa-chevron-down text-[10px] text-gray-400 dark:text-gray-500 ml-1 transition-transform duration-300"
                                 id="user-menu-arrow"></i>
@@ -394,10 +409,9 @@
                             <!-- Header -->
                             <div
                                 class="px-5 py-4 border-b border-gray-100 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/50 rounded-t-2xl">
-                                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                    Đăng nhập với</p>
-                                <p class="text-sm font-bold text-gray-900 dark:text-white mt-1 truncate">
-                                    {{ optional(request()->user())->email }}</p>
+                                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Truy cập nhanh</p>
+                                {{-- <p class="text-sm font-bold text-gray-900 dark:text-white mt-1 truncate">
+                                    {{ optional(request()->user())->email }}</p> --}}
                             </div>
 
                             <!-- Menu Items -->
@@ -442,7 +456,7 @@
         </nav>
 
         <!-- Main -->
-        <main class="z-[100] h-[calc(100dvh-55px)] 2xl:h-[calc(100dvh-65px)] mt-[55px] 2xl:mt-[64px] p-2 md:p-6 transition-all duration-300 bg-gray-100 dark:bg-gray-900 overflow-y-auto">
+        <main class="z-[100] h-[calc(100dvh-54px)] 3xl:h-[calc(100dvh-71px)] mt-[54px] 3xl:mt-[71px] p-2 md:p-6 transition-all duration-300 bg-gray-100 dark:bg-gray-900 overflow-y-auto">
             @yield('content')
         </main>
     </div>

@@ -18,8 +18,8 @@ class HlsSignedUrlService
 
     public function __construct()
     {
-        $this->secretKey = config('hls.secret_key', env('HLS_SECRET_KEY', 'your-secret-key'));
-        $this->defaultExpiry = config('hls.default_expiry', env('HLS_DEFAULT_EXPIRY', 3600)); // 1 giờ
+        $this->secretKey = config('static-source.secret_key', env('STATIC_SOURCE_SECRET_KEY', 'TQULUXsEuwX1bjwfZJW5EhFkjxuScYCZ'));
+        $this->defaultExpiry = config('static-source.default_expiry', env('STATIC_SOURCE_DEFAULT_EXPIRY', 3600)); // 1 giờ
     }
 
     /**
@@ -38,16 +38,10 @@ class HlsSignedUrlService
         $expires = $expiry ?? (Carbon::now()->timestamp + $this->defaultExpiry);
 
         // Chuẩn hóa URI
-        $uri = '/' . ltrim($uri, '/');
+        $uri = '/' . ltrim($uri, '/'); 
 
-        // Tạo chuỗi cần ký
-        // Format: {expires}{uri}{secret_key} hoặc {expires}{uri}{client_ip}{secret_key}
-        if ($clientIp) {
-            // $stringToSign = $expires . $uri . $clientIp . $this->secretKey;
-            $stringToSign = $expires . $uri . ' ' . $this->secretKey;
-        } else {
-            $stringToSign = $expires . $uri . ' ' . $this->secretKey;
-        }
+
+        $stringToSign = $expires . $uri . $this->secretKey;
 
         // Tạo chữ ký MD5 (base64 URL-safe)
         // Nginx secure_link dùng MD5 binary -> base64
@@ -71,9 +65,9 @@ class HlsSignedUrlService
      * @param string|null $clientIp IP của client
      * @return array
      */
-    public function generateSignedUrl(string $baseUrl, string $uri, ?int $expiry = null, ?string $clientIp = null): array
+    public function generateSignedUrl(string $baseUrl, string $uri, ?int $expiry = null): array
     {
-        $signature = $this->generateSignature($uri, $expiry, $clientIp);
+        $signature = $this->generateSignature($uri, $expiry);
 
         $baseUrl = rtrim($baseUrl, '/');
         $uri = '/' . ltrim($uri, '/');

@@ -5,7 +5,7 @@
 @section('description', 'Xem thông tin chi tiết và phân quyền của một vai trò')
 
 @section('content')
-<div class="w-full max-w-[1800px] max-h-full mx-auto flex flex-col items-stretch justify-start gap-4 2xl:gap-6">
+<div class="h-full w-full max-w-[1800px] max-h-full mx-auto flex flex-col items-stretch justify-start gap-4 3xl:gap-6">
     <input type="hidden" id="roleId" value="{{ $roleId ?? '' }}">
 
     {{-- Header Card --}}
@@ -57,7 +57,7 @@
         </div>
     </div>
 
-    <div class="flex-1 flex flex-row items-stretch gap-4 2xl:gap-6 min-h-0 overflow-hidden"> 
+    <div class="flex-1 flex flex-row items-stretch gap-4 3xl:gap-6 min-h-0 overflow-hidden"> 
 
         {{-- Permissions --}}
         <div class="flex-1 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col flex-shrink-0 min-h-0 overflow-hidden">
@@ -277,19 +277,19 @@
             <div class="overflow-x-auto h-full">
                 <table class="w-full table-fixed border-separate border-spacing-0">
                     <colgroup>
-                        <col class="w-[40px]">
+                        <col class="w-[40px] 3xl:w-[60px]">
                         <col class="">
                         <col class="">
-                        <col class="w-[80px]">
+                        <col class="w-[80px] 3xl:w-[100px]">
                         <col class="w-[150px]">
                     </colgroup>
                     <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
                         <tr>
-                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">ID</th>
-                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Tên</th>
-                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Mô tả</th>
-                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Method</th>
-                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Path</th>
+                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words truncate">ID</th>
+                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words truncate">Tên</th>
+                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words truncate">Mô tả</th>
+                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words truncate">Method</th>
+                            <th scope="col" class="px-4 py-3 sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words truncate">Path</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -349,11 +349,11 @@
     function renderMethodBadge(method = '-') {
         const methodUpper = (method || '-').toUpperCase();
         const mapColor = {
-            GET: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-            POST: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-            PUT: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
-            PATCH: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
-            DELETE: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+            GET: 'text-xs bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+            POST: 'text-xs bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+            PUT: 'text-xs bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
+            PATCH: 'text-xs bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
+            DELETE: 'text-xs bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
         };
         const cls = mapColor[methodUpper] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
         return `<span class="inline-flex items-center px-2 py-1  font-semibold rounded ${cls}">${methodUpper}</span>`;
@@ -433,8 +433,8 @@
             <div class="overflow-x-auto h-full">
                 <table class="w-full table-fixed border-separate border-spacing-0">
                     <colgroup>
-                        <col class="w-[40px] 2xl:w-[60px]">
-                        <col class="w-[80px] 2xl:w-[110px]">
+                        <col class="w-[40px] 3xl:w-[60px]">
+                        <col class="w-[80px] 3xl:w-[100px]">
                         <col class="w-auto">
                         <col class="w-auto">
                         <col class="w-[180px]">

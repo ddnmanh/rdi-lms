@@ -5,7 +5,7 @@
 @section('description', 'Chỉnh sửa thông tin hồ sơ cá nhân của bạn.')
 
 @section('content')
-<div class="w-full max-w-[900px] my-10 mx-auto p-4 md:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg text-[12px] 2xl:text-[14px]"> 
+<div class="w-full max-w-[900px] my-10 mx-auto p-4 md:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg text-[12px] 3xl:text-[14px]"> 
     <form class="space-y-6" onsubmit="handleUpdateUser(event)">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="md:col-span-2">
@@ -41,7 +41,7 @@
                                     class="hidden"
                                 />
                             </div>
-                            <div class="mt-2 text-gray-500 dark:text-gray-400">Hỗ trợ PNG, JPG, WEBP, GIF — Tối đa 2MB</div>
+                            <div class="mt-2 text-gray-500 dark:text-gray-400">Hỗ trợ PNG, JPG, WEBP — Tối đa 10MB</div>
                         </div>
                     </div>
                 </div>

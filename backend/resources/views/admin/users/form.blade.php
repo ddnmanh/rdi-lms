@@ -5,7 +5,7 @@
 @section('description', $mode === 'CREATE' ? 'Thêm người dùng mới vào hệ thống' : 'Chỉnh sửa thông tin người dùng')
 
 @section('content')
-<div class="h-full flex flex-col items-stretch justify-start gap-4 2xl:gap-6"> 
+<div class="h-full flex flex-col items-stretch justify-start gap-4 3xl:gap-6"> 
 
     {{-- Form Card --}}
     <form id="userForm" onsubmit="saveUser(event)" class="w-full max-w-[1400px] mx-auto p-4 md:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
@@ -48,7 +48,7 @@
                                     class="hidden"
                                 />
                             </div>
-                            <div class="mt-2  text-gray-500 dark:text-gray-400">Hỗ trợ PNG, JPG, WEBP, GIF — Tối đa 2MB</div>
+                            <div class="mt-2  text-gray-500 dark:text-gray-400">Hỗ trợ PNG, JPG, WEBP — Tối đa 10MB</div>
                         </div>
                     </div>
                 </div>
@@ -105,17 +105,46 @@
 
                 {{-- Roles --}}
                 <div class="md:col-span-2">
-                    <label class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Vai trò <span class="text-red-500">*</span></label>
-                    <div id="rolesCheckboxes" class="flex flex-row flex-wrap gap-1">
-                        <div class="flex items-center justify-center py-8 w-full">
-                            <div class="flex flex-col items-center justify-center">
-                                <div class="h-12 w-12 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center mb-3">
-                                    <i class="fas fa-spinner fa-spin text-xl text-gray-400 dark:text-gray-500"></i>
+                    <label class="ml-4 block font-semibold text-blue-700 dark:text-gray-300 mb-1">Vai trò <span class="text-red-500">*</span></label>
+                    
+                    {{-- Custom Multi-Select with Search --}}
+                    <div class="relative">
+                        {{-- Selected Items Display --}}
+                        <div id="selectedRolesContainer" class="min-h-[44px] w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 cursor-pointer flex flex-wrap gap-2 items-center">
+                            <div id="selectedRolesList" class="flex flex-wrap gap-2 flex-1">
+                                <span class="text-gray-400 dark:text-gray-500 text-sm">Đang tải vai trò...</span>
+                            </div>
+                            <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+
+                        {{-- Dropdown Menu --}}
+                        <div id="rolesDropdown" class="hidden absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-80 overflow-hidden flex flex-col">
+                            {{-- Search Input --}}
+                            <div class="p-3 border-b border-gray-200 dark:border-gray-700">
+                                <div class="relative">
+                                    <input 
+                                        type="text" 
+                                        id="roleSearchInput" 
+                                        placeholder="Tìm kiếm vai trò..."
+                                        class="w-full px-3 py-2 pl-9 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    />
+                                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
                                 </div>
-                                <p class=" text-gray-600 dark:text-gray-400">Đang tải vai trò...</p>
+                            </div>
+
+                            {{-- Options List --}}
+                            <div id="rolesOptionsList" class="overflow-y-auto flex-1">
+                                <div class="flex items-center justify-center py-8">
+                                    <div class="h-8 w-8 rounded-full border-2 border-blue-500 border-t-transparent animate-spin"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    
                     <p class="ml-4 text-sm text-gray-500 dark:text-gray-400 mt-1">Chọn ít nhất một vai trò cho người dùng</p>
                 </div>
             </div>
@@ -143,6 +172,8 @@
 
 <script>
     let rolesList = [];
+    let selectedRoles = [];
+    let isDropdownOpen = false;
     const mode = '{{ $mode }}'; // CREATE or EDIT
     const userId = @if($mode === 'EDIT' && isset($userId)) {{ $userId }} @else null @endif;
     let existingThumbnail = null;
@@ -150,49 +181,174 @@
     let isDragActive = false;
 
     document.addEventListener('DOMContentLoaded', async function() {
-        await loadRoles();
+        // 1. Tạo một mảng chứa các promise bắt buộc phải chạy
+        const promises = [loadRoles()];
+
+        // 2. Nếu thỏa điều kiện, thêm promise thứ 2 vào mảng
         if (mode === 'EDIT' && userId) {
-            await loadUserData(userId);
+            promises.push(loadUserData(userId));
         }
+
+        // 3. Chạy tất cả cùng lúc
+        await Promise.all(promises);
+
+        if (rolesList.length > 0) {
+            renderRolesOptions();
+            updateSelectedRolesDisplay();
+        }
+
         initAvatarPreviewForm();
+        initRoleSelector();
     });
 
     function handleBack() {
-        window.history.back();
+        window.location.href = '{{ route('admin.users.list') }}';
     }
 
     async function loadRoles() {
         try {
-            const data = await apiRequest('/roles?per_page=100');
+            const data = await apiRequest('/roles?sort_by=level&order_by=asc&page=1&per_page=1000');
             if (data.success) {
                 rolesList = data.data.data || [];
-                renderRolesCheckboxes();
             }
         } catch (error) {
             showNotificationModel_Global('Không thể tải danh sách vai trò: ' + error.message, 'error');
         }
     }
 
-    function renderRolesCheckboxes(selectedRoleIds = []) {
-        const container = document.getElementById('rolesCheckboxes');
-        if (rolesList.length === 0) {
-            container.innerHTML = `
-                <div class="flex items-center justify-center py-8 w-full">
-                    <p class=" text-gray-600 dark:text-gray-400">Không có vai trò nào</p>
+    function initRoleSelector() {
+        const container = document.getElementById('selectedRolesContainer');
+        const dropdown = document.getElementById('rolesDropdown');
+        const searchInput = document.getElementById('roleSearchInput');
+
+        // Toggle dropdown
+        container.addEventListener('click', (e) => {
+            if (e.target.closest('.role-tag-remove')) return;
+            toggleDropdown();
+        });
+
+        // Search functionality
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            filterRoles(searchTerm);
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#selectedRolesContainer') && !e.target.closest('#rolesDropdown')) {
+                closeDropdown();
+            }
+        });
+
+        // Prevent dropdown close when clicking inside
+        dropdown.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    }
+
+    function toggleDropdown() {
+        const dropdown = document.getElementById('rolesDropdown');
+        isDropdownOpen = !isDropdownOpen;
+        
+        if (isDropdownOpen) {
+            dropdown.classList.remove('hidden');
+            document.getElementById('roleSearchInput').focus();
+        } else {
+            dropdown.classList.add('hidden');
+        }
+    }
+
+    function closeDropdown() {
+        const dropdown = document.getElementById('rolesDropdown');
+        isDropdownOpen = false;
+        dropdown.classList.add('hidden');
+        document.getElementById('roleSearchInput').value = '';
+        filterRoles('');
+    }
+
+    function filterRoles(searchTerm) {
+        const optionsList = document.getElementById('rolesOptionsList');
+        // Lọc roles: loại bỏ những role đã được chọn
+        const filteredRoles = rolesList.filter(role => {
+            const isNotSelected = !selectedRoles.some(r => r.id === role.id);
+            const matchesSearch = role.name.toLowerCase().includes(searchTerm);
+            return isNotSelected && matchesSearch;
+        });
+
+        if (filteredRoles.length === 0) {
+            optionsList.innerHTML = `
+                <div class="flex items-center justify-center py-8">
+                    <p class="text-gray-500 dark:text-gray-400">Không tìm thấy vai trò</p>
                 </div>
             `;
             return;
         }
 
         let html = '';
-        rolesList.forEach(role => {
-            const checked = selectedRoleIds.includes(role.id) ? 'checked' : '';
+        filteredRoles.forEach(role => {
             html += `
-                <label class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer transition-colors">
-                    <input type="checkbox" name="role_ids[]" value="${role.id}" ${checked}
-                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                    <span class=" font-medium text-gray-700 dark:text-gray-300">${role.name}</span>
-                </label>
+                <div onclick="toggleRole(${role.id})" 
+                    class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                    <div class="w-5 h-5 flex items-center justify-center">
+                        <div class="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 rounded"></div>
+                    </div>
+                    <span class="text-gray-700 dark:text-gray-300">${role.name}</span>
+                </div>
+            `;
+        });
+        optionsList.innerHTML = html;
+    }
+
+    function renderRolesOptions() {
+        filterRoles('');
+    }
+
+    function toggleRole(roleId) {
+        const role = rolesList.find(r => r.id === roleId);
+        if (!role) return;
+
+        const index = selectedRoles.findIndex(r => r.id === roleId);
+        if (index > -1) {
+            selectedRoles.splice(index, 1);
+        } else {
+            selectedRoles.push(role);
+        }
+
+        // Clear search input và reset danh sách
+        const searchInput = document.getElementById('roleSearchInput');
+        if (searchInput) {
+            searchInput.value = '';
+        }
+
+        updateSelectedRolesDisplay();
+        renderRolesOptions();
+    }
+
+    function removeRole(roleId) {
+        selectedRoles = selectedRoles.filter(r => r.id !== roleId);
+        updateSelectedRolesDisplay();
+        renderRolesOptions();
+    }
+
+    function updateSelectedRolesDisplay() {
+        const container = document.getElementById('selectedRolesList');
+        
+        if (selectedRoles.length === 0) {
+            container.innerHTML = '<span class="text-gray-400 dark:text-gray-500 text-sm">Chọn vai trò...</span>';
+            return;
+        }
+
+        let html = '';
+        selectedRoles.forEach(role => {
+            html += `
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium">
+                    ${role.name}
+                    <button type="button" onclick="event.stopPropagation(); removeRole(${role.id})" class="role-tag-remove hover:bg-blue-200 dark:hover:bg-blue-800 rounded-full p-0.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </span>
             `;
         });
         container.innerHTML = html;
@@ -223,8 +379,10 @@
                     placeholderEl.classList.add('hidden');
                 }
 
-                const userRoleIds = (user.roles || []).map(r => r.id);
-                renderRolesCheckboxes(userRoleIds);
+                // Set selected roles
+                selectedRoles = user.roles || [];
+                updateSelectedRolesDisplay();
+                renderRolesOptions();
             }
         } catch (error) {
             showNotificationModel_Global('Không thể tải thông tin người dùng: ' + error.message, 'error');
@@ -370,8 +528,7 @@
         const fileInput = document.getElementById('avatar');
         const avatarFile = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
 
-        const roleCheckboxes = document.querySelectorAll('input[name="role_ids[]"]:checked');
-        if (roleCheckboxes.length === 0) {
+        if (selectedRoles.length === 0) {
             showNotificationModel_Global('Vui lòng chọn ít nhất một vai trò', 'error');
             if (submitBtn) {
                 submitBtn.disabled = false;
@@ -379,7 +536,7 @@
             }
             return;
         }
-        const roleIds = Array.from(roleCheckboxes).map(cb => parseInt(cb.value));
+        const roleIds = selectedRoles.map(r => r.id);
 
         const url = mode === 'EDIT' ? `/users/${userIdValue}` : '/users';
         const method = mode === 'EDIT' ? 'PUT' : 'POST';

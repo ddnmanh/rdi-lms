@@ -23,7 +23,7 @@ class GetAllRequest extends FormRequest
             'permission_id' => ['nullable', 'integer', 'exists:permissions,id'],
             'sort_by'       => ['nullable', 'string', 'in:id,name,level,created_at,updated_at'],
             'order_by'      => ['nullable', 'string', 'in:asc,desc'],
-            'per_page'      => ['nullable', 'integer', 'min:1', 'max:100'],
+            'per_page'      => ['nullable', 'integer', 'min:1', 'max:1000'],
             'page'          => ['nullable', 'integer', 'min:1'],
         ];
     }

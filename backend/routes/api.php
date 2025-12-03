@@ -242,16 +242,28 @@ Route::middleware('auth:api')->group(function () {
             'description' => 'Cho phép xóa bài học, không thể xóa bài học đang thuộc về một khóa học'
         ]);
 
-        routeWithPermission('get', '/{lesson}/stream', [LessonVideoStreamController::class, 'stream'], [
+        // routeWithPermission('get', '/{lesson}/stream', [LessonVideoStreamController::class, 'stream'], [
+        //     'group' => 'Bài học',
+        //     'name' => 'Stream video Bài học',
+        //     'description' => 'Cho phép stream video bài học với hỗ trợ HTTP range để ứng dụng Flutter có thể phát mà không cần tải toàn bộ file'
+        // ]);
+
+        routeWithPermission('get', '/{lesson}/auto-signature', [LessonVideoStreamController::class, 'getUriWithSignatureForVideo'], [
             'group' => 'Bài học',
-            'name' => 'Stream video Bài học',
-            'description' => 'Cho phép stream video bài học với hỗ trợ HTTP range để ứng dụng Flutter có thể phát mà không cần tải toàn bộ file'
+            'name' => 'Lấy chữ ký cho video (tự chọn HLS hoặc mp4)',
+            'description' => 'Cấp chữ ký (signed token) cho video (tự động chọn HLS hoặc MP4) để truy cập qua Nginx secure link'
         ]);
 
-        routeWithPermission('get', '/{lesson}/hls-signature', [LessonVideoStreamController::class, 'getHlsSignature'], [
+        routeWithPermission('get', '/{lesson}/hls-signature', [LessonVideoStreamController::class, 'getUriWithSignatureForHlsVideo'], [
             'group' => 'Bài học',
-            'name' => 'Lấy chữ ký HLS video',
+            'name' => 'Lấy chữ ký cho HLS video',
             'description' => 'Cấp chữ ký (signed token) cho video HLS để truy cập qua Nginx secure link'
+        ]);
+        
+        routeWithPermission('get', '/{lesson}/mp4-signature', [LessonVideoStreamController::class, 'getUriWithSignatureForMp4Video'], [
+            'group' => 'Bài học',
+            'name' => 'Lấy chữ ký cho mp4 video',
+            'description' => 'Cấp chữ ký (signed token) cho video mp4 để truy cập qua Nginx secure link'
         ]);
 
         

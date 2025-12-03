@@ -5,7 +5,7 @@
 @section('description', 'Quản lý tất cả vai trò trong hệ thống')
 
 @section('content')
-<div class="h-full flex flex-col items-stretch justify-start gap-2.5 2xl:gap-4">
+<div class="h-full flex flex-col items-stretch justify-start gap-2.5 3xl:gap-4">
     <div class="flex flex-col items-stretch justify-start gap-2.5">
         {{-- Actions Bar --}}
         <div class="flex items-center justify-start gap-3">
@@ -19,7 +19,7 @@
         </div>
 
         {{-- Filter Section --}}
-        <form onsubmit="return handleSubmitFilter(event)" class="max-w-1/2 p-3 2xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col lg:flex-row justify-start gap-4">
+        <form onsubmit="return handleSubmitFilter(event)" class="max-w-1/2 p-3 3xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col lg:flex-row justify-start gap-4">
             <div class="flex flex-col lg:flex-row justify-start flex-wrap gap-4 flex-1">
                 {{-- Name Filter --}}
                 <div class="flex-1 min-w-40 max-w-80 flex flex-col items-stretch justify-start gap-0.5">
@@ -121,7 +121,7 @@
                 </div>
 
                 {{-- Custom Pagination --}}
-                <div id="pagination" class="flex items-center justify-end gap-1  2xl:text-base"></div>
+                <div id="pagination" class="flex items-center justify-end gap-1  3xl:text-base"></div>
             </div>
         </div>
     </div>
@@ -280,37 +280,41 @@
     function renderRolesTable(roles = []) {
         const tableContainer = document.getElementById('rolesTable');
 
+        const headerTable = `
+            <colgroup>
+                <col class="w-[40px] 3xl:w-[60px]">
+                <col class="w-[60px] 3xl:w-[80px]">
+                <col class="w-[140px] 3xl:w-[160px]">
+                <col class="">
+                <col class="w-[80px] 3xl:w-[90px]">
+                <col class="">
+                <col class="w-[120px] 3xl:w-[150px]">
+            </colgroup>
+            <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
+                <tr>
+                    <th class="px-4 py-3 text-center sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm">
+                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                    </th>
+                    <th onclick="handleSort('id')" class="${getHeaderClass('id')}">
+                        ID${getSortIcon('id')}
+                    </th>
+                    <th onclick="handleSort('name')" class="${getHeaderClass('name')}">
+                        Tên${getSortIcon('name')}
+                    </th>
+                    <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Mô tả</th>
+                    <th onclick="handleSort('level')" class="${getHeaderClass('level')}">
+                        Hạng${getSortIcon('level')}
+                    </th>
+                    <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Permissions</th>
+                    <th class="px-4 py-3 text-right sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Thao tác</th>
+                </tr>
+            </thead>
+        `;
+
         if (roles.length === 0) {
             tableContainer.innerHTML = `
                 <table class="w-full table-fixed border-separate border-spacing-0 ">
-                    <colgroup>
-                        <col class="w-[40px] 2xl:w-[80px]">
-                        <col class="w-[60px] 2xl:w-[120px]">
-                        <col class="w-[100px] 2xl:w-[200px]">
-                        <col class="w-[140px] 2xl:w-[240px]">
-                        <col class="w-[80px] 2xl:w-[160px]">
-                        <col class="">
-                        <col class="w-[120px] 2xl:w-[240px]">
-                    </colgroup>
-                    <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
-                        <tr>
-                            <th class="px-4 py-3 text-center sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm">
-                                <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                            </th>
-                            <th onclick="handleSort('id')" class="${getHeaderClass('id')}">
-                                ID${getSortIcon('id')}
-                            </th>
-                            <th onclick="handleSort('name')" class="${getHeaderClass('name')}">
-                                Tên${getSortIcon('name')}
-                            </th>
-                            <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Mô tả</th>
-                            <th onclick="handleSort('level')" class="${getHeaderClass('level')}">
-                                Hạng${getSortIcon('level')}
-                            </th>
-                            <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Permissions</th>
-                            <th class="px-4 py-3 text-right sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Thao tác</th>
-                        </tr>
-                    </thead>
+                    ${headerTable}
                     <tbody class="[&>tr:not(:first-child)>td]:border-t [&>tr:not(:first-child)>td]:border-gray-200 dark:[&>tr:not(:first-child)>td]:border-gray-700">
                         <tr>
                             <td colspan="7" class="pt-40 text-center">
@@ -331,34 +335,7 @@
 
         let html = `
             <table class="w-full table-fixed border-separate border-spacing-0 ">
-                <colgroup>
-                    <col class="w-[40px] 2xl:w-[80px]">
-                    <col class="w-[60px] 2xl:w-[120px]">
-                    <col class="w-[100px] 2xl:w-[200px]">
-                    <col class="w-[140px] 2xl:w-[240px]">
-                    <col class="w-[80px] 2xl:w-[160px]">
-                    <col class="">
-                    <col class="w-[120px] 2xl:w-[240px]">
-                </colgroup>
-                <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
-                    <tr>
-                        <th class="px-4 py-3 text-center sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm">
-                            <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                        </th>
-                        <th onclick="handleSort('id')" class="${getHeaderClass('id')}">
-                            ID${getSortIcon('id')}
-                        </th>
-                        <th onclick="handleSort('name')" class="${getHeaderClass('name')}">
-                            Tên${getSortIcon('name')}
-                        </th>
-                        <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Mô tả</th>
-                        <th onclick="handleSort('level')" class="${getHeaderClass('level')}">
-                            Hạng${getSortIcon('level')}
-                        </th>
-                        <th class="px-4 py-3 text-left sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Permissions</th>
-                        <th class="px-4 py-3 text-right sticky top-0 z-20 bg-blue-600 dark:bg-gray-700 shadow-sm whitespace-normal break-words">Thao tác</th>
-                    </tr>
-                </thead>
+                ${headerTable}
                 <tbody class="[&>tr:not(:first-child)>td]:border-t [&>tr:not(:first-child)>td]:border-gray-200 dark:[&>tr:not(:first-child)>td]:border-gray-700">
         `;
 
@@ -372,7 +349,7 @@
 
             const isChecked = selectedRoleIds.has(role.id);
             html += `
-                <tr class="border border-gray-100 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700">
+                <tr class="border border-gray-100 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
                     <td class="px-4 py-3 text-center">
                         <input type="checkbox"
                             class="role-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
@@ -398,17 +375,17 @@
                     <td class="px-4 py-3 align-top">
                         <div class="flex flex-nowrap items-center justify-end gap-2 overflow-x-auto">
                             <a href="/admin/roles/${role.id}/show"
-                                class="inline-flex shrink-0 size-7 2xl:size-8 items-center justify-center rounded-md border border-blue-500 hover:border-blue-600 text-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300"
+                                class="inline-flex shrink-0 size-7 3xl:size-8 items-center justify-center rounded-md border border-blue-500 hover:border-blue-600 text-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300"
                                 title="Xem chi tiết">
-                                <i class="fas fa-eye  2xl:"></i>
+                                <i class="fas fa-eye  3xl:"></i>
                             </a>
                             <a href="/admin/roles/${role.id}/edit"
-                                class="inline-flex shrink-0 size-7 2xl:size-8 items-center justify-center rounded-md border border-amber-500 hover:border-amber-600 text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-300"
+                                class="inline-flex shrink-0 size-7 3xl:size-8 items-center justify-center rounded-md border border-amber-500 hover:border-amber-600 text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-300"
                                 title="Chỉnh sửa">
                                 <i class="fa-solid fa-pen  "></i>
                             </a>
                             <button onclick="openSingleDeleteModal(${role.id}, '${role.name}', '${role.description?.slice(0,30)}')"
-                                class="inline-flex shrink-0 size-7 2xl:size-8 items-center justify-center rounded-md border border-red-500 hover:border-red-600 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300"
+                                class="inline-flex shrink-0 size-7 3xl:size-8 items-center justify-center rounded-md border border-red-500 hover:border-red-600 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300"
                                 title="Xóa">
                                 <i class="fas fa-trash  "></i>
                             </button>

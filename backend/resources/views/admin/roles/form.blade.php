@@ -5,18 +5,18 @@
 @section('description', $mode === 'CREATE' ? 'Thêm vai trò mới vào hệ thống' : 'Chỉnh sửa thông tin vai trò')
 
 @section('content')
-<div class="h-full flex flex-col items-stretch justify-start gap-4 2xl:gap-6">
+<div class="h-full flex flex-col items-stretch justify-start gap-4 3xl:gap-6">
 
     {{-- Form Card --}}
     <form id="roleForm" onsubmit="saveRole(event)"
-        class="w-full max-w-[1800px] h-full mx-auto p-6 flex flex-col justify-start gap-3 2xl:gap-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+        class="w-full max-w-[1800px] h-full mx-auto p-6 flex flex-col justify-start gap-3 3xl:gap-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
 
         <input type="hidden" id="roleId" value="{{ $mode === 'EDIT' ? ($roleId ?? '') : '' }}">
 
         <!-- MAIN FORM WRAPPER -->
-        <div class="flex-1 flex flex-col items-stretch justify-start gap-3 2xl:gap-4 min-h-0">
+        <div class="flex-1 flex flex-col items-stretch justify-start gap-3 3xl:gap-4 min-h-0">
 
-            <div class="flex flex-row justify-between items-start gap-4 2xl:gap-6">
+            <div class="flex flex-row justify-between items-start gap-4 3xl:gap-6">
                 <!-- field: name -->
                 <div class="flex-1 ">
                     <label name="name_LABEL" for="name" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Tên <span class="text-red-500">*</span></label>
@@ -59,7 +59,7 @@
                             </span>
                             <input type="text" id="permissionSearch" placeholder="Tìm theo tên, mô tả ..."
                                 class="w-full px-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
-                            <span id="permissionSearchClearBtn" class="w-[15px] 2xl:w-[20px] aspect-square rounded-full absolute top-[50%] right-3 translate-y-[-50%] flex items-center text-gray-400 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 cursor-pointer flex justify-center">
+                            <span id="permissionSearchClearBtn" class="w-[15px] 3xl:w-[20px] aspect-square rounded-full absolute top-[50%] right-3 translate-y-[-50%] flex items-center text-gray-400 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 cursor-pointer flex justify-center">
                                 <i class="fa-solid fa-times text-sm text-white dark:text-gray-700"></i>
                             </span>
                         </div>
@@ -160,7 +160,7 @@
     async function loadPermissions() {
         try {
             // Try to get permissions from roles
-            const rolesData = await apiRequest('/roles?per_page=100');
+            const rolesData = await apiRequest('/roles?per_page=1000');
             if (rolesData.success && rolesData.data.data) {
                 const allPermissions = new Map();
                 rolesData.data.data.forEach(role => {
@@ -258,11 +258,11 @@
             <div class="overflow-x-auto h-full">
                 <table class="w-full table-fixed border-separate border-spacing-0">
                     <colgroup>
-                        <col class="w-[40px] 2xl:w-[60px]">
-                        <col class="w-[60px] 2xl:w-[80px]">
+                        <col class="w-[40px] 3xl:w-[60px]">
+                        <col class="w-[60px] 3xl:w-[80px]">
                         <col class="">
                         <col class="">
-                        <col class="w-[80px] 2xl:w-[100px]">
+                        <col class="w-[80px] 3xl:w-[100px]">
                         <col class="">
                     </colgroup>
                     <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">

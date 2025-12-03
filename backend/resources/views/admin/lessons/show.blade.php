@@ -4,7 +4,7 @@
 @section('description', 'Xem thông tin chi tiết của bài học')
 
 @section('content')
-<div class="w-full max-w-[1600px] mx-auto flex flex-col gap-4 2xl:gap-6"> 
+<div class="w-full max-w-[1600px] mx-auto flex flex-col gap-4 3xl:gap-6"> 
 
     {{-- Loading State (Flat Skeleton) --}}
     <div id="loadingState" class="flex-1 p-6 sm:p-8">
@@ -87,10 +87,10 @@
                 @endphp
 
                 {!! $infoField('ID', 'lessonId') !!}
-                {!! $infoField('Tiêu đề', 'lessonTitle') !!}
                 {!! $infoField('Khóa học', 'lessonCourse') !!}
+                {!! $infoField('Tiêu đề', 'lessonTitle') !!}
                 {!! $infoField('Thời lượng', 'lessonDuration') !!}
-                {!! $infoField('Thứ tự hiển thị', 'lessonDisplayOrder') !!}
+                {!! $infoField('Thứ tự học', 'lessonDisplayOrder') !!}
                 {!! $infoField('Video Path', 'lessonVideoUrl') !!}
                 {!! $infoField('Ngày tạo', 'lessonCreatedAt') !!}
                 {!! $infoField('Ngày cập nhật', 'lessonUpdatedAt') !!}
@@ -157,7 +157,7 @@
         document.getElementById('errorState').classList.toggle('hidden', !error);
     }
 
-    function displayLessonData(lesson) {
+    async function displayLessonData(lesson) {
         toggleStates({ loading: false, detail: true, error: false });
 
         document.getElementById('editButton').href = `/admin/lessons/${lesson.id}/edit`;
@@ -169,16 +169,11 @@
             avatarEl.src = lesson.thumbnail_path;
             avatarEl.classList.remove('hidden');
             placeholderEl.classList.add('hidden');
-        } else {
-            const name = lesson.title || 'Bài học';
-            avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=3b82f6&color=fff&size=128`;
-            avatarEl.classList.remove('hidden');
-            placeholderEl.classList.add('hidden');
         }
 
         setText('lessonId', lesson.id);
-        setText('lessonTitle', lesson.title || 'Chưa có tiêu đề');
-        setText('lessonDescription', lesson.description || 'Chưa có mô tả');
+        setText('lessonTitle', lesson.title || '-');
+        setText('lessonDescription', lesson.description || '-');
         setText('lessonDisplayOrder', lesson.display_order || 0);
         setDate('lessonCreatedAt', lesson.created_at);
         setDate('lessonUpdatedAt', lesson.updated_at);
@@ -192,9 +187,7 @@
  
         setText('lessonDuration', formatSecondsToHHMMSS_Global(lesson.duration || 0, true) || '0 giây');
 
-        // // Video Path
-        const videoUrl = lesson.video_path || '';
-        setText('lessonVideoUrl', videoUrl || 'Chưa có video');
+        setText('lessonVideoUrl', lesson.video_path || 'Chưa có video');
 
         // Video preview
         const videoContainer = document.getElementById('videoContainer');
@@ -202,41 +195,38 @@
         const videoSource = document.getElementById('videoSource');
         const videoLink = document.getElementById('videoLink');
 
-
-        if (videoUrl) {
-            // Check if it's an external URL (http://, https://)
-            const isExternalUrl = videoUrl.startsWith('http://') || videoUrl.startsWith('https://');
-
-            // Check if it's a direct video file
-            const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
-            const isVideoFile = videoExtensions.some(ext => videoUrl.toLowerCase().includes(ext));
-
-            if (isVideoFile && !isExternalUrl) {
-                // Internal video file - use stream route
-                const streamUrl = `${API_BASE_URL}/lessons/${lesson.id}/stream`;
-                videoSource.src = streamUrl;
-                videoSource.type = getVideoMimeType(videoUrl);
-                videoElement.load();
-                videoElement.style.display = 'block';
-                videoLink.style.display = 'none';
-            } else if (isVideoFile && isExternalUrl) {
-                // External video file - use direct URL
-                videoSource.src = videoUrl;
-                videoSource.type = getVideoMimeType(videoUrl);
-                videoElement.load();
-                videoElement.style.display = 'block';
-                videoLink.style.display = 'none';
+        // Hiển thị video, ưu tiên HLS nếu có
+        const videoPath = lesson.hls_path || lesson.video_path;
+        const isBackgroundUpload = lesson.video_path?.startsWith('background-upload://');
+        if (!videoPath || isBackgroundUpload) {
+            videoElement.style.display = 'none';
+            videoLink.style.display = 'none';
+            return;
+        }
+        const endpoint = lesson.hls_path 
+            ? `/lessons/${lesson.id}/hls-signature`
+            : `/lessons/${lesson.id}/mp4-signature`;
+        
+        let data = await apiRequest(endpoint);
+        if (!data?.success && lesson.hls_path) {
+            data = await apiRequest(`/lessons/${lesson.id}/mp4-signature`);
+        }
+        if (data?.success && data?.data?.signed_uri) { 
+            videoSource.src = data.data.base_url + data.data.signed_uri;
+            // Set đúng MIME type cho HLS hoặc MP4
+            if (lesson.hls_path) {
+                videoSource.type = 'application/x-mpegURL';
             } else {
-                // External video link (YouTube, Vimeo, etc.)
-                videoElement.style.display = 'none';
-                videoLink.href = videoUrl;
-                document.getElementById('videoLinkText').textContent = videoUrl;
-                videoLink.style.display = 'inline-flex';
+                videoSource.type = getVideoMimeType(lesson.video_path);
             }
+            videoElement.load();
+            videoElement.style.display = 'block';
+            videoLink.style.display = 'none';
         } else {
             videoElement.style.display = 'none';
             videoLink.style.display = 'none';
         }
+
     }
 
     function showError(message) {

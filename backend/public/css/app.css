@@ -10,16 +10,18 @@ main {
     font-family: 'UTM Avo', sans-serif;
 }
 
-@media (min-width: 1536px) {
+/* Màn hình macbook */
+@media (min-width: 1450px) {
     html,
     body,
     input,
     main {
-        font-size: 14px;
+        font-size: 12px;
     }
 } 
 
-@media (min-width: 2000px) {
+/* Màn hình PC cơ bản */
+@media (min-width: 1900px) {
     html,
     body,
     input,

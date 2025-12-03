@@ -61,10 +61,10 @@ class UpdateRequest extends FormRequest
                         return;
                     }
 
-                    // Kiểm tra kích thước (max 2048 KB = 2MB)
+                    // Kiểm tra kích thước (max 10240 KB = 10MB)
                     $sizeInKB = $value->getSize() / 1024;
-                    if ($sizeInKB > 2048) {
-                        $fail('Ảnh đại diện không được vượt quá 2048 kilobytes.');
+                    if ($sizeInKB > 10240) {
+                        $fail('Ảnh đại diện không được vượt quá 10240 kilobytes.');
                         return;
                     }
                 },

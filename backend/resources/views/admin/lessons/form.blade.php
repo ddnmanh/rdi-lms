@@ -5,7 +5,7 @@
 @section('description', $mode === 'CREATE' ? 'Thêm bài học mới vào hệ thống' : 'Chỉnh sửa thông tin bài học')
 
 @section('content')
-<div class="w-full max-w-[1600px] mx-auto flex flex-col items-stretch justify-start gap-4 2xl:gap-6">
+<div class="w-full max-w-[1600px] mx-auto flex flex-col items-stretch justify-start gap-4 3xl:gap-6">
 
     {{-- Form Card --}}
     <form id="lessonForm" onsubmit="saveLesson(event)" class="w-full bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
@@ -15,18 +15,18 @@
 
             {{-- Thumbnail Upload Section --}}
             <div class="flex flex-col gap-0.5">
-                <label class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Ảnh thumbnail</label>
+                <span class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Ảnh thumbnail</span>
                 <div
                     id="thumbnailDropZone"
-                    class="flex items-center gap-4 p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg"
+                    class="h-[142px] flex items-stretch gap-4 p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg"
                 >
-                    <div class="w-[150px] aspect-video rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
+                    <div class="h-full aspect-video rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
                         <img id="thumbnailPreview" alt="thumbnail preview" class="h-full w-full object-cover hidden">
                         <i id="thumbnailIconPlaceholder" class="fa-solid fa-image text-[20px] text-gray-400"></i>
                     </div>
 
                     <div class="flex-1">
-                        <div class=" text-gray-600 dark:text-gray-300">Kéo & thả ảnh vào đây, hoặc</div>
+                        <div class=" text-gray-600 dark:text-gray-300">Kéo & thả ảnh hoặc chọn ảnh</div>
                         <div class="mt-2 flex items-center gap-3">
                             <label for="thumbnail" class="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 ">
                                 Chọn ảnh
@@ -41,30 +41,20 @@
                             <input
                                 id="thumbnail"
                                 type="file"
-                                accept="image/*"
+                                accept="image/png,image/jpeg,image/webp"
                                 class="hidden"
                             />
                         </div>
-                        <div class="mt-2  text-gray-500 dark:text-gray-400">Hỗ trợ PNG, JPG, WEBP, GIF — Tối đa 2MB</div>
+                        <div class="mt-2  text-gray-500 dark:text-gray-400">Hỗ trợ PNG, JPG, WEBP — Tối đa 10MB</div>
                     </div>
                 </div>
             </div>
 
             {{-- Video Upload Section --}}
             <div class="flex flex-col gap-0.5">
-                <label class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">
+                <span class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">
                     Video <span class="text-red-500">*</span>
-                </label>
-                <div class="flex items-center gap-2 mb-2">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="video_type" value="file" id="video_type_file" checked class="w-4 h-4 text-blue-600">
-                        <span class=" text-gray-700 dark:text-gray-300">Video file</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="video_type" value="url" id="video_type_url" class="w-4 h-4 text-blue-600">
-                        <span class=" text-gray-700 dark:text-gray-300">URL Video</span>
-                    </label>
-                </div>
+                </span>
 
                 {{-- Video File Upload --}}
                 <div id="videoFileSection">
@@ -73,9 +63,9 @@
                         class="flex flex-col items-stretch justify-start gap-4 p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg"
                     >
 
-                        <div class="flex flex-row items-start gap-4">
-                            <div id="videoPreviewContainer" class="flex flex-col gap-2">
-                                <div class="relative w-[150px] aspect-video bg-gray-100 dark:bg-gray-900 rounded-lg overflow-hidden flex items-center justify-center">
+                        <div class="h-[106px] flex flex-row items-start gap-4">
+                            <div id="videoPreviewContainer" class="h-full flex flex-col gap-2">
+                                <div class="relative h-full aspect-video bg-gray-100 dark:bg-gray-900 rounded-lg overflow-hidden flex items-center justify-center">
                                     <video id="videoFilePreview" controls class="hidden w-full h-full object-cover bg-black"></video>
                                     <iframe id="videoUrlPreview" class="hidden w-full h-full" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
                                     <i id="videoIconPlaceholder" class="fa-solid fa-video text-[20px] text-gray-400 dark:text-gray-400"></i>
@@ -83,7 +73,7 @@
                             </div>
 
                             <div class="flex-1">
-                                <div id="videoDirectUploadHint" class=" text-gray-600 dark:text-gray-300">Kéo & thả video vào đây, hoặc</div>
+                                <div id="videoDirectUploadHint" class=" text-gray-600 dark:text-gray-300">Kéo & thả video hoặc chọn video</div>
                                 <div class="mt-2 flex items-center gap-3">
                                     <label for="video_file" class="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 ">
                                         Chọn video
@@ -110,8 +100,7 @@
                                         class="hidden"
                                     />
                                 </div>
-                                <div class="mt-2  text-gray-500 dark:text-gray-400">Hỗ trợ MP4, AVI, MOV, WEBM — Tối đa 10GB</div>
-                                <div id="videoFileName" class="mt-2  text-gray-700 dark:text-gray-300 hidden"></div>
+                                <div class="mt-2  text-gray-500 dark:text-gray-400">Hỗ trợ MP4, MOV có codec MPEG-4 HE AAC, H.264, Timed Metadata, HEVC — Tối đa 10GB</div>
 
                             </div>
                         </div>
@@ -120,7 +109,7 @@
                             <div class="flex items-start justify-between gap-4">
                                 <div>
                                     <p class=" font-semibold text-blue-700 dark:text-blue-200">Tải video lên máy chủ</p>
-                                    {{-- <p id="backgroundUploadFileInfo" class=" text-gray-600 dark:text-gray-300 mt-1">Chưa chọn video</p> --}}
+                                    <div id="videoFileName" class="mt-2  text-gray-700 dark:text-gray-300 hidden"></div>
                                 </div>
                                 <span id="backgroundUploadStatusBadge" class="px-2 py-1  rounded-full bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-100 whitespace-nowrap">Chưa khởi tạo</span>
                             </div>
@@ -138,35 +127,8 @@
 
                     </div>
 
-                </div>
+                </div> 
 
-                {{-- Video URL Input --}}
-                <div id="videoUrlSection" class="flex flex-col gap-2 hidden">
-                    <input type="url" id="video_url" placeholder="https://example.com/video.mp4"
-                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
-                    {{-- <p class=" text-gray-500 dark:text-gray-400 ml-3">Đường dẫn đến video bài học</p> --}}
-                </div>
-
-            </div>
-
-            <div id="videoDurationInputCluster" class="flex flex-col gap-0.5 hidden">
-                <label name="duration_LABEL" for="duration" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">
-                    Thời lượng (giây) <span class="text-red-500">*</span>
-                </label>
-                <input type="number" id="duration" min="0" value="0"
-                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
-                <span id="duration_MSG" class="ml-4 text-sm mt-1 italic hidden"></span>
-            </div>
-
-            <div class="flex flex-col gap-0.5 hidden">
-                <label for="course_id" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">
-                    Khóa học <span class="text-red-500">*</span>
-                </label>
-                <select id="course_id"
-                    class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700/50 text-gray-900 dark:text-gray-100 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 outline-none">
-                    <option value="">Chọn khóa học</option>
-                </select>
-                <p class=" text-gray-500 dark:text-gray-400 mt-1 ml-3">Chọn khóa học mà bài học này thuộc về</p>
             </div>
 
             <div class="flex flex-col gap-0.5">
@@ -179,33 +141,14 @@
             </div>
 
             <div class="flex flex-col gap-0.5">
-                <label for="description" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Mô tả</label>
-                <textarea id="description" rows="4"
+                <label for="description" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Mô tả <span id="description_COUNT_WORDS" class="text-gray-500 dark:text-gray-400 font-normal"></span></label>
+                <textarea id="description" rows="4" minlength="0" maxlength="255"
                     class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none resize-none"></textarea>
-                <p class=" text-gray-500 dark:text-gray-400 mt-1 ml-3">Mô tả chi tiết về bài học</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="flex flex-col gap-0.5 hidden">
-                    <label for="duration" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">
-                        Thời lượng (giây)
-                    </label>
-                    <input type="number" id="duration" min="0" value="0"
-                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
-                    <p class=" text-gray-500 dark:text-gray-400 mt-1 ml-3">Thời lượng bài học tính bằng giây</p>
-                </div>
-
-                <div class="flex flex-col gap-0.5 hidden">
-                    <label for="display_order" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Thứ tự hiển thị</label>
-                    <input type="number" id="display_order" min="0" value="0"
-                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
-                    <p class=" text-gray-500 dark:text-gray-400 mt-1 ml-3">Thứ tự hiển thị bài học trong khóa học</p>
-                </div>
             </div>
 
         </div>
 
-        <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-end gap-3 pt-6">
             <button type="button"
                 id="lessonFormCancelButton"
                 class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">
@@ -234,8 +177,6 @@
 
     // Quản lý video
     let existingVideoSource = null; // Đường dẫn video hiện tại (cho mode EDIT)
-    let existingVideoIsExternal = false; // Kiểm tra video có phải URL bên ngoài không
-    let videoPreviewObjectUrl = null; // Object URL cho video preview
 
     // Trạng thái drag & drop
     let isThumbnailDragActive = false;
@@ -301,6 +242,23 @@
         } else {
             document.getElementById('lessonFormSubmitButton_text').textContent = 'Cập nhật';
         }
+
+        // Cập nhật số ký tự mô tả
+        const descriptionInput = document.getElementById('description');
+        const descCountWord = document.getElementById('description_COUNT_WORDS');
+        
+        const updateDescriptionCount = () => {
+            if (descCountWord) {
+                descCountWord.textContent = `(${descriptionInput.value.length}/255)`;
+            }
+        };
+
+        // Cập nhật khi load và khi thay đổi
+        if (descriptionInput && descCountWord) {
+            updateDescriptionCount();
+            descriptionInput.addEventListener('input', updateDescriptionCount);
+            descriptionInput.addEventListener('change', updateDescriptionCount);
+        }
     }
 
     // ========================================
@@ -328,11 +286,9 @@
      * Hiển thị thông tin bài học lên form
      */
     async function renderLesson() {
-        document.getElementById('course_id').value = lessonData.course_id || '';
+        // document.getElementById('course_id').value = lessonData.course_id || '';
         document.getElementById('title').value = lessonData.title || '';
         document.getElementById('description').value = lessonData.description || '';
-        document.getElementById('duration').value = lessonData.duration || 0;
-        document.getElementById('display_order').value = lessonData.display_order || 0;
         document.getElementById('thumbnail_path').value = lessonData.thumbnail_path || '';
 
         // Set thumbnail preview
@@ -344,30 +300,12 @@
             thumbnailIconPlaceholderEl.classList.add('hidden');
         }
 
-        // Set video - check if it's a URL or file path
         if (lessonData.video_path) {
-            // Check if it's a URL (starts with http:// or https://)
-            if (lessonData.video_path.startsWith('http://') || lessonData.video_path.startsWith('https://')) {
-                existingVideoIsExternal = true;
-                document.getElementById('video_type_url').checked = true;
-                document.getElementById('video_url').value = lessonData.video_path;
-                document.getElementById('videoUrlSection').classList.remove('hidden');
-                document.getElementById('videoFileSection').classList.add('hidden');
-                document.getElementById('videoDurationInputCluster').classList.remove('hidden');
-                existingVideoSource = lessonData.video_path;
-                handleVideoUrlInput(true);
-            } else {
-                // It's a file path, show in file section
-                existingVideoIsExternal = false;
-                document.getElementById('video_type_file').checked = true;
-                document.getElementById('videoUrlSection').classList.add('hidden');
-                document.getElementById('videoFileSection').classList.remove('hidden');
-                document.getElementById('videoFileName').textContent = lessonData.video_path.split('/').pop();
-                document.getElementById('videoFileName').classList.remove('hidden');
-                document.getElementById('videoDurationInputCluster').classList.add('hidden');
-                existingVideoSource = lessonData.video_path;
-                showVideoFilePreview(lessonData.video_path);
-            }
+            document.getElementById('videoFileSection').classList.remove('hidden');
+            document.getElementById('videoFileName').textContent = lessonData.video_path.split('/').pop();
+            document.getElementById('videoFileName').classList.remove('hidden');
+            existingVideoSource = lessonData.video_path;
+            showVideoPreview(lessonData.video_path);
         }
     }
 
@@ -507,9 +445,8 @@
      * Xử lý khi người dùng chọn/xóa file video
      * @param {File|null} file - File video hoặc null để xóa
      */
-    function handleChangeVideoFile(file) {
-        const ALLOWED_TYPES = ['video/mp4', 'video/avi', 'video/quicktime', 'video/webm', 'video/x-msvideo'];
-        const videoTypeUrlRadio = document.getElementById('video_type_url');
+    async function handleChangeVideoFile(file) {
+        const ALLOWED_TYPES = ['video/mp4', 'video/quicktime'];
 
         // Nếu file = null, reset video và hủy upload nếu đang chạy
         if (!file) {
@@ -519,25 +456,36 @@
             clearBtn.classList.add('hidden');
             fileNameEl.classList.add('hidden');
             if (input) input.value = '';
-            if (!videoTypeUrlRadio || !videoTypeUrlRadio.checked) {
-                if (existingVideoSource && !existingVideoIsExternal) {
-                    showVideoFilePreview(existingVideoSource);
-                } else {
-                    resetVideoPreview();
-                }
+            if (existingVideoSource ) {
+                showVideoPreview(existingVideoSource);
             }
             cancelBackgroundUpload(true);
             changeVideoUploadUI();
             return;
         }
 
+        // Kiểm tra định dạng file
         if (!ALLOWED_TYPES.includes(file.type)) {
-            showNotificationModel_Global('Định dạng không hỗ trợ. Hãy chọn video MP4, AVI, MOV hoặc WEBM.', 'error');
+            showNotificationModel_Global('Định dạng không hỗ trợ. Chỉ chấp nhận file MP4 hoặc MOV.', 'error');
+            const input = document.getElementById('video_file');
+            if (input) input.value = '';
             return;
         }
 
         if (file.size > MAX_BACKGROUND_VIDEO_SIZE) {
             showNotificationModel_Global('Video quá lớn, Tối đa 10GB.', 'error');
+            const input = document.getElementById('video_file');
+            if (input) input.value = '';
+            return;
+        }
+
+        // Kiểm tra codec của video
+        const codecValidation = await validateVideoCodecs(file);
+        codecValidation.valid = true; // Tạm thời bỏ qua kiểm tra codec do độ tin cậy không cao
+        if (!codecValidation.valid) {
+            showNotificationModel_Global(codecValidation.message, 'error');
+            const input = document.getElementById('video_file');
+            if (input) input.value = '';
             return;
         }
 
@@ -546,9 +494,241 @@
         clearBtn.classList.remove('hidden');
         fileNameEl.textContent = file.name;
         fileNameEl.classList.remove('hidden');
-        showVideoFilePreview(file, true);
+        showVideoPreview(file);
 
         startBackgroundUploadFlow(file);
+    }
+
+    /**
+     * Kiểm tra video codecs (H.264 cho video, AAC cho audio)
+     * @param {File} file - File video cần kiểm tra
+     * @returns {Promise<{valid: boolean, message: string}>}
+     */
+    async function validateVideoCodecs(file) {
+        return new Promise((resolve) => {
+            const video = document.createElement('video');
+            video.preload = 'metadata';
+            video.muted = true; // Mute để tránh lỗi autoplay
+            
+            const objectUrl = URL.createObjectURL(file);
+            video.src = objectUrl;
+
+            const timeout = setTimeout(() => {
+                cleanup();
+                resolve({
+                    valid: false,
+                    message: 'Không thể đọc thông tin video. Vui lòng thử file khác.'
+                });
+            }, 15000); // Timeout sau 15 giây
+
+            const cleanup = () => {
+                clearTimeout(timeout);
+                video.removeEventListener('loadedmetadata', onLoadedMetadata);
+                video.removeEventListener('error', onError);
+                video.pause();
+                video.src = '';
+                video.load();
+                try {
+                    URL.revokeObjectURL(objectUrl);
+                } catch (e) {
+                    // noop
+                }
+            };
+
+            const onLoadedMetadata = async () => {
+                try {
+                    // Kiểm tra video có audio và video track không
+                    const hasVideoTrack = video.videoWidth > 0 && video.videoHeight > 0;
+                    
+                    if (!hasVideoTrack) {
+                        cleanup();
+                        resolve({
+                            valid: false,
+                            message: 'Video không hợp lệ hoặc bị hỏng.'
+                        });
+                        return;
+                    }
+
+                    // Kiểm tra format file trước
+                    if (file.type === 'video/webm') {
+                        cleanup();
+                        resolve({
+                            valid: false,
+                            message: 'Không hỗ trợ định dạng WebM. Vui lòng sử dụng MP4 hoặc MOV với codec H.264 và AAC.'
+                        });
+                        return;
+                    }
+
+                    // Kiểm tra codec không được phép TRƯỚC KHI thử phát
+                    // AV1 codec detection
+                    const testAV1Codecs = [
+                        'video/mp4; codecs="av01.0.05M.08"',
+                        'video/mp4; codecs="av01.0.04M.08"',
+                        'video/mp4; codecs="av01.0.08M.08"',
+                        'video/webm; codecs="av01"',
+                        'video/webm; codecs="av01.0.05M.08"'
+                    ];
+                    
+                    const hasAV1Support = testAV1Codecs.some(codec => 
+                        video.canPlayType(codec) === 'probably' || video.canPlayType(codec) === 'maybe'
+                    );
+
+                    // VP9 codec detection
+                    const hasVP9Support = video.canPlayType('video/webm; codecs="vp9"') === 'probably' || 
+                                         video.canPlayType('video/webm; codecs="vp9"') === 'maybe';
+
+                    // VP8 codec detection
+                    const hasVP8Support = video.canPlayType('video/webm; codecs="vp8"') === 'probably' || 
+                                         video.canPlayType('video/webm; codecs="vp8"') === 'maybe';
+
+                    // HEVC/H.265 codec detection
+                    const hasHEVCSupport = video.canPlayType('video/mp4; codecs="hvc1"') === 'probably' || 
+                                          video.canPlayType('video/mp4; codecs="hvc1"') === 'maybe' ||
+                                          video.canPlayType('video/mp4; codecs="hev1"') === 'probably' || 
+                                          video.canPlayType('video/mp4; codecs="hev1"') === 'maybe';
+
+                    // H.264/AVC codec detection
+                    const testH264Codecs = [
+                        'video/mp4; codecs="avc1.42E01E"',  // H.264 Baseline
+                        'video/mp4; codecs="avc1.4D401E"',  // H.264 Main
+                        'video/mp4; codecs="avc1.64001E"',  // H.264 High
+                        'video/mp4; codecs="avc1.640028"'   // H.264 High Profile
+                    ];
+
+                    const hasH264Support = testH264Codecs.some(codec => 
+                        video.canPlayType(codec) === 'probably' || video.canPlayType(codec) === 'maybe'
+                    );
+
+                    // Tạo canvas để capture frame và kiểm tra video có decode được không
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = Math.min(video.videoWidth, 320);
+                    canvas.height = Math.min(video.videoHeight, 240);
+
+                    // Thử phát và capture frame để xác minh codec thực tế
+                    try {
+                        // Seek đến 1 giây để tránh frame đầu đen
+                        video.currentTime = Math.min(1, video.duration / 2);
+                        
+                        await new Promise((resolveSeek, rejectSeek) => {
+                            const seekTimeout = setTimeout(() => {
+                                rejectSeek(new Error('Seek timeout'));
+                            }, 5000);
+
+                            const onSeeked = () => {
+                                clearTimeout(seekTimeout);
+                                video.removeEventListener('seeked', onSeeked);
+                                resolveSeek();
+                            };
+
+                            video.addEventListener('seeked', onSeeked);
+                        });
+
+                        // Thử play video
+                        const playPromise = video.play();
+                        if (playPromise !== undefined) {
+                            await playPromise;
+                        }
+
+                        // Đợi một chút để video render
+                        await new Promise(resolve => setTimeout(resolve, 150));
+
+                        // Thử vẽ frame lên canvas
+                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        
+                        // Kiểm tra xem canvas có dữ liệu không (không phải toàn màu đen hoặc trong suốt)
+                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        const data = imageData.data;
+                        let totalBrightness = 0;
+                        let nonZeroPixels = 0;
+                        
+                        // Kiểm tra nhiều pixel hơn để chính xác hơn
+                        for (let i = 0; i < data.length; i += 400) {
+                            const brightness = data[i] + data[i+1] + data[i+2];
+                            totalBrightness += brightness;
+                            if (brightness > 30) {
+                                nonZeroPixels++;
+                            }
+                        }
+
+                        const avgBrightness = totalBrightness / (data.length / 400);
+                        const hasValidFrame = nonZeroPixels > 10 || avgBrightness > 20;
+
+                        video.pause();
+
+                        // Nếu video không decode được frame -> có thể là codec không hỗ trợ
+                        if (!hasValidFrame) {
+                            cleanup();
+                            resolve({
+                                valid: false,
+                                message: 'Video sử dụng codec không được hỗ trợ hoặc bị lỗi. Vui lòng sử dụng H.264 (video) và AAC (audio).'
+                            });
+                            return;
+                        }
+
+                        // Nếu video phát được NHƯNG không hỗ trợ H.264, có thể là AV1 hoặc codec khác
+                        if (!hasH264Support && (hasAV1Support || hasVP9Support || hasVP8Support || hasHEVCSupport)) {
+                            let codecName = 'không xác định';
+                            if (hasAV1Support) codecName = 'AV1';
+                            else if (hasHEVCSupport) codecName = 'HEVC/H.265';
+                            else if (hasVP9Support) codecName = 'VP9';
+                            else if (hasVP8Support) codecName = 'VP8';
+
+                            cleanup();
+                            resolve({
+                                valid: false,
+                                message: `Video sử dụng codec ${codecName} không được hỗ trợ. Vui lòng chuyển đổi sang H.264 (video) và AAC (audio).`
+                            });
+                            return;
+                        }
+
+                        // Video phát được và có H.264 support -> chấp nhận
+                        if (hasValidFrame && hasH264Support) {
+                            cleanup();
+                            resolve({
+                                valid: true,
+                                message: 'Video hợp lệ'
+                            });
+                            return;
+                        }
+
+                        // Trường hợp không xác định được codec
+                        cleanup();
+                        resolve({
+                            valid: false,
+                            message: 'Không thể xác định codec video. Vui lòng đảm bảo sử dụng H.264 (video) và AAC (audio).'
+                        });
+
+                    } catch (playError) {
+                        console.error('Video playback error:', playError);
+                        cleanup();
+                        resolve({
+                            valid: false,
+                            message: 'Video không thể phát được. Vui lòng đảm bảo video sử dụng codec H.264 (video) và AAC (audio).'
+                        });
+                    }
+                } catch (error) {
+                    console.error('Validation error:', error);
+                    cleanup();
+                    resolve({
+                        valid: false,
+                        message: 'Lỗi khi kiểm tra codec. Vui lòng thử lại.'
+                    });
+                }
+            };
+
+            const onError = (e) => {
+                console.error('Video error event:', e);
+                cleanup();
+                resolve({
+                    valid: false,
+                    message: 'File video không hợp lệ hoặc bị hỏng. Vui lòng chọn file khác.'
+                });
+            };
+
+            video.addEventListener('loadedmetadata', onLoadedMetadata);
+            video.addEventListener('error', onError);
+        });
     }
 
 
@@ -556,44 +736,8 @@
     // XỬ LÝ VIDEO PREVIEW
     // ========================================
 
-    /**
-     * Chuyển đổi URL YouTube thành URL embed
-     * @param {string} url - URL YouTube
-     * @returns {string|null} URL embed hoặc null nếu không hợp lệ
-     */
-    function getYoutubeEmbedUrl(url) {
-        try {
-            const parsed = new URL(url);
-            const host = parsed.hostname.replace('www.', '');
-            let videoId = null;
-
-            if (host === 'youtu.be') {
-                videoId = parsed.pathname.replace('/', '');
-            } else if (host === 'youtube.com' || host.endsWith('.youtube.com')) {
-                videoId = parsed.searchParams.get('v');
-                if (!videoId && parsed.pathname.startsWith('/embed/')) {
-                    videoId = parsed.pathname.replace('/embed/', '');
-                }
-            }
-
-            return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
-        } catch (error) {
-            return null;
-        }
-    }
-
     function resetVideoPreview() {
         if (!videoPreviewContainer || !videoFilePreview || !videoUrlPreview || !videoIconPlaceholder) return;
-
-        if (videoPreviewObjectUrl) {
-            try {
-                URL.revokeObjectURL(videoPreviewObjectUrl);
-            } catch (e) {
-                console.error('Error revoking object URL:', e);
-            } finally {
-                videoPreviewObjectUrl = null;
-            }
-        }
 
         videoFilePreview.pause();
         videoFilePreview.removeAttribute('src');
@@ -685,21 +829,21 @@
         progressText.textContent = `${percent}%`;
         chunkText.textContent = `${uploadedChunks} / ${totalChunks} chunks`;
 
-        const badgeStyles = {
-            idle: { text: 'Chưa khởi tạo', className: 'px-2 py-1  rounded-full bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-100' },
-            creating_session: { text: 'Đang tạo phiên', className: 'px-2 py-1  rounded-full bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-200' },
-            uploading: { text: 'Đang upload', className: 'px-2 py-1  rounded-full bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-200' },
-            uploaded: { text: 'Đã upload', className: 'px-2 py-1  rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-200' },
-            completing: { text: 'Đang gửi xử lý', className: 'px-2 py-1  rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-200' },
-            processing: { text: 'Đang ghép video', className: 'px-2 py-1  rounded-full bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-200' },
-            completed: { text: 'Hoàn tất', className: 'px-2 py-1  rounded-full bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-200' },
-            failed: { text: 'Lỗi upload', className: 'px-2 py-1  rounded-full bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-200' },
-            cancelled: { text: 'Đã hủy', className: 'px-2 py-1  rounded-full bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-200' }
+        const badgeConfig = {
+            idle: ['Chưa khởi tạo', 'px-2 py-1 rounded-full bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-100'],
+            creating_session: ['Đang tạo phiên', 'px-2 py-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-200'],
+            uploading: ['Đang upload', 'px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-200'],
+            uploaded: ['Đã upload', 'px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-200'],
+            completing: ['Đang gửi xử lý', 'px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-200'],
+            processing: ['Đang ghép video', 'px-2 py-1 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-200'],
+            completed: ['Hoàn tất', 'px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-200'],
+            failed: ['Lỗi upload', 'px-2 py-1 rounded-full bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-200'],
+            cancelled: ['Đã hủy', 'px-2 py-1 rounded-full bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-200']
         };
 
-        const badge = badgeStyles[status] || badgeStyles.idle;
-        statusBadge.textContent = badge.text;
-        statusBadge.className = badge.className;
+        const [badgeText, badgeClass] = badgeConfig[status] || badgeConfig.idle;
+        statusBadge.textContent = badgeText;
+        statusBadge.className = badgeClass;
 
         // Cập nhật text và hiển thị button Clear/Cancel
         if (clearBtn && clearBtnText) {
@@ -718,7 +862,6 @@
         }
 
         if (lastError && status === 'failed') {
-            // progressText.textContent = lastError;
             progressText.textContent = 'Đã xảy ra lỗi vui lòng thử lại!';
         }
     }
@@ -1028,105 +1171,38 @@
         }
     }
 
-    function showVideoFilePreview(source, isBlobSource = false) {
+    async function showVideoPreview(source) {
         if (!videoPreviewContainer || !videoFilePreview || !videoUrlPreview || !videoIconPlaceholder) return;
 
-        if (videoPreviewObjectUrl) {
-            try {
-                URL.revokeObjectURL(videoPreviewObjectUrl);
-            } catch (e) {
-                // noop
-            } finally {
-                videoPreviewObjectUrl = null;
-            }
-        }
-
-        let finalSrc = source;
-
-        // Nếu là File/Blob (user chọn file mới), tạo ObjectURL
-        if (isBlobSource && source instanceof File) {
+        let finalSrc = null;
+       
+        if (source instanceof File) {
             finalSrc = URL.createObjectURL(source);
-            videoPreviewObjectUrl = finalSrc;
-        } else if (!isBlobSource && source && typeof source === 'string') {
-            // Kiểm tra nếu là video file nội bộ (không phải external URL)
-            const isExternalUrl = source.startsWith('http://') || source.startsWith('https://');
-            const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
-            const isVideoFile = videoExtensions.some(ext => source.toLowerCase().includes(ext));
+        } else if (source && typeof source === 'string' && mode === 'EDIT' && lessonId) {
+            let data = await apiRequest(`/lessons/${lessonId}/auto-signature`);
 
-            // Nếu là video file nội bộ và đang ở chế độ EDIT, dùng route stream
-            if (isVideoFile && !isExternalUrl && mode === 'EDIT' && lessonId) {
-                finalSrc = `${API_BASE_URL}/lessons/${lessonId}/stream`;
+            if (data?.success && data?.data?.signed_uri) {
+                finalSrc = data.data.base_url + data.data.signed_uri;
+                // Set đúng MIME type cho HLS hoặc MP4
+                if (data?.data?.type === 'hls') {
+                    videoFilePreview.type = 'application/x-mpegURL';
+                } else if (data?.data?.type === 'mp4') {
+                    videoFilePreview.type = getVideoMimeType(data?.data?.uri);
+                }
             }
         }
 
-        // videoPreviewContainer.classList.remove('hidden');
         videoIconPlaceholder.classList.add('hidden');
         videoUrlPreview.classList.add('hidden');
         videoFilePreview.classList.remove('hidden');
         videoFilePreview.src = finalSrc;
         videoFilePreview.load();
-    }
-
-    function showVideoUrlPreview(url) {
-        if (!videoPreviewContainer || !videoFilePreview || !videoUrlPreview || !videoIconPlaceholder) return;
-
-        if (videoPreviewObjectUrl) {
-            try {
-                URL.revokeObjectURL(videoPreviewObjectUrl);
-            } catch (e) {
-                // noop
-            } finally {
-                videoPreviewObjectUrl = null;
-            }
-        }
-
-        // videoPreviewContainer.classList.remove('hidden');
-        videoIconPlaceholder.classList.add('hidden');
-        videoFilePreview.classList.add('hidden');
-        videoUrlPreview.classList.remove('hidden');
-        videoUrlPreview.src = url;
-    }
-
-    function handleVideoUrlInput(force = false) {
-        const videoTypeUrlRadio = document.getElementById('video_type_url');
-        if (!videoTypeUrlRadio || (!videoTypeUrlRadio.checked && !force)) {
-            return;
-        }
-
-        const videoUrlInput = document.getElementById('video_url');
-        if (!videoUrlInput) return;
-
-        const url = videoUrlInput.value.trim();
-        if (!url) {
-            resetVideoPreview();
-            return;
-        }
-
-        const youtubeEmbedUrl = getYoutubeEmbedUrl(url);
-        if (youtubeEmbedUrl) {
-            showVideoUrlPreview(youtubeEmbedUrl);
-            return;
-        }
-
-        const isDirectVideoUrl = /\.(mp4|mov|webm|ogg|m3u8)(\?.*)?$/i.test(url);
-
-        if (isDirectVideoUrl || (!url.startsWith('http://') && !url.startsWith('https://'))) {
-            showVideoFilePreview(url);
-            return;
-        }
-
-        showVideoUrlPreview(url);
-    }
+    } 
 
     function initVideoUploadForm() {
         const dropZone = document.getElementById('videoDropZone');
         const input = document.getElementById('video_file');
         const clearBtn = document.getElementById('btnClearNewVideo');
-        const videoTypeUrl = document.getElementById('video_type_url');
-        const videoTypeFile = document.getElementById('video_type_file');
-        const videoUrlSection = document.getElementById('videoUrlSection');
-        const videoFileSection = document.getElementById('videoFileSection');
-        const videoUrlInput = document.getElementById('video_url');
         const backgroundRetryBtn = document.getElementById('btnRetryBackgroundUpload');
         const lessonFormCancelButton = document.getElementById('lessonFormCancelButton');
 
@@ -1158,43 +1234,20 @@
                     },
                     successFuncCallback: () => {
                         handleBackToPrevPage();
-                        // showNotificationModel_Global(`Hủy ${mode === 'CREATE' ? 'tạo mới' : 'chỉnh sửa'} bài học thành công`, 'success', handleBackToPrevPage);
                     }
                 })
             });
-        }
+        } 
 
-        // Radio button handlers
-        if (videoTypeUrl) {
-            videoTypeUrl.addEventListener('change', () => {
-                if (videoTypeUrl.checked) {
-                    videoUrlSection.classList.remove('hidden');
-                    videoFileSection.classList.add('hidden');
-                    videoUrlInput.required = true;
-                    if (input) input.required = false;
-                    handleVideoUrlInput(true);
-                    document.getElementById('videoDurationInputCluster').classList.remove('hidden');
-                }
-            });
-        }
-
-        if (videoTypeFile) {
-            videoTypeFile.addEventListener('change', () => {
-                if (videoTypeFile.checked) {
-                    videoUrlSection.classList.add('hidden');
-                    videoFileSection.classList.remove('hidden');
-                    videoUrlInput.required = false;
-                    if (input) input.required = true;
-                    if (backgroundUploadState.file) {
-                        showVideoFilePreview(backgroundUploadState.file, true);
-                    } else if (existingVideoSource && !existingVideoIsExternal) {
-                        showVideoFilePreview(existingVideoSource);
-                    } else {
-                        resetVideoPreview();
-                    }
-                    document.getElementById('videoDurationInputCluster').classList.add('hidden');
-                }
-            });
+        // Không set required cho video input vì nó bị ẩn và sẽ gây lỗi validation
+        // Sẽ validate bằng JavaScript trong hàm saveLesson
+        if (input) input.required = false;
+        if (backgroundUploadState.file) {
+            showVideoPreview(backgroundUploadState.file);
+        } else if (existingVideoSource) {
+            showVideoPreview(existingVideoSource);
+        } else {
+            resetVideoPreview();
         }
 
         if (backgroundRetryBtn) {
@@ -1277,12 +1330,6 @@
             });
         }
 
-        if (videoUrlInput) {
-            videoUrlInput.addEventListener('input', () => handleVideoUrlInput());
-            videoUrlInput.addEventListener('change', () => handleVideoUrlInput());
-            videoUrlInput.addEventListener('blur', () => handleVideoUrlInput());
-        }
-
         changeVideoUploadUI();
     }
 
@@ -1301,16 +1348,10 @@
         const lessonIdValue = document.getElementById('lessonId').value;
         const title = document.getElementById('title').value.trim();
         const description = document.getElementById('description').value.trim();
-        const duration = document.getElementById('duration').value;
-        const displayOrder = document.getElementById('display_order').value || 0;
-        const pathThumbnail = document.getElementById('thumbnail_path').value || null;
         const thumbnailInput = document.getElementById('thumbnail');
         const thumbnailFile = thumbnailInput && thumbnailInput.files && thumbnailInput.files[0] ? thumbnailInput.files[0] : null;
-        const isChoiceVideoUrl = document.getElementById('video_type_url').checked;
-        const videoUrl = isChoiceVideoUrl ? document.getElementById('video_url').value.trim() : '';
         const videoInput = document.getElementById('video_file');
         const selectedVideoFile = videoInput && videoInput.files && videoInput.files[0] ? videoInput.files[0] : null;
-        const isBackgroundMode = !isChoiceVideoUrl; // Luôn dùng background upload cho video file
 
         // Validation: Tiêu đề bắt buộc
         if (!title) {
@@ -1318,15 +1359,19 @@
             return;
         }
 
-        if (isBackgroundMode) {
-            // if (backgroundUploadState.file != null && !backgroundUploadState.uploadId) {
-            //     showNotificationModel_Global('Vui lòng chọn video và upload nền hoàn tất trước khi lưu.', 'warning');
-            //     return;
-            // }
-            if (backgroundUploadState.file != null && !['uploaded', 'processing', 'completed'].includes(backgroundUploadState.status)) {
-                showNotificationModel_Global('Video vẫn đang upload. Vui lòng chờ hoàn tất để lưu.', 'warning');
-                return;
-            }
+        // Validation: Video bắt buộc khi CREATE
+        if (mode === 'CREATE' && !backgroundUploadState.file && !selectedVideoFile) {
+            showNotificationModel_Global('Vui lòng chọn video cho bài học', 'error');
+            return;
+        }
+
+        if (backgroundUploadState.file != null && !backgroundUploadState.uploadId) {
+            showNotificationModel_Global('Vui lòng chọn video và upload nền hoàn tất trước khi lưu.', 'warning');
+            return;
+        }
+        if (backgroundUploadState.file != null && !['uploaded', 'processing', 'completed'].includes(backgroundUploadState.status)) {
+            showNotificationModel_Global('Video vẫn đang upload. Vui lòng chờ hoàn tất để lưu.', 'warning');
+            return;
         }
 
         handleChangeStateButtonSubmitting(true);
@@ -1342,26 +1387,13 @@
             }
             fd.append('title', title || '');
             fd.append('description', description || '');
-            fd.append('duration', parseInt(duration) || 0);
-            fd.append('display_order', parseInt(displayOrder) || 0);
 
-            fd.append('thumbnail_path', lessonData?.thumbnail_path || '');
             if (thumbnailFile) {
-                fd.append('thumbnail_file', thumbnailFile);
+                fd.append('thumbnail', thumbnailFile);
             }
 
-            // Nếu chọn URL video
-            if (isChoiceVideoUrl) {
-                fd.append('video_path', videoUrl);
-            } else if (isBackgroundMode) {
-                const placeholderVideoPath = existingVideoSource || `background-upload://${backgroundUploadState.uploadId}`;
-                fd.append('video_path', placeholderVideoPath);
-            } else {
-                fd.append('video_path', lessonData?.video_path);
-                if (selectedVideoFile) {
-                    fd.append('video_file', selectedVideoFile);
-                }
-            }
+            const placeholderVideoPath = existingVideoSource || `background-upload://${backgroundUploadState.uploadId}`;
+            fd.append('video_path', placeholderVideoPath);
 
             const response = await fetch(`/api${url}`, {
                 method: 'POST',
@@ -1391,7 +1423,7 @@
                     document.getElementById('lessonId').value = savedLessonId;
                 }
 
-                if (isBackgroundMode && backgroundUploadState.uploadId && savedLessonId) {
+                if (backgroundUploadState.uploadId && savedLessonId) {
                     try {
                         await startBackgroundProcessing(savedLessonId);
                         existingVideoSource = `background-upload://${backgroundUploadState.uploadId}`;
@@ -1452,6 +1484,20 @@
             event.returnValue = '';
         }
     });
+
+    function getVideoMimeType(url) {
+        const extension = url.split('?')[0].split('.').pop().toLowerCase();
+        const mimeTypes = {
+            mp4: 'video/mp4',
+            webm: 'video/webm',
+            ogg: 'video/ogg',
+            mov: 'video/quicktime',
+            avi: 'video/x-msvideo',
+            mpeg: 'video/mpeg'
+        };
+
+        return mimeTypes[extension] || 'video/mp4';
+    }
+
 </script>
 @endsection
-

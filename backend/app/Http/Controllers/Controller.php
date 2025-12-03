@@ -69,7 +69,7 @@ class Controller extends BaseController
     * @param string $separator Ký tự phân cách (mặc định: '-')
     * @return string Slug đã được tạo
     */
-    protected function createSlug($string, $separator = '-')
+    protected function createSlug($string = '', $separator = '-')
     {
         if (empty($string)) {
             return '';

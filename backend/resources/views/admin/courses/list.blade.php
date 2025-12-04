@@ -380,9 +380,9 @@
                     <col class="w-[100px] 3xl:w-[160px]">
                     <col class="w-[100px] 3xl:w-[160px]">
                     <col class="w-[120px] 3xl:w-[150px]">
-                    <col class="w-[95px] 3xl:w-[120px]">
-                    <col class="w-[85px] 3xl:w-[110px]">
-                    <col class="w-[100px] 3xl:w-[140px]">
+                    <col class="w-[105px] 3xl:w-[120px]">
+                    <col class="w-[95px] 3xl:w-[110px]">
+                    <col class="w-[115px] 3xl:w-[140px]">
                 </colgroup>
                 <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
                     <tr>

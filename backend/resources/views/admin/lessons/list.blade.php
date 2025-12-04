@@ -307,8 +307,8 @@
                 <col class="">
                 <col class="">
                 <col class="">
-                <col class="w-[110px] 3xl:w-[150px]">
-                <col class="w-[100px] 3xl:w-[150px]">
+                <col class="w-[125px] 3xl:w-[150px]">
+                <col class="w-[120px] 3xl:w-[150px]">
             </colgroup>
             <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
                 <tr>

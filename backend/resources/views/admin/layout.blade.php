@@ -209,7 +209,7 @@
     <!-- Sidebar -->
     <aside id="sidebar" class="shrink-0 w-[180px] 3xl:w-[250px] h-screen bg-white dark:bg-gray-900 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700/60 overflow-hidden transition-all duration-300 z-40 flex flex-col">
         <!-- Sidebar Header -->
-        <div class="h-[54px] 3xl:h-[71px] sidebar-item flex flex-col items-center !justify-between flex-shrink-0">
+        <div class="h-[62.5px] 3xl:h-[71px] sidebar-item flex flex-col items-center !justify-between flex-shrink-0">
             <div class="w-full"></div>
             <a href="{{ route('admin.dashboard') }}"
                 class="group flex items-center gap-3 hover:opacity-90 transition-all duration-300">
@@ -456,7 +456,7 @@
         </nav>
 
         <!-- Main -->
-        <main class="z-[100] h-[calc(100dvh-54px)] 3xl:h-[calc(100dvh-71px)] mt-[54px] 3xl:mt-[71px] p-2 md:p-6 transition-all duration-300 bg-gray-100 dark:bg-gray-900 overflow-y-auto">
+        <main class="z-[100] h-[calc(100dvh-62.5px)] 3xl:h-[calc(100dvh-71px)] mt-[62.5px] 3xl:mt-[71px] p-2 md:p-6 transition-all duration-300 bg-gray-100 dark:bg-gray-900 overflow-y-auto">
             @yield('content')
         </main>
     </div>

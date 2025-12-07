@@ -236,7 +236,69 @@ Hành động này là bắt buộc, xem tài liệu bên ngoài
 ### 2. Tạo file cấu hình
 Copy cấu hình nginx từ source vào thư mục cấu hình Nginx ở Host (Ubuntu server)
 ```bash
-cp nginx-host.conf /etc/nginx/sites-available/lms.domain.vn
+vim /etc/nginx/sites-available/rdi.sotech.io.vn
+```
+Ghi nội dung sau vào file vừa tạo hoặc có thể lấy nội dung từ `nginx-host.conf`:
+```nginx
+# HTTP Server - Redirect to HTTPS
+server {
+    listen 80;
+    server_name rdi.sotech.io.vn;
+    
+    # Redirect all HTTP requests to HTTPS
+    return 308 https://$server_name$request_uri;
+}
+
+# HTTPS Server
+server {
+    listen 443 ssl;
+    server_name rdi.sotech.io.vn;
+
+    # SSL Certificate paths (update these paths after generating certificates)
+    ssl_certificate /etc/letsencrypt/live/rdi.sotech.io.vn/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/rdi.sotech.io.vn/privkey.pem;
+    
+    # SSL Configuration - Modern and secure
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384';
+    ssl_prefer_server_ciphers off;
+    
+    # SSL Session cache
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+    
+    # HSTS (optional but recommended)
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    # QUAN TRỌNG: Tăng giới hạn upload size
+    # Phải đặt ở đây vì Nginx host nhận request trước Docker
+    client_max_body_size 256M;
+    client_body_buffer_size 128k;
+    client_body_timeout 600s;
+
+    location / {
+        # Proxy đến Docker Nginx container (port 8080)
+        proxy_pass http://localhost:8080;
+        
+        # Headers để giữ thông tin client
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Port $server_port;
+        
+        # Timeout cho upload file lớn
+        proxy_connect_timeout 600;
+        proxy_send_timeout 600;
+        proxy_read_timeout 600;
+        send_timeout 600;
+        
+        # Disable buffering để upload nhanh hơn
+        # Request sẽ được stream trực tiếp vào backend
+        proxy_buffering off;
+        proxy_request_buffering off;
+    }
+}
 ```
 
 ### 3. Sử lại file cấu hình

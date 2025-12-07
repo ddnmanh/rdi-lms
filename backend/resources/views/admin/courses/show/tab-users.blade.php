@@ -32,7 +32,7 @@
         } else {
             usersList.innerHTML = usersData_MainShow.map((user, idx) => {
                 const progress = user.course_progress || {};
-                const lessonViews = Array.isArray(user.lesson_views) ? user.lesson_views : [];
+                const lessonViews = Array.isArray(user.lesson_progress) ? user.lesson_progress : [];
                 const viewedLessonsCount = lessonViews.length;
                 const isPassed = progress.is_passed === 1;
                 const completionPercentage = progress.completion_percentage || 0;

@@ -13,7 +13,7 @@ class StudentController extends Controller
 {
     /**
      * Danh sách khóa học của sinh viên
-     * 
+     *
      * Query params:
      * - search: Tìm kiếm theo title hoặc description
      * - sort_by: Sắp xếp theo (id, title, start_date, end_date, created_at) - mặc định: id
@@ -40,7 +40,7 @@ class StudentController extends Controller
         // Sắp xếp
         $sortBy = strtolower($request->get('sort_by', 'joined_at'));
         $orderBy = strtolower($request->get('order_by', 'desc'));
-        
+
         // Validate order_by
         if (!in_array($orderBy, ['asc', 'desc'])) {
             $orderBy = 'desc';
@@ -52,7 +52,7 @@ class StudentController extends Controller
             case 'start_date':
             case 'end_date':
             case 'created_at':
-            case 'updated_at': 
+            case 'updated_at':
                 $query->orderBy($sortBy, $orderBy);
                 break;
             case 'joined_at':
@@ -78,7 +78,7 @@ class StudentController extends Controller
         // Gán lesson_view vào từng lesson và thêm progress vào course
         $courses->each(function ($course) use ($lessonViews) {
             $course->lessons->each(function ($lesson) use ($lessonViews) {
-                $lesson->lesson_view = $lessonViews->get($lesson->id);
+                $lesson->progress = $lessonViews->get($lesson->id);
             });
 
             // Chuyển dữ liệu từ pivot sang progress
@@ -138,7 +138,7 @@ class StudentController extends Controller
                 'watched_duration' => $lessonView ? $lessonView->watched_duration : 0,
                 'last_position' => $lessonView ? $lessonView->last_position : 0,
                 'last_watched_at' => $lessonView ? $lessonView->last_watched_at : null,
-                'completion_percentage' => $lesson->duration > 0 
+                'completion_percentage' => $lesson->duration > 0
                     ? round(($lessonView ? $lessonView->watched_duration + 1 : 0) / $lesson->duration * 100, 2)
                     : 0,
             ];
@@ -147,17 +147,17 @@ class StudentController extends Controller
         });
 
         $course->lessons = $lessons;
-        
+
         // Lấy thông tin pivot từ user đầu tiên (chỉ có 1 user do filter ở trên)
         $userPivot = $course->users->first()->pivot;
-        
+
         $course->progress = [
             'completion_percentage' => $userPivot->completion_percentage ?? 0,
             'is_passed' => $userPivot->is_passed ?? false,
             'joined_at' => $userPivot->created_at,
             'updated_at' => $userPivot->updated_at,
         ];
-        
+
         // Xóa users khỏi response vì không cần thiết
         unset($course->users);
 
@@ -257,7 +257,7 @@ class StudentController extends Controller
         $watchedDuration = max(($lessonView ? $lessonView->watched_duration : 0), $lastPosition);
 
         // Tính completion_percentage
-        $completionPercentage = $lesson->duration > 0 
+        $completionPercentage = $lesson->duration > 0
             ? round(($watchedDuration + 1) / $lesson->duration * 100, 2)
             : 0;
 
@@ -273,7 +273,7 @@ class StudentController extends Controller
                 'last_watched_at' => now(),
                 'completion_percentage' => $completionPercentage,
             ]
-        ); 
+        );
 
         // Cập nhật tiến độ của khóa học (course_user)
         $this->updateProcessCourseUserPivot($user->id, $lesson->course_id);
@@ -317,7 +317,7 @@ class StudentController extends Controller
 
         foreach ($course->lessons as $lesson) {
             $totalDuration += $lesson->duration;
-            
+
             $lessonView = LessonView::where('user_id', $user->id)
                 ->where('lesson_id', $lesson->id)
                 ->first();
@@ -327,7 +327,7 @@ class StudentController extends Controller
             }
         }
 
-        $overallPercentage = $totalDuration > 0 
+        $overallPercentage = $totalDuration > 0
             ? round($totalWatchedDuration / $totalDuration * 100, 2)
             : 0;
 
@@ -363,7 +363,7 @@ class StudentController extends Controller
     private function calculateCourseCompletionPercentage($user_id, $course_id)
     {
         $course = Course::with('lessons')->find($course_id);
-        
+
         if (!$course) {
             return 0;
         }
@@ -392,7 +392,7 @@ class StudentController extends Controller
 
         $totalLessonWatched = 0; // Đếm các bài học đã xem hơn 1s
 
-        foreach ($lessonViews as $view) { 
+        foreach ($lessonViews as $view) {
             $totalLessonWatchedDuration += $view->watched_duration;
 
             if ($view->watched_duration > 0) {
@@ -400,10 +400,10 @@ class StudentController extends Controller
             }
         }
 
-        $percent = $totalLessonDuration > 0 
+        $percent = $totalLessonDuration > 0
             ? round(($totalLessonWatchedDuration / $totalLessonDuration) * 100, 2)
             : 0;
-        
+
         // Tính toán sai số 1s cho mỗi bài học đã xem
         if (round((($totalLessonWatchedDuration + $totalLessonWatched) / $totalLessonDuration) * 100, 2) >= 100) {
             $percent = 100;

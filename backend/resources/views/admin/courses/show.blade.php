@@ -101,7 +101,7 @@
         usersData_MainShow = Array.isArray(courseData_MainShow.users) ? courseData_MainShow.users : [];
 
         usersData_MainShow.forEach(user => {
-            const lessonViews = Array.isArray(user.lesson_views) ? user.lesson_views : [];
+            const lessonViews = Array.isArray(user.lesson_progress) ? user.lesson_progress : [];
             lessonViews.forEach(view => {
                 if (view.lesson_id) {
                     lessonUserWatchedCounts_MainShow[view.lesson_id] = (lessonUserWatchedCounts_MainShow[view.lesson_id] || 0) + 1;

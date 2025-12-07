@@ -115,7 +115,7 @@ class AdminController extends Controller
     public function editCourse($id)
     {
         return view('admin.courses.form', ['mode' => 'EDIT_COURSE', 'courseId' => $id]);
-    } 
+    }
 
     /**
      * Trang quản lý lessons

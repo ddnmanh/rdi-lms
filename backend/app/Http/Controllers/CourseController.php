@@ -222,7 +222,7 @@ class CourseController extends Controller
                 ];
 
                 // Gán lesson_views cho từng user
-                $course->users[$i]->lesson_views = $lessonViews->get($userId, collect());
+                $course->users[$i]->lesson_progress = $lessonViews->get($userId, collect());
 
                 unset($course->users[$i]->pivot);
             }

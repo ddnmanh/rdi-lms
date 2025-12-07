@@ -1,6 +1,6 @@
 import '../../core/constants/api_constants.dart';
 import '../models/course_model.dart';
-import '../models/hls_signature_model.dart';
+import '../models/auto_signature_model.dart';
 import '../services/api_service.dart';
 
 class CourseRepository {
@@ -55,15 +55,32 @@ class CourseRepository {
     return null;
   }
 
-  /// Lấy HLS signature cho lesson để stream video
+  /// Lấy auto signature cho lesson để stream video (hỗ trợ cả HLS và MP4)
+  /// GET /api/lessons/{lessonId}/auto-signature
+  Future<AutoSignature?> getAutoSignature(int lessonId) async {
+    try {
+      final response = await _apiService.dio.get(
+        ApiConstants.getAutoSignatureUrl(lessonId),
+      );
+      if (response.statusCode == 200 && response.data['success'] == true) {
+        return AutoSignature.fromJson(response.data['data']);
+      }
+    } catch (e) {
+      rethrow;
+    }
+    return null;
+  }
+
+  /// Lấy HLS signature cho lesson (deprecated - sử dụng getAutoSignature thay thế)
   /// GET /api/lessons/{lessonId}/hls-signature
-  Future<HlsSignature?> getHlsSignature(int lessonId) async {
+  @Deprecated('Sử dụng getAutoSignature() thay thế')
+  Future<AutoSignature?> getHlsSignature(int lessonId) async {
     try {
       final response = await _apiService.dio.get(
         ApiConstants.getHlsSignatureUrl(lessonId),
       );
       if (response.statusCode == 200 && response.data['success'] == true) {
-        return HlsSignature.fromJson(response.data['data']);
+        return AutoSignature.fromJson(response.data['data']);
       }
     } catch (e) {
       rethrow;

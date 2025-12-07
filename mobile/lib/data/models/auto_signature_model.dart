@@ -35,11 +35,11 @@ class AutoSignature {
 
   /// Lấy URL đầy đủ để stream video (hỗ trợ cả HLS và MP4)
   String get fullStreamUrl => '$baseUrl$signedUri';
-
+  
   /// Kiểm tra xem có phải video HLS không
   bool get isHls => type.toLowerCase() == 'hls';
-
-  /// Kiểm tra xem có phải video MP4 không
+  
+  /// Kiểm tra xem có phải video MP4 không  
   bool get isMp4 => type.toLowerCase() == 'mp4';
 
   /// Kiểm tra xem signature đã hết hạn chưa

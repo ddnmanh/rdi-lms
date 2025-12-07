@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile/core/constants/api_constants.dart';
-import 'package:mobile/core/utils/scroll_tracking.dart';
-import 'package:mobile/data/models/course_model.dart';
-import 'package:mobile/data/models/lesson_model.dart';
-import 'package:mobile/presentation/widgets/header_navigation_bar.dart';
-import 'package:mobile/presentation/widgets/notification_modal.dart';
-import 'package:mobile/presentation/widgets/spinner_loading.dart';
-import 'package:mobile/theme/ios_widgets.dart';
+import 'package:LMS/core/constants/api_constants.dart';
+import 'package:LMS/core/utils/scroll_tracking.dart';
+import 'package:LMS/data/models/course_model.dart';
+import 'package:LMS/data/models/lesson_model.dart';
+import 'package:LMS/presentation/widgets/header_navigation_bar.dart';
+import 'package:LMS/presentation/widgets/notification_modal.dart';
+import 'package:LMS/presentation/widgets/spinner_loading.dart';
+import 'package:LMS/theme/ios_widgets.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/course_provider.dart';
 import '../../../theme/app_colors.dart';
@@ -15,8 +15,15 @@ import '../player/video_player_screen.dart';
 
 class CourseDetailScreen extends StatefulWidget {
   final int courseId;
+  final int? autoPlayLessonId; // Tự động mở video player với lesson này
+  final String? autoPlayLessonTitle; // Title hiển thị trong lúc loading
 
-  const CourseDetailScreen({super.key, required this.courseId});
+  const CourseDetailScreen({
+    super.key,
+    required this.courseId,
+    this.autoPlayLessonId,
+    this.autoPlayLessonTitle,
+  });
 
   @override
   State<CourseDetailScreen> createState() => _CourseDetailScreenState();
@@ -26,6 +33,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
     with ScrollTracking {
   bool _hasStartedLoading = false;
   bool _hasShownError = false;
+  bool _hasAutoPlayedLesson = false; // Đảm bảo chỉ auto-play 1 lần
 
   @override
   double get scrollThreshold => 50.0;
@@ -43,26 +51,17 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
     _loadCourseDetail();
   }
 
-  /// Load chi tiết khóa học
+  /// Load chi tiết khóa học - luôn tải mới khi truy cập
   void _loadCourseDetail() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
-      final courseProvider = context.read<CourseProvider>();
-      final isCurrentCourseLoaded =
-          courseProvider.selectedCourse?.id == widget.courseId;
+      setState(() {
+        _hasStartedLoading = true;
+        _hasShownError = false;
+      });
 
-      if (!isCurrentCourseLoaded) {
-        setState(() {
-          _hasStartedLoading = true;
-          _hasShownError = false;
-        });
-        courseProvider.fetchCourseDetail(widget.courseId);
-      } else {
-        setState(() {
-          _hasStartedLoading = true;
-        });
-      }
+      context.read<CourseProvider>().fetchCourseDetail(widget.courseId);
     });
   }
 
@@ -77,6 +76,9 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
         : null;
 
     _handleErrorState(isLoading, error, course);
+
+    // Auto-play lesson nếu có autoPlayLessonId và course đã load xong
+    _handleAutoPlayLesson(isLoading, course);
 
     return SpinnerLoading(
       isLoading: isLoading,
@@ -109,6 +111,38 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
     }
   }
 
+  /// Xử lý auto-play lesson khi course load xong
+  void _handleAutoPlayLesson(bool isLoading, Course? course) {
+    // Chỉ auto-play khi:
+    // - Có autoPlayLessonId
+    // - Course đã load xong (không loading)
+    // - Course có data
+    // - Chưa auto-play lần nào
+    if (widget.autoPlayLessonId != null &&
+        !isLoading &&
+        course != null &&
+        !_hasAutoPlayedLesson) {
+      _hasAutoPlayedLesson = true;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          // Tìm lesson trong course
+          final lesson = course.lessons.where((l) => l.id == widget.autoPlayLessonId).firstOrNull;
+
+          _navigateToVideoPlayer(
+            lesson ?? Lesson(
+              id: widget.autoPlayLessonId!,
+              courseId: widget.courseId,
+              title: widget.autoPlayLessonTitle ?? '',
+              duration: 0,
+              displayOrder: 0,
+            ),
+          );
+        }
+      });
+    }
+  }
+
   /// Hiển thị thông báo lỗi và quay về trang trước
   Future<void> _showErrorNotification() async {
     await NotificationModal.show(
@@ -133,16 +167,14 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
 
   /// Build body
   Widget _buildBody(bool isLoading, Course? course) {
-    final title = isLoading ? 'Đang tải...' : (course?.title ?? 'Chi tiết khóa học');
+    final title = isLoading
+        ? 'Đang tải...'
+        : (course?.title ?? 'Chi tiết khóa học');
 
     return Stack(
       children: [
         RefreshIndicator(
           onRefresh: _handleRefresh,
-          // displacement: 0.0, // Khoảng cách hiển thị indicator từ đỉnh
-          // edgeOffset: MediaQuery.of(context).padding.top + HeaderNavigationBar().barHeight + 30, // Offset từ cạnh trên (tránh bị che bởi header)
-          // strokeWidth: 2.5, // Độ dày của indicator
-          // color: _systemBlue, // Màu của indicator
           child: CustomScrollView(
             controller: scrollTrackingController,
             physics: const BouncingScrollPhysics(
@@ -174,8 +206,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
           titleStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w600,
             color: Colors.black,
-
-          )
+          ),
         ),
       ],
     );
@@ -186,11 +217,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
     // Khi đang loading, SpinnerLoading sẽ hiển thị overlay
     // Hiển thị container trống để giữ layout
     if (isLoading) {
-      return [
-        const SliverFillRemaining(
-          child: SizedBox.shrink(),
-        ),
-      ];
+      return [const SliverFillRemaining(child: SizedBox.shrink())];
     }
 
     // Khi không có dữ liệu
@@ -230,9 +257,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
       SliverToBoxAdapter(child: _buildCourseStats(course)),
 
       // Header cho danh sách bài học
-      SliverToBoxAdapter(
-        child: IOSSectionHeader(title: 'Bài học')
-      ),
+      SliverToBoxAdapter(child: IOSSectionHeader(title: 'Bài học')),
 
       // Danh sách bài học
       _buildLessonList(course),
@@ -427,7 +452,6 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
     );
   }
 
-
   /// Build danh sách bài học với iOS 18 grouped style
   Widget _buildLessonList(Course course) {
     if (course.lessons.isEmpty) {
@@ -464,29 +488,36 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
       child: IOSGroupedList(
         children: [
           for (int i = 0; i < course.lessons.length; i++) ...[
-            // _buildLessonTile(course.lessons[i], i + 1),
             CupertinoButton(
               padding: EdgeInsets.zero,
               onPressed: () => _navigateToVideoPlayer(course.lessons[i]),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
                 child: Row(
                   children: [
-                    // Lesson number với gradient background
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        gradient: AppColors.primaryGradient,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Center(
-                        child: Text(
-                          '${i+1}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                    // Lesson Thumbnail
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        '${ApiConstants.baseUrl}${course.lessons[i].thumbnailPath}',
+                        width: 64,
+                        height: 36,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          width: 64,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: _secondaryLabelColor,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            CupertinoIcons.photo,
+                            size: 20,
+                            // ignore: deprecated_member_use
+                            color: Colors.white.withOpacity(0.6),
                           ),
                         ),
                       ),
@@ -507,7 +538,8 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 6),
+                          // Progress bar và thông tin
                           Row(
                             children: [
                               Icon(
@@ -523,32 +555,71 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                                   color: _secondaryLabelColor,
                                 ),
                               ),
+                              const SizedBox(width: 12),
                             ],
                           ),
                         ],
                       ),
                     ),
-                    // Play icon
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        // ignore: deprecated_member_use
-                        color: _systemBlue.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Icon(
-                        CupertinoIcons.play_fill,
-                        size: 16,
-                        color: _systemBlue,
-                      ),
+                    // Play/Check icon
+                    _buildLessonProgressWithPlay(
+                      completionPercentage:
+                          course.lessons[i].progress.completionPercentage,
+                      lesson: course.lessons[i],
                     ),
                   ],
                 ),
               ),
-            )
+            ),
           ],
         ],
       ),
+    );
+  }
+
+  Widget _buildLessonProgressWithPlay({
+    required double completionPercentage,
+    required Lesson lesson,
+    double iconSize = 16,
+    double contentPadding = 6,
+    double strokeWidth = 2, // Độ dày của thanh progress
+  }) {
+    final double progress = (completionPercentage / 100).clamp(0.0, 1.0);
+    final bool isCompleted = completionPercentage >= 100;
+
+    final Color activeColor = isCompleted
+        ? CupertinoColors.systemGreen
+        : CupertinoColors.activeBlue;
+
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Positioned.fill(
+          child: CircularProgressIndicator(
+            value: progress,
+            strokeWidth: strokeWidth,
+            // ignore: deprecated_member_use
+            backgroundColor: activeColor.withOpacity(0.1),
+            valueColor: AlwaysStoppedAnimation<Color>(activeColor),
+          ),
+        ),
+
+        Container(
+          // Ở đây mình +2 để tạo một khoảng trắng nhỏ (gap) cho thoáng mắt.
+          margin: EdgeInsets.all(strokeWidth/2),
+          padding: EdgeInsets.all(contentPadding),
+          decoration: BoxDecoration(
+            // ignore: deprecated_member_use
+            color: activeColor.withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            isCompleted ? Icons.check : CupertinoIcons.play_fill,
+            size: iconSize,
+            color: activeColor,
+          ),
+        ),
+      ],
     );
   }
 
@@ -574,12 +645,20 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
   }
 
   /// Chuyển đến màn hình xem video
-  void _navigateToVideoPlayer(Lesson lesson) {
-    Navigator.push(
+  void _navigateToVideoPlayer(Lesson lesson) async {
+    await Navigator.push(
       context,
       CupertinoPageRoute(
-        builder: (context) => VideoPlayerScreen(lesson: lesson),
+        builder: (context) => VideoPlayerScreen(
+          lessonId: lesson.id,
+          initialTitle: lesson.title,
+        ),
       ),
     );
+
+    // Refresh course detail sau khi xem video để cập nhật tiến độ
+    if (mounted) {
+      context.read<CourseProvider>().fetchCourseDetail(widget.courseId);
+    }
   }
 }

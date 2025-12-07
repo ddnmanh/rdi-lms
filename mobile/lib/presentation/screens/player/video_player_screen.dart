@@ -8,13 +8,18 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import '../../../core/constants/api_constants.dart';
-import '../../../data/models/hls_signature_model.dart';
+import '../../../data/models/auto_signature_model.dart';
 import '../../../data/models/lesson_model.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
-  final Lesson lesson;
+  final int lessonId;
+  final String? initialTitle; // Optional: hiển thị title trong lúc loading
 
-  const VideoPlayerScreen({super.key, required this.lesson});
+  const VideoPlayerScreen({
+    super.key,
+    required this.lessonId,
+    this.initialTitle,
+  });
 
   @override
   State<VideoPlayerScreen> createState() => _VideoPlayerScreenState();
@@ -36,6 +41,13 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   Duration _duration = Duration.zero;
   bool _isSeeking = false;
   Duration _seekPosition = Duration.zero;
+
+  // Lesson data từ API (luôn tải lại khi mở screen)
+  Lesson? _lesson;
+
+  // Progress tracking
+  Duration _maxWatchedPosition = Duration.zero;
+  bool _isProgressSaved = false;
 
   // New features state
   bool _isFullscreen = false;
@@ -124,7 +136,15 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     });
 
     _player.stream.position.listen((position) {
-      if (mounted && !_isSeeking) setState(() => _position = position);
+      if (mounted && !_isSeeking) {
+        setState(() {
+          _position = position;
+          // Track maximum watched position
+          if (position > _maxWatchedPosition) {
+            _maxWatchedPosition = position;
+          }
+        });
+      }
     });
 
     _player.stream.duration.listen((duration) {
@@ -166,16 +186,37 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         throw Exception('Không tìm thấy token xác thực');
       }
 
-      final hlsSignature = await _fetchHlsSignature();
+      // Tải lesson detail từ API
+      await _fetchLessonDetail();
 
-      if (hlsSignature == null) {
-        throw Exception('Không thể lấy được URL video HLS');
+      // Kiểm tra lesson đã được load thành công
+      if (_lesson == null) {
+        throw Exception('Không thể tải thông tin bài học');
       }
 
-      final streamUrl = hlsSignature.fullStreamUrl;
-      debugPrint('HLS Stream URL: $streamUrl');
+      final autoSignature = await _fetchAutoSignature();
+
+      if (autoSignature == null) {
+        throw Exception('Không thể lấy được URL video');
+      }
+
+      final streamUrl = autoSignature.fullStreamUrl;
+      final videoType = autoSignature.type;
+      debugPrint('Video Type: $videoType, Stream URL: $streamUrl');
 
       await _player.open(Media(streamUrl), play: false);
+
+      // Tự động tua đến vị trí đã xem trước đó
+      final savedWatchedDuration = _lesson!.progress.watchedDuration;
+      debugPrint('Saved duration: $savedWatchedDuration');
+      if (savedWatchedDuration > 0) {
+        // Đợi video load xong (có duration) trước khi seek
+        await _waitForVideoReady();
+        if (mounted) {
+          await _player.seek(Duration(seconds: savedWatchedDuration));
+          debugPrint('Restored video position to: ${savedWatchedDuration}s');
+        }
+      }
 
       if (mounted) setState(() => _isLoading = false);
     } catch (e) {
@@ -189,7 +230,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     }
   }
 
-  Future<HlsSignature?> _fetchHlsSignature() async {
+  /// Fetch lesson detail từ API
+  Future<void> _fetchLessonDetail() async {
     final dio = Dio()
       ..options.baseUrl = ApiConstants.baseUrl
       ..options.connectTimeout = const Duration(seconds: 10)
@@ -201,13 +243,118 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       };
 
     final response = await dio.get(
-      ApiConstants.getHlsSignatureUrl(widget.lesson.id),
+      ApiConstants.getLessonDetail(widget.lessonId),
     );
 
     if (response.statusCode == 200 && response.data['success'] == true) {
-      return HlsSignature.fromJson(response.data['data']);
+      final lessonData = response.data['data'];
+      if (mounted) {
+        setState(() {
+          _lesson = Lesson.fromJson(lessonData);
+        });
+      }
+      debugPrint('Loaded lesson detail: ${_lesson!.title}');
+      debugPrint('Progress: ${_lesson!.progress}');
+    } else {
+      throw Exception(response.data['message'] ?? 'Không thể tải bài học');
+    }
+  }
+
+  /// Đợi video sẵn sàng (có duration) trước khi thực hiện các thao tác seek
+  Future<void> _waitForVideoReady() async {
+    // Nếu đã có duration thì return ngay
+    if (_player.state.duration.inMilliseconds > 0) {
+      return;
+    }
+
+    // Đợi duration stream emit giá trị > 0
+    final completer = Completer<void>();
+    StreamSubscription<Duration>? subscription;
+
+    subscription = _player.stream.duration.listen((duration) {
+      if (duration.inMilliseconds > 0 && !completer.isCompleted) {
+        completer.complete();
+        subscription?.cancel();
+      }
+    });
+
+    // Timeout sau 10 giây
+    return completer.future.timeout(
+      const Duration(seconds: 10),
+      onTimeout: () {
+        subscription?.cancel();
+        debugPrint('Timeout waiting for video ready');
+      },
+    );
+  }
+
+  Future<AutoSignature?> _fetchAutoSignature() async {
+    final dio = Dio()
+      ..options.baseUrl = ApiConstants.baseUrl
+      ..options.connectTimeout = const Duration(seconds: 10)
+      ..options.receiveTimeout = const Duration(seconds: 10)
+      ..options.headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $_authToken',
+      };
+
+    final response = await dio.get(
+      ApiConstants.getAutoSignatureUrl(widget.lessonId),
+    );
+
+    if (response.statusCode == 200 && response.data['success'] == true) {
+      return AutoSignature.fromJson(response.data['data']);
     }
     throw Exception(response.data['message'] ?? 'Lỗi không xác định');
+  }
+
+  /// Lưu tiến độ xem video lên server
+  Future<void> _saveProgress() async {
+    // Prevent duplicate saves
+    if (_isProgressSaved) return;
+    _isProgressSaved = true;
+
+    // Only save if user has watched something
+    if (_maxWatchedPosition.inSeconds == 0 && _position.inSeconds == 0) {
+      return;
+    }
+
+    try {
+      final dio = Dio()
+        ..options.baseUrl = ApiConstants.baseUrl
+        ..options.connectTimeout = const Duration(seconds: 10)
+        ..options.receiveTimeout = const Duration(seconds: 10)
+        ..options.headers = {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $_authToken',
+        };
+
+      final watchedDuration = _maxWatchedPosition.inSeconds > 0
+          ? _maxWatchedPosition.inSeconds
+          : _position.inSeconds;
+      final lastPosition = _position.inSeconds;
+
+      debugPrint(_lesson?.toString() ?? 'Lesson is null');
+      debugPrint('Watched duration: $watchedDuration, Last position: $lastPosition');
+      debugPrint('Lesson ID: ${widget.lessonId}');
+      debugPrint('Auth token: $_authToken');
+      debugPrint('Progress saved: watched=$watchedDuration, position=$lastPosition');
+      debugPrint('API URL: ${ApiConstants.studentProgress}');
+
+      await dio.post(
+        ApiConstants.studentProgress,
+        data: {
+          'lesson_id': widget.lessonId,
+          'last_position': lastPosition,
+        },
+      );
+
+      debugPrint('Progress saved: watched=$watchedDuration, position=$lastPosition');
+    } catch (e) {
+      debugPrint('Failed to save progress: $e');
+    }
   }
 
   String _getErrorMessage(dynamic error) {
@@ -236,7 +383,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     HapticFeedback.selectionClick();
     final duration = _duration.inMilliseconds > 0
         ? _duration
-        : Duration(seconds: widget.lesson.duration);
+        : Duration(seconds: _lesson?.duration ?? 0);
     var newPosition = _position + Duration(seconds: seconds);
     newPosition = newPosition.clamp(Duration.zero, duration);
     _player.seek(newPosition);
@@ -369,6 +516,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
 
   @override
   void dispose() {
+    // Save progress before disposing
+    _saveProgress();
+
     WidgetsBinding.instance.removeObserver(this);
     _controlsAnimController.dispose();
     _seekAnimController.dispose();
@@ -383,11 +533,19 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
-      child: Scaffold(
-        backgroundColor: _systemBlack,
-        body: _buildBody(),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        await _saveProgress();
+        if (mounted) Navigator.pop(context);
+      },
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle.light,
+        child: Scaffold(
+          backgroundColor: _systemBlack,
+          body: _buildBody(),
+        ),
       ),
     );
   }
@@ -548,9 +706,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
           // Back button
           CupertinoButton(
             padding: const EdgeInsets.all(12),
-            onPressed: () {
+            onPressed: () async {
               HapticFeedback.lightImpact();
-              Navigator.pop(context);
+              await _saveProgress();
+              if (mounted) Navigator.pop(context);
             },
             child: Container(
               padding: const EdgeInsets.all(8),
@@ -571,7 +730,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
             Expanded(
               flex: 3,
               child: Text(
-                widget.lesson.title,
+                _lesson?.title ?? widget.initialTitle ?? 'Đang tải...',
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -682,7 +841,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     final position = _isSeeking ? _seekPosition : _position;
     final duration = _duration.inMilliseconds > 0
         ? _duration
-        : Duration(seconds: widget.lesson.duration);
+        : Duration(seconds: _lesson?.duration ?? 0);
 
     return Padding(
       padding: EdgeInsets.fromLTRB(16, 0, 16, safeArea.bottom > 0 ? 8 : 16),
@@ -1040,7 +1199,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 48),
               child: Text(
-                widget.lesson.title,
+                _lesson?.title ?? widget.initialTitle ?? '',
                 style: const TextStyle(
                   color: _white40,
                   fontSize: 14,

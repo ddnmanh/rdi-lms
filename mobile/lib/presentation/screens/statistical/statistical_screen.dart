@@ -1,5 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../providers/course_provider.dart';
 import '../../../theme/ios_widgets.dart';
 import '../../../theme/app_colors.dart';
 import '../../widgets/header_bar.dart';
@@ -33,6 +35,11 @@ class _StatisticalScreenState extends State<StatisticalScreen> with ScrollTracki
     // Tính ngày đầu tuần (Thứ 2)
     _selectedWeekStart = _getWeekStart(DateTime.now());
     _generateMockData();
+
+    // Đảm bảo courses đã được load
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CourseProvider>().ensureCoursesLoaded();
+    });
   }
 
   DateTime _getWeekStart(DateTime date) {
@@ -203,73 +210,50 @@ class _StatisticalScreenState extends State<StatisticalScreen> with ScrollTracki
                   child: IOSSectionHeader(title: 'Tiến trình khóa học'),
                 ),
 
-                // Course progress list
+                // Course progress list - sử dụng data thực từ Provider
                 SliverToBoxAdapter(
-                  child: IOSGroupedList(
-                    children: [
-                      _buildCourseProgress(
-                        context,
-                        title: 'Giới thiệu Flutter',
-                        progress: 0.75,
-                        lessons: '15/20 bài học',
-                      ),
-                      _buildCourseProgress(
-                        context,
-                        title: 'Tiến trình Dart',
-                        progress: 0.4,
-                        lessons: '8/20 bài học',
-                      ),
-                      _buildCourseProgress(
-                        context,
-                        title: 'Trạng thái quản lý',
-                        progress: 0.2,
-                        lessons: '3/15 bài học',
-                      ),
-                    ],
-                  ),
-                ),
+                  child: Consumer<CourseProvider>(
+                    builder: (context, courseProvider, child) {
+                      if (courseProvider.courses.isEmpty) {
+                        return IOSGroupedList(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Center(
+                                child: Text(
+                                  'Chưa có khóa học nào',
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: const Color(0xFF999999),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
 
-                const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                      // Lấy tối đa 5 khóa học để hiển thị
+                      final displayCourses = courseProvider.courses.take(5).toList();
 
-                // Section header
-                const SliverToBoxAdapter(
-                  child: IOSSectionHeader(title: 'Hành trình'),
-                ),
+                      return IOSGroupedList(
+                        children: displayCourses.map((course) {
+                          final progress = (course.progress?.completionPercentage ?? 0) / 100;
+                          final completedLessons = course.lessons.where(
+                            (l) => l.progress.completionPercentage >= 80
+                          ).length;
+                          final totalLessons = course.lessons.length;
 
-                // Achievements
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: [
-                        _buildAchievementBadge(
-                          context,
-                          icon: Icons.emoji_events_rounded,
-                          title: 'Kỷ lục tuần',
-                          color: Colors.orange,
-                        ),
-                        _buildAchievementBadge(
-                          context,
-                          icon: Icons.school_rounded,
-                          title: 'Học viên nhanh tay',
-                          color: Colors.blue,
-                        ),
-                        _buildAchievementBadge(
-                          context,
-                          icon: Icons.star_rounded,
-                          title: 'Top học viên',
-                          color: AppColors.primaryEnd,
-                        ),
-                        _buildAchievementBadge(
-                          context,
-                          icon: Icons.rocket_launch_rounded,
-                          title: 'Nhanh tay',
-                          color: Colors.green,
-                        ),
-                      ],
-                    ),
+                          return _buildCourseProgress(
+                            context,
+                            title: course.title,
+                            progress: progress,
+                            lessons: totalLessons > 0
+                              ? '$completedLessons/$totalLessons bài học'
+                              : 'Chưa có bài học',
+                          );
+                        }).toList(),
+                      );
+                    },
                   ),
                 ),
 
@@ -755,46 +739,5 @@ class _StatisticalScreenState extends State<StatisticalScreen> with ScrollTracki
     );
   }
 
-  Widget _buildAchievementBadge(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required Color color,
-  }) {
-    return Container(
-      width: (MediaQuery.of(context).size.width - 44) / 2,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: color, size: 32),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            title,
-            style: Theme.of(
-              context,
-            ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
+
 }

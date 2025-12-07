@@ -1,7 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile/core/constants/api_constants.dart';
-import 'package:mobile/data/models/course_model.dart';
-import 'package:mobile/presentation/widgets/spinner_loading.dart';
+import 'package:LMS/core/constants/api_constants.dart';
+import 'package:LMS/data/models/course_model.dart';
+import 'package:LMS/presentation/widgets/spinner_loading.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/course_provider.dart';
 import '../../../theme/ios_widgets.dart';
@@ -11,32 +12,108 @@ import '../../widgets/header_bar.dart';
 import 'course_detail_screen.dart';
 
 class CourseScreen extends StatefulWidget {
-  const CourseScreen({super.key});
+  final int? autoNavigateToCourseId; // Tự động navigate đến course này
+  final int? autoPlayLessonId; // Tự động play lesson này (truyền cho CourseDetailScreen)
+  final String? autoPlayLessonTitle; // Title của lesson (hiển thị khi loading)
+
+  const CourseScreen({
+    super.key,
+    this.autoNavigateToCourseId,
+    this.autoPlayLessonId,
+    this.autoPlayLessonTitle,
+  });
 
   @override
   State<CourseScreen> createState() => _CourseScreenState();
 }
 
-class _CourseScreenState extends State<CourseScreen> with AutomaticKeepAliveClientMixin, ScrollTracking {
+class _CourseScreenState extends State<CourseScreen> with ScrollTracking {
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
+  bool _hasAutoNavigated = false; // Đảm bảo chỉ auto-navigate 1 lần
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<CourseProvider>().fetchCourses(sortBy: 'joined_at', sortOrder: 'desc');
+      context.read<CourseProvider>().fetchCourses(
+        sortBy: 'joined_at',
+        sortOrder: 'desc',
+        forceRefresh: true, // Force refresh khi vào trang
+      );
     });
   }
 
-  Future<void> _handleRefresh() async {
-    await context.read<CourseProvider>().fetchCourses(sortBy: 'joined_at', sortOrder: 'desc');
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _searchFocusNode.dispose();
+    super.dispose();
   }
 
-  // CourseScreen đang mixin AutomaticKeepAliveClientMixin, nên nó phải override getter wantKeepAlive.
-  //Trả về true báo cho Flutter rằng widget con này muốn giữ trạng thái sống khi bị đưa ra khỏi cây
-  //(ví dụ chuyển tab, đổi màn hình trong PageView).
-  //Nhờ vậy _CourseScreenState không bị dispose, dữ liệu đã tải và vị trí cuộn trong CustomScrollView được giữ nguyên khi quay lại,
-  //tránh gọi fetchCourses() lại hoặc reset UI.
-  @override
-  bool get wantKeepAlive => true;
+  void _onSearchChanged(String query) {
+    setState(() {}); // Rebuild để cập nhật nút clear/search
+  }
+
+  void _performSearch({bool isAcceptEmptySearch = false}) {
+    FocusScope.of(context).unfocus(); // Ẩn bàn phím
+    if (_searchController.text.isNotEmpty || isAcceptEmptySearch) {
+      context.read<CourseProvider>().fetchCourses(
+        search: _searchController.text,
+        sortBy: 'joined_at',
+        sortOrder: 'desc',
+      );
+    }
+  }
+
+  Future<void> _handleRefresh() async {
+    await context.read<CourseProvider>().fetchCourses(
+      search: _searchController.text,
+      sortBy: 'joined_at',
+      sortOrder: 'desc',
+      forceRefresh: true, // Buộc fetch lại khi user chủ động refresh
+    );
+  }
+
+  /// Xử lý auto-navigation đến CourseDetailScreen
+  void _handleAutoNavigation(CourseProvider courseProvider) {
+    // Chỉ auto-navigate khi:
+    // - Có autoNavigateToCourseId
+    // - Courses đã load xong (không loading)
+    // - Có courses data
+    // - Chưa auto-navigate lần nào
+    if (widget.autoNavigateToCourseId != null &&
+        !courseProvider.isLoadingAllCourses &&
+        courseProvider.courses.isNotEmpty &&
+        !_hasAutoNavigated) {
+      _hasAutoNavigated = true;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          Navigator.push(
+            context,
+            CupertinoPageRoute(
+              builder: (context) => CourseDetailScreen(
+                courseId: widget.autoNavigateToCourseId!,
+                autoPlayLessonId: widget.autoPlayLessonId,
+                autoPlayLessonTitle: widget.autoPlayLessonTitle,
+              ),
+            ),
+          ).then((_) {
+            // Refresh courses khi quay lại
+            if (mounted) {
+              context.read<CourseProvider>().fetchCourses(
+                search: _searchController.text,
+                sortBy: 'joined_at',
+                sortOrder: 'desc',
+                forceRefresh: true,
+              );
+            }
+          });
+        }
+      });
+    }
+  }
 
   @override
   double get scrollThreshold => 20.0;
@@ -44,28 +121,23 @@ class _CourseScreenState extends State<CourseScreen> with AutomaticKeepAliveClie
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     final courseProvider = context.watch<CourseProvider>();
 
-    return Scaffold(
-      body: courseProvider.isLoadingAllCourses
-          ?
-           SpinnerLoading(
-            isLoading: true,
-            child: Scaffold(
-              appBar: AppBar(title: Text('Trang của tôi')),
-              body: Center(child: Text('Nội dung trang')),
-            ),
-          )
-          : courseProvider.courses.isEmpty
-          ? _buildEmptyState(context)
-          : Stack(
+    // Auto-navigate đến CourseDetailScreen nếu có autoNavigateToCourseId
+    _handleAutoNavigation(courseProvider);
+
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        body: Stack(
             children: [
                 RefreshIndicator(
                   onRefresh: _handleRefresh,
                   child: CustomScrollView(
-                    key: const PageStorageKey('course_screen_scroll_view'),
                     controller: scrollTrackingController,
+                    physics: const BouncingScrollPhysics(
+                      parent: AlwaysScrollableScrollPhysics(),
+                    ),
                     slivers: [
                       const SliverToBoxAdapter(child: SizedBox(height: 50)),
 
@@ -88,44 +160,111 @@ class _CourseScreenState extends State<CourseScreen> with AutomaticKeepAliveClie
                         child: Padding(
                           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF2F2F7),
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.search,
-                                  color: Color(0xFF999999),
-                                  size: 20,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Tìm kiếm khóa học...',
-                                  style: Theme.of(context).textTheme.bodyMedium
-                                      ?.copyWith(
-                                        color: const Color(0xFF999999),
-                                      ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.08),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 2),
                                 ),
                               ],
+                            ),
+                            child: TextField(
+                              controller: _searchController,
+                              focusNode: _searchFocusNode,
+                              onChanged: _onSearchChanged,
+                              onSubmitted: (_) => _performSearch(),
+                              textInputAction: TextInputAction.search,
+                              decoration: InputDecoration(
+                                hintText: 'Tìm kiếm khóa học...',
+                                hintStyle:  const TextStyle(
+                                  color: Color(0xFF999999)
+                                ),
+                                prefixIconConstraints: BoxConstraints(
+                                  minWidth: 32, // Giảm vùng bao prefixIcon xuống 32 thay vì 48
+                                  minHeight: 32,
+                                ),
+                                prefixIcon: Container(
+                                  padding: const EdgeInsets.only(left: 12, right: 0),
+                                  child: const Icon(
+                                    Icons.search,
+                                    color: Color(0xFF999999),
+                                    size: 20,
+                                  ),
+                                ),
+                                suffixIcon: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (_searchController.text.isNotEmpty)
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.clear,
+                                          color: Color(0xFF999999),
+                                          size: 20,
+                                        ),
+                                        onPressed: () {
+                                          _searchController.clear();
+                                          _onSearchChanged('');
+                                          _performSearch(isAcceptEmptySearch: true); // Reset về danh sách gốc
+                                        },
+                                      ),
+                                    Container(
+                                      margin: const EdgeInsets.only(right: 4),
+                                      child: IconButton(
+                                        icon: Icon(
+                                          Icons.arrow_forward_rounded,
+                                          color: AppColors.primary,
+                                          size: 22,
+                                        ),
+                                        onPressed: _performSearch,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                filled: true,
+                                fillColor: Colors.white,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 14,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: AppColors.primary,
+                                    width: 1.5,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ),
                       ),
 
-                      // Course list
-                      SliverPadding(
-                        padding: const EdgeInsets.only(bottom: 100),
-                        sliver: SliverList(
-                          delegate: SliverChildBuilderDelegate((context, index) {
-                            return _buildCourseItem(context, courseProvider.courses[index]);
-                          }, childCount: courseProvider.courses.length),
+                      if (courseProvider.courses.isEmpty && !courseProvider.isLoadingAllCourses)
+                        SliverFillRemaining(
+                          hasScrollBody: false,
+                          child: _buildEmptyState(context),
+                        )
+                      else if (!courseProvider.isLoadingAllCourses)
+                        // Course list
+                        SliverPadding(
+                          padding: const EdgeInsets.only(bottom: 100),
+                          sliver: SliverList(
+                            delegate: SliverChildBuilderDelegate((context, index) {
+                              return _buildCourseItem(context, courseProvider.courses[index]);
+                            }, childCount: courseProvider.courses.length),
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),
@@ -145,25 +284,50 @@ class _CourseScreenState extends State<CourseScreen> with AutomaticKeepAliveClie
                     textAlign: TextAlign.center,
                   ),
                 ),
+                // Loading overlay
+                if (courseProvider.isLoadingAllCourses)
+                  Positioned.fill(
+                    child: SpinnerLoading(
+                      isLoading: true,
+                      child: const SizedBox.shrink(),
+                    ),
+                  ),
               ],
             ),
+      ),
     );
   }
 
   Widget _buildCourseItem(BuildContext context, Course course) {
+
+    final completePercentage = course.progress?.completionPercentage ?? 0.0;
+
     return IOSCard(
         margin: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 8,
         ),
         padding: EdgeInsets.zero,
-        onTap: () async => await Navigator.push(
-          // ignore: use_build_context_synchronously
-          context,
-          MaterialPageRoute(
-            builder: (context) => CourseDetailScreen(courseId: course.id),
-          ),
-        ),
+        onTap: () async {
+          _searchFocusNode.unfocus();
+          await Navigator.push(
+            // ignore: use_build_context_synchronously
+            context,
+            CupertinoPageRoute(
+              builder: (context) => CourseDetailScreen(courseId: course.id),
+            ),
+          );
+          // Refresh courses list sau khi quay lại để cập nhật tiến độ
+          if (mounted) {
+            // ignore: use_build_context_synchronously
+            context.read<CourseProvider>().fetchCourses(
+              search: _searchController.text,
+              sortBy: 'joined_at',
+              sortOrder: 'desc',
+              forceRefresh: true,
+            );
+          }
+        },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -229,28 +393,30 @@ class _CourseScreenState extends State<CourseScreen> with AutomaticKeepAliveClie
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      const Icon(
-                        Icons.play_circle_outline_rounded,
+                      Icon(
+                        completePercentage > 80 ? Icons.check_circle_rounded : Icons.play_circle_outline_rounded,
                         size: 16,
-                        color: AppColors.primary,
+                        color: completePercentage > 0
+                          ? completePercentage > 80 ? CupertinoColors.systemGreen : CupertinoColors.systemBlue
+                          : CupertinoColors.systemOrange,
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        'Bắt đầu học',
+                        completePercentage > 0
+                            ? '${completePercentage.toStringAsFixed(0)}% đã học'
+                            : 'Bắt đầu học',
                         style: Theme.of(context)
                             .textTheme
                             .bodySmall
                             ?.copyWith(
-                              color: AppColors.primary,
+                              color: completePercentage > 0
+                                  ? completePercentage > 80 ? CupertinoColors.systemGreen : CupertinoColors.systemBlue
+                                  : CupertinoColors.systemOrange,
                               fontWeight: FontWeight.w600,
                             ),
                       ),
                       const Spacer(),
-                      const Icon(
-                        Icons.chevron_right_rounded,
-                        size: 20,
-                        color: Color(0xFFCCCCCC),
-                      ),
+                      _buildCourseTimeInfo(course),
                     ],
                   ),
                 ],
@@ -261,36 +427,162 @@ class _CourseScreenState extends State<CourseScreen> with AutomaticKeepAliveClie
       );
   }
 
+  Widget _buildCourseTimeInfo(Course course) {
+    final now = DateTime.now();
+    DateTime? startDate;
+    DateTime? endDate;
+
+    if (course.startDate != null) {
+      startDate = DateTime.tryParse(course.startDate!);
+    }
+    if (course.endDate != null) {
+      endDate = DateTime.tryParse(course.endDate!);
+    }
+
+    String text;
+    Color color;
+    IconData icon;
+
+    if (startDate != null && now.isBefore(startDate)) {
+      // Khóa học chưa bắt đầu - luôn màu xanh dương
+      final diff = startDate.difference(now);
+      text = _formatDuration(diff, prefix: 'Bắt đầu trong ', suffix: '');
+      color = CupertinoColors.systemBlue;
+      icon = Icons.play_circle_fill;
+    } else if (endDate != null && now.isBefore(endDate)) {
+      // Khóa học đang diễn ra
+      final diff = endDate.difference(now);
+
+      if (diff.inDays < 3) {
+        // < 3 ngày: màu đỏ, hiển thị cả ngày và giờ
+        text = _formatDurationWithDayAndHour(diff, prefix: 'Còn ');
+        color = CupertinoColors.systemRed;
+      } else if (diff.inDays < 15) {
+        // < 15 ngày: màu cam
+        text = _formatDuration(diff, prefix: 'Còn ', suffix: '');
+        color = CupertinoColors.systemOrange;
+      } else {
+        // >= 15 ngày: màu xanh lá cây
+        text = _formatDuration(diff, prefix: 'Còn ', suffix: '');
+        color = CupertinoColors.systemGreen;
+      }
+      icon = Icons.timer_rounded;
+    } else if (endDate != null) {
+      // Khóa học đã kết thúc
+      text = 'Đã kết thúc';
+      color = CupertinoColors.systemGrey;
+      icon = Icons.check_circle_outline_rounded;
+    } else {
+      // Không có thông tin thời gian
+      return const Icon(
+        Icons.chevron_right_rounded,
+        size: 20,
+        color: Color(0xFFCCCCCC),
+      );
+    }
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: color),
+        const SizedBox(width: 4),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 12,
+            color: color,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatDuration(Duration diff, {String prefix = '', String suffix = ''}) {
+    if (diff.inDays > 30) {
+      final months = (diff.inDays / 30).floor();
+      return '$prefix$months tháng$suffix';
+    } else if (diff.inDays > 0) {
+      return '$prefix${diff.inDays} ngày$suffix';
+    } else if (diff.inHours > 0) {
+      return '$prefix${diff.inHours} giờ$suffix';
+    } else if (diff.inMinutes > 0) {
+      return '$prefix${diff.inMinutes} phút$suffix';
+    } else {
+      return '${prefix}Sắp đến$suffix';
+    }
+  }
+
+  String _formatDurationWithDayAndHour(Duration diff, {String prefix = ''}) {
+    final days = diff.inDays;
+    final hours = diff.inHours % 24;
+
+    if (days > 0 && hours > 0) {
+      return '$prefix$days ngày $hours giờ';
+    } else if (days > 0) {
+      return '$prefix$days ngày';
+    } else if (hours > 0) {
+      return '$prefix$hours giờ';
+    } else if (diff.inMinutes > 0) {
+      return '$prefix${diff.inMinutes} phút';
+    } else {
+      return '${prefix}Sắp hết';
+    }
+  }
+
   Widget _buildEmptyState(BuildContext context) {
+    // Offset để bù lại phần header phía trên (title + search bar)
+    // giúp nội dung căn giữa thực sự trên màn hình
+    const headerOffset = 100.0;
+
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF2F2F7),
-              shape: BoxShape.circle,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: headerOffset),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFFF3F4F6), // gray-100
+                    Color(0xFFE5E7EB), // gray-200
+                  ],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.inbox_rounded,
+                size: 30,
+                color: Color(0xFF9CA3AF), // gray-400
+              ),
             ),
-            child: Icon(
-              Icons.school_rounded,
-              size: 64,
-              // ignore: deprecated_member_use
-              color: AppColors.primary.withOpacity(0.5),
+            Text(
+              'Không có khóa học',
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
-          ),
-          Text(
-            'Chưa có khóa học',
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Khóa học sẽ được cập nhật',
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: const Color(0xFF999999)),
-          ),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              'Liên hệ giảng viên để được hỗ trợ',
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: const Color(0xFF999999)),
+            ),
+          ],
+        ),
       ),
     );
   }

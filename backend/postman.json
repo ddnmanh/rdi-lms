@@ -78,7 +78,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "// {\n//   \"email\": \"root@rdi.tvu.vn\",\n//   \"password\": \"123123123\"\n// }\n// {\n//   \"email\": \"admin2@lms.vn\",\n//   \"password\": \"123123123\"\n// }\n{\n  \"email\": \"student3@lms.vn\",\n  \"password\": \"123123123\"\n}"
+							"raw": "// {\n//   \"email\": \"root@lms.vn\",\n//   \"password\": \"123123123\"\n// }\n// {\n//   \"email\": \"admin2@lms.vn\",\n//   \"password\": \"123123123\"\n// }\n{\n  \"email\": \"student3@lms.vn\",\n  \"password\": \"123123123\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/auth/login",
@@ -845,6 +845,43 @@
 					"response": []
 				},
 				{
+					"name": "Block/Unblock Roles",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"role_ids\": [2, 3],\n  \"is_block\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/roles/block",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"roles",
+								"block"
+							]
+						},
+						"description": "Khóa hoặc mở khóa nhiều role cùng lúc. is_block=true để khóa, is_block=false để mở khóa. Không thể khóa role ROOT."
+					},
+					"response": []
+				},
+				{
 					"name": "Assign Permissions to Role",
 					"request": {
 						"method": "POST",
@@ -885,6 +922,76 @@
 							]
 						},
 						"description": "Gán lại toàn bộ danh sách permission cho role."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Permission Management",
+			"item": [
+				{
+					"name": "Get All Permissions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/permissions?search=&group=&method=&sort_by=group&order_by=asc&per_page=15&page=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"permissions"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Tìm kiếm theo name, description hoặc group"
+								},
+								{
+									"key": "group",
+									"value": "",
+									"description": "Lọc theo nhóm permission"
+								},
+								{
+									"key": "method",
+									"value": "",
+									"description": "Lọc theo HTTP method (GET, POST, PUT, DELETE,...)"
+								},
+								{
+									"key": "sort_by",
+									"value": "group",
+									"description": "Sắp xếp theo (id, name, group, method, created_at, updated_at)"
+								},
+								{
+									"key": "order_by",
+									"value": "asc",
+									"description": "Thứ tự sắp xếp (asc, desc)"
+								},
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Số lượng phần tử mỗi trang (bỏ qua để lấy tất cả)"
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Trang hiện tại"
+								}
+							]
+						},
+						"description": "Danh sách tất cả permission với phân trang và bộ lọc. Có thể bỏ qua per_page để lấy toàn bộ danh sách."
 					},
 					"response": []
 				}
@@ -1283,7 +1390,7 @@
 					"response": []
 				},
 				{
-					"name": "Sync Course Users",
+					"name": "Add Users to Course",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -1323,7 +1430,7 @@
 								}
 							]
 						},
-						"description": "Gán danh sách sinh viên cho khóa học (sync: thay thế toàn bộ danh sách hiện có)."
+						"description": "Thêm danh sách sinh viên vào khóa học."
 					},
 					"response": []
 				},
@@ -2063,7 +2170,7 @@
 					"response": []
 				},
 				{
-					"name": "Stream Lesson Video",
+					"name": "Get Video Auto Signature",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -2074,15 +2181,10 @@
 							{
 								"key": "Accept",
 								"value": "application/json"
-							},
-							{
-								"key": "Range",
-								"value": "bytes=0-",
-								"description": "HTTP Range header để hỗ trợ streaming (tùy chọn)"
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/lessons/:lesson/stream",
+							"raw": "{{base_url}}/api/lessons/:lesson/auto-signature",
 							"host": [
 								"{{base_url}}"
 							],
@@ -2090,7 +2192,7 @@
 								"api",
 								"lessons",
 								":lesson",
-								"stream"
+								"auto-signature"
 							],
 							"variable": [
 								{
@@ -2099,7 +2201,79 @@
 								}
 							]
 						},
-						"description": "Stream video bài học với hỗ trợ HTTP range để ứng dụng Flutter có thể phát mà không cần tải toàn bộ file."
+						"description": "Lấy chữ ký (signed token) cho video (tự động chọn HLS hoặc MP4) để truy cập qua Nginx secure link."
+					},
+					"response": []
+				},
+				{
+					"name": "Get HLS Video Signature",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/lessons/:lesson/hls-signature",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"lessons",
+								":lesson",
+								"hls-signature"
+							],
+							"variable": [
+								{
+									"key": "lesson",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Lấy chữ ký (signed token) cho video HLS để truy cập qua Nginx secure link."
+					},
+					"response": []
+				},
+				{
+					"name": "Get MP4 Video Signature",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/lessons/:lesson/mp4-signature",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"lessons",
+								":lesson",
+								"mp4-signature"
+							],
+							"variable": [
+								{
+									"key": "lesson",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Lấy chữ ký (signed token) cho video mp4 để truy cập qua Nginx secure link."
 					},
 					"response": []
 				}

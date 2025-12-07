@@ -270,7 +270,7 @@
                     <i
                         class="fas fa-user-shield sidebar-icon {{ request()->routeIs('admin.roles.*') ? 'text-white' : 'text-gray-600 dark:text-gray-400' }} text-sm"></i>
                 </div>
-                <span class="sidebar-text">Vai trò</span>
+                <span class="sidebar-text">Phân quyền</span>
                 {{-- <span class="sidebar-tooltip z-50">Vai trò</span> --}}
             </a>
             <a href="{{ route('admin.courses.list') }}"

@@ -18,9 +18,10 @@ class CreateRolesTable extends Migration
             $table->string('name', 50)->nullable()->unique();
             $table->string('description', 255)->nullable();
             $table->unsignedTinyInteger('level')->nullable()->default(127);
+            $table->boolean('is_block')->default(false);
             $table->timestamps();
             $table->softDeletes();
-            
+
             $table->engine = 'InnoDB';
             $table->charset = 'utf8mb4';
             $table->collation = 'utf8mb4_0900_ai_ci';

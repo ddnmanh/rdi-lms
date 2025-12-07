@@ -66,7 +66,7 @@ class UserSeederDev extends Seeder
 
         // 1 ROOT user
         $users[] = [
-            'email' => 'root@rdi.tvu.vn',
+            'email' => 'root@lms.vn',
             'password' => '123123123',
             'fullname' => 'Root Administrator',
             'birthday' => '1990-01-01',

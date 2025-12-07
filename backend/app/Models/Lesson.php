@@ -20,6 +20,7 @@ class Lesson extends Model
         'hls_path',
         'display_order',
         'created_by',
+        'updated_by',
         'deleted_by',
     ];
 
@@ -45,6 +46,11 @@ class Lesson extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updater()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 
     public function deleter()

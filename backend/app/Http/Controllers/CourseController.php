@@ -48,6 +48,12 @@ class CourseController extends Controller
 
             $query = Course::with('lessons', 'users')->withCount('users', 'lessons');
 
+            // Nếu không phải root/admin thì chỉ thấy các khóa học do mình tạo
+            if (!$request->user()->hasRole('ROOT') && !$request->user()->hasRole('ADMIN')) {
+                // Chỉ thấy các khóa học do mình tạo
+                $query->where('created_by', $request->user()->id);
+            }
+
             // Tìm kiếm
             if (isset($body['search']) && $body['search']) {
                 $search = $body['search'];
@@ -190,6 +196,37 @@ class CourseController extends Controller
                 ], 404);
             }
 
+            // Lấy thông tin user tạo khóa học
+            $course->load('creator:id,fullname,email,avatar_path');
+
+            // Lấy tất cả lesson IDs của course
+            $lessonIds = $course->lessons->pluck('id');
+
+            // Lấy tất cả user IDs
+            $userIds = $course->users->pluck('id');
+
+            // Lấy tất cả lesson_views cho các user trong course
+            $lessonViews = \App\Models\LessonView::whereIn('user_id', $userIds)
+                ->whereIn('lesson_id', $lessonIds)
+                ->get()
+                ->groupBy('user_id');
+
+            for ($i = 0; $i < count($course->users); $i++) {
+                $userId = $course->users[$i]->id;
+
+                $course->users[$i]->course_progress = [
+                    'completion_percentage' => $course->users[$i]->pivot->completion_percentage,
+                    'is_passed' => $course->users[$i]->pivot->is_passed,
+                    'created_at' => $course->users[$i]->pivot->created_at,
+                    'updated_at' => $course->users[$i]->pivot->updated_at,
+                ];
+
+                // Gán lesson_views cho từng user
+                $course->users[$i]->lesson_views = $lessonViews->get($userId, collect());
+
+                unset($course->users[$i]->pivot);
+            }
+
             return response()->json([
                 'success' => true,
                 'data' => $course
@@ -222,6 +259,7 @@ class CourseController extends Controller
                 'description' => isset($body['description']) ? $body['description'] : null,
                 'start_date' => $startDate,
                 'end_date' => $endDate,
+                'created_by' => $request->user()->id,
             ];
 
             $course = Course::create($courseData);
@@ -337,22 +375,56 @@ class CourseController extends Controller
             $courses = Course::whereIn('id', $courseIds)->get();
 
             foreach ($courses as $course) {
-                $course->delete();
-                Lesson::where('course_id', $course->id)->delete();
-                $course->users()->detach();
+            // Xóa thumbnail nếu có
+            if ($course->thumbnail_path) {
+                $oldPath = str_replace('/storage/', '', $course->thumbnail_path);
+                Storage::disk('public')->delete($oldPath);
+            }
+
+            // Xóa quan hệ với users
+            $course->users()->detach();
+
+            // Cập nhật course_id = null cho các lessons
+            Lesson::where('course_id', $course->id)->update(['course_id' => null, 'display_order' => null]);
+
+            // Xóa vĩnh viễn course
+            $course->forceDelete();
             }
 
             return response()->json([
-                'success' => true,
-                'message' => 'Xóa khóa học thành công'
+            'success' => true,
+            'message' => 'Xóa khóa học thành công'
             ]);
         } catch (\Exception $e) {
             report($e);
             return response()->json([
-                'success' => false,
-                'message' => 'Lỗi khi xóa khóa học: ' . $e->getMessage()
+            'success' => false,
+            'message' => 'Lỗi khi xóa khóa học: ' . $e->getMessage()
             ], 500);
         }
+
+        // try {
+        //     $body = $request->validated();
+        //     $courseIds = isset($body['course_ids']) ? $body['course_ids'] : [];
+        //     $courses = Course::whereIn('id', $courseIds)->get();
+
+        //     foreach ($courses as $course) {
+        //         $course->delete();
+        //         Lesson::where('course_id', $course->id)->delete();
+        //         $course->users()->detach();
+        //     }
+
+        //     return response()->json([
+        //         'success' => true,
+        //         'message' => 'Xóa khóa học thành công'
+        //     ]);
+        // } catch (\Exception $e) {
+        //     report($e);
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Lỗi khi xóa khóa học: ' . $e->getMessage()
+        //     ], 500);
+        // }
     }
 
     /**
@@ -373,18 +445,40 @@ class CourseController extends Controller
             }
 
             $userIds = isset($body['user_ids']) ? $body['user_ids'] : [];
-            $course->users()->syncWithPivotValues($userIds, ['created_at' => now(), 'updated_at' => now()], true);
+
+            // Lấy danh sách user_id hiện có trong khóa học
+            $existingUserIds = $course->users()->pluck('user_id')->toArray();
+
+            // sync() sẽ tự động:
+            // - Thêm user mới (có trong $userIds nhưng chưa có trong DB)
+            // - Xóa user cũ (có trong DB nhưng không có trong $userIds)
+            // - Giữ nguyên user đã tồn tại (có trong cả DB và $userIds)
+            $syncData = [];
+            foreach ($userIds as $userId) {
+                if (in_array($userId, $existingUserIds)) {
+                    // User đã tồn tại, không set gì để giữ nguyên mọi thứ
+                    $syncData[$userId] = [];
+                } else {
+                    // User mới, set cả created_at và updated_at
+                    $syncData[$userId] = [
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ];
+                }
+            }
+
+            $course->users()->sync($syncData);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Thêm sinh viên vào khóa học thành công',
+                'message' => 'Cập nhật danh sách sinh viên thành công',
                 'data' => $course->load('users')
             ]);
         } catch (\Exception $e) {
             report($e);
             return response()->json([
                 'success' => false,
-                'message' => 'Lỗi khi thêm sinh viên vào khóa học: ' . $e->getMessage()
+                'message' => 'Lỗi khi cập nhật danh sách sinh viên: ' . $e->getMessage()
             ], 500);
         }
     }

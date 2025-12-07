@@ -35,6 +35,18 @@ class LessonController extends Controller
 
             $query = Lesson::with('course');
 
+            // Nếu không phải root/admin thì chỉ thấy các bài học thỏa điều kiện sau:
+            // Do mình tạo
+            // Thuộc khóa học do mình tạo
+            if (!$request->user()->hasRole('ROOT') && !$request->user()->hasRole('ADMIN')) {
+                $query->where(function ($q) use ($request) {
+                    $q->where('created_by', $request->user()->id)
+                        ->orWhereHas('course', function ($q) use ($request) {
+                            $q->where('created_by', $request->user()->id);
+                        });
+                });
+            }
+
             // Lọc theo khóa học
             if (isset($body['course_id']) && $body['course_id']) {
                 $query->where('course_id', $body['course_id']);
@@ -142,6 +154,7 @@ class LessonController extends Controller
                 'description' => $body['description'] ?? null,
                 'duration' => null,
                 'display_order' => 0,
+                'created_by' => $request->user()->id ?? null,
             ];
 
             $lesson = Lesson::create($lessonData);
@@ -214,9 +227,8 @@ class LessonController extends Controller
             $updateData = [
                 'title' => $body['title'] ?? null,
                 'description' => $body['description'] ?? null,
-            ]; 
-
-
+                'updated_by' => $request->user()->id ?? null,
+            ];
 
             // Xử lý upload thumbnail nếu có
             // Sử dụng $request->hasFile() để kiểm tra file thực sự, tránh trường hợp chuỗi "null"
@@ -245,10 +257,10 @@ class LessonController extends Controller
             if (isset($body['video_path']) && $body['video_path'] != $lesson->video_path) {
                 // Lưu video path cũ để xóa sau
                 $oldVideoPath = $lesson->video_path;
-                
+
                 // Cập nhật video path mới
                 $updateData['video_path'] = $body['video_path'];
-                
+
                 // Xóa video cũ nếu là file local storage (không phải URL bên ngoài hoặc background upload)
                 // Chỉ xóa sau khi cập nhật thành công
                 if ($oldVideoPath && $this->isLocalStorageFile($oldVideoPath)) {

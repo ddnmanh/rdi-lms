@@ -6,6 +6,7 @@ use App\Http\Requests\users\DestroyRequest;
 use App\Http\Requests\users\StoreRequest;
 use App\Http\Requests\users\UpdateRequest;
 use App\Models\User;
+use App\Models\LessonView;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -116,6 +117,38 @@ class UserController extends Controller
                 'success' => false,
                 'message' => 'Không tìm thấy người dùng'
             ], 404);
+        }
+
+        // Lấy tất cả lesson_views của user cho các lessons trong courses
+        $lessonIds = $user->courses->flatMap(function ($course) {
+            return $course->lessons->pluck('id');
+        });
+
+        $lessonViews = LessonView::where('user_id', $user->id)
+            ->whereIn('lesson_id', $lessonIds)
+            ->get()
+            ->keyBy('lesson_id');
+
+        // Chuyển pivot của course thành progress và gán lesson_view vào lesson
+        foreach ($user->courses as $course) {
+            // Chuyển course->pivot thành course->progress
+            $course->progress = [
+                'completion_percentage' => $course->pivot->completion_percentage ?? 0,
+                'is_passed' => $course->pivot->is_passed ?? false,
+                'created_at' => $course->pivot->created_at,
+                'updated_at' => $course->pivot->updated_at,
+            ];
+            unset($course->pivot);
+
+            // Gán lesson_view vào từng lesson
+            foreach ($course->lessons as $lesson) {
+                $lesson->progress = [
+                    'watched_duration' => $lessonViews->has($lesson->id) ? $lessonViews->get($lesson->id)->watched_duration : 0,
+                    'last_position' => $lessonViews->has($lesson->id) ? $lessonViews->get($lesson->id)->last_position : 0,
+                    'completion_percentage' => $lessonViews->has($lesson->id) ? $lessonViews->get($lesson->id)->completion_percentage : 0,
+                    'last_watched_at' => $lessonViews->has($lesson->id) ? $lessonViews->get($lesson->id)->last_watched_at : null,
+                ];
+            }
         }
 
         return response()->json([

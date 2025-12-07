@@ -14,12 +14,14 @@ class LessonView extends Model
         'lesson_id',
         'watched_duration',
         'last_position',
+        'completion_percentage',
         'last_watched_at',
     ];
 
     protected $casts = [
         'watched_duration' => 'integer',
         'last_position' => 'integer',
+        'completion_percentage' => 'integer',
         'last_watched_at' => 'datetime',
     ];
 

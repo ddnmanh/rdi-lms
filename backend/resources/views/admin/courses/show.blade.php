@@ -23,155 +23,126 @@
     </div>
 
     {{-- Course Detail Card (Tabs) --}}
-    <div id="courseDetailCard" class="hidden w-full max-w-[1400px] h-full mx-auto min-h-0"> {{-- cho phép co giãn & cuộn --}}
+    <div id="courseDetailCard" class="hidden w-full max-w-[1600px] h-full mx-auto min-h-0"> {{-- cho phép co giãn & cuộn --}}
         <div class="h-full flex flex-col items-stretch justify-start">
             {{-- Tabs header --}}
             <div class="relative bg-transparent flex flex-row items-end gap-2">
                 <button type="button"
-                    class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-5 py-2.5 font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-800/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                    class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-6 py-2.5 font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-800/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                     data-tab-target="tab-course-info">
                     <i class="fa-regular fa-bookmark"></i>
-                    <span>Thông tin khóa học</span>
+                    <span>Khóa học</span>
                 </button>
                 <button type="button"
-                    class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-5 py-2.5 font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-800/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                    class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-6 py-2.5 font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-800/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                     data-tab-target="tab-lessons">
                     <i class="fa-regular fa-clipboard"></i>
                     <span>Bài học</span>
                     <span id="lessonsTabCount" class="hidden rounded-full bg-gray-200 dark:bg-gray-800 px-2 py-0.5 font-semibold text-gray-600 dark:text-gray-300"></span>
                 </button>
                 <button type="button"
-                    class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-5 py-2.5 font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-800/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                    class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-6 py-2.5 font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-800/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                     data-tab-target="tab-users">
                     <i class="fa-regular fa-user"></i>
-                    <span>Học viên</span>
+                    <span>Sinh viên</span>
                     <span id="usersTabCount" class="hidden rounded-full bg-gray-200 dark:bg-gray-800 px-2 py-0.5 font-semibold text-gray-600 dark:text-gray-300"></span>
+                </button>
+                <button type="button"
+                    class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-6 py-2.5 font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-800/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                    data-tab-target="tab-statistics">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Thống kê</span>
                 </button>
             </div>
 
             {{-- Content area --}}
             <div class="flex-1 min-h-0 h-full bg-white dark:bg-gray-800 rounded-b-xl overflow-hidden">
-                {{-- Course Information --}}
-                <div class="tab-panel max-h-full overflow-y-auto" data-tab-content="tab-course-info">
-                    <div class="px-6 py-4 flex items-center justify-between gap-3 rounded-t-none rounded-b-none">
-                        <div class="flex items-center gap-3"></div>
-                        <a id="editButton" href="#"
-                           class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5  font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
-                            <i class="fa-solid fa-pen"></i>
-                            <span>Chỉnh sửa</span>
-                        </a>
-                    </div>
+                {{-- Course Information Tab --}}
+                @include('admin.courses.show.tab-course-info')
 
-                    <div class="space-y-6 p-6">
-                        {{-- Personal Information Section --}}
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {{-- Avatar Section --}}
-                            <div class="md:col-span-2">
-                                <label class="block  font-semibold text-blue-700 dark:text-gray-300 mb-2">Ảnh đại diện</label>
-                                <div class="flex items-center gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900/40">
-                                    <div class="w-[300px] aspect-video rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
-                                        <img id="courseThumbnail" src="" alt="Avatar" class="h-full w-full object-cover hidden">
-                                    </div>
-                                    <div class="flex-1">
-                                        {{-- <div class=" text-gray-600 dark:text-gray-300">Ảnh đại diện của người dùng</div> --}}
-                                    </div>
-                                </div>
-                            </div>
+                {{-- Lessons Tab --}}
+                @include('admin.courses.show.tab-lessons')
 
-                            @php
-                                $infoField = function($label, $id) {
-                                    return <<<HTML
-                                    <div>
-                                        <label class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">{$label}</label>
-                                        <div class="px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-                                            <p class="{$id}  text-gray-900 dark:text-gray-100 break-all">-</p>
-                                        </div>
-                                    </div>
-                                    HTML;
-                                };
-                            @endphp
+                {{-- Users Tab --}}
+                @include('admin.courses.show.tab-users')
 
-                            {!! $infoField('ID', 'courseId') !!}
-                            {!! $infoField('Tiêu đề', 'courseTitle') !!}
-                            {!! $infoField('Ngày bắt đầu', 'courseStartDate') !!}
-                            {!! $infoField('Ngày kết thúc', 'courseEndDate') !!}
-                            {!! $infoField('Số bài học', 'courseLessonsCount') !!}
-                            {!! $infoField('Số học viên', 'courseUsersCount') !!}
-                            {!! $infoField('Ngày tạo', 'courseCreatedAt') !!}
-                            {!! $infoField('Ngày cập nhật', 'courseUpdatedAt') !!}
-                        </div>
-                    </div>
-
-                    {{-- Description --}}
-                    <div class="px-6 pb-6">
-                        <label class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Mô tả</label>
-                        <div class="px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-                            <p class="courseDescription  text-gray-900 dark:text-gray-100 break-all">-</p>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Lessons --}}
-                <div class="tab-panel hidden h-full flex flex-col items-stretch justify-start" data-tab-content="tab-lessons">
-                    <div class="px-6 py-4 flex items-center justify-between gap-3 rounded-t-none">
-                        <div class="flex items-center gap-3"></div>
-                        <a id="manageLessonsButton" href="#"
-                            class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5  font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
-                            <i class="fa-solid fa-pen"></i>
-                            <span>Quản lý bài học</span>
-                        </a>
-                    </div>
-                    <div class="flex-1 min-h-0 p-6 pt-0">
-                        <div id="lessonsList" class="space-y-2 h-full overflow-y-auto">
-
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Users --}}
-                <div class="tab-panel hidden h-full flex flex-col items-stretch justify-start" data-tab-content="tab-users">
-                    <div class="px-6 py-4 flex items-center justify-between gap-3 rounded-t-none">
-                        <div class="flex items-center gap-3"></div>
-                        <a id="manageUsersButton" href="#"
-                            class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5  font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
-                            <i class="fa-solid fa-pen"></i>
-                            <span>Quản lý học viên</span>
-                        </a>
-                    </div>
-                    <div class="flex-1 min-h-0 p-6 pt-0">
-                        <div id="usersList" class="space-y-2 h-full overflow-y-auto">
-
-                        </div>
-                    </div>
-                </div>
+                {{-- Statistics Tab --}}
+                @include('admin.courses.show.tab-statistics')
             </div>
         </div>
     </div>
 </div>
 
-{{-- Scripts --}}
+{{-- Main JavaScript --}}
 <script>
     const courseId = {{ $courseId }};
+    let courseData_MainShow = null;
+    let userCreator_MainShow = null;
+    let lessonsData_MainShow = [];
+    let usersData_MainShow = [];
+
+    let lessonUserWatchedCounts_MainShow = {}; // Số sinh viên xem mỗi bài học
+    let lessonUserFinishedCounts_MainShow = {}; // Số sinh viên hoàn thành mỗi bài học
 
     document.addEventListener('DOMContentLoaded', async () => {
         setupTabs();
         await loadCourseData();
+        if (courseData_MainShow != null) {
+            handleProcessDataForGeneralUse();
+            hubToCallActionAllSubPage();
+        }
     });
+
+    // Xử lý dữ liệu chung cho các tab
+    function handleProcessDataForGeneralUse() {
+
+        userCreator_MainShow = courseData_MainShow.creator || null;
+        lessonsData_MainShow = Array.isArray(courseData_MainShow.lessons) ? courseData_MainShow.lessons : [];
+        usersData_MainShow = Array.isArray(courseData_MainShow.users) ? courseData_MainShow.users : [];
+
+        usersData_MainShow.forEach(user => {
+            const lessonViews = Array.isArray(user.lesson_views) ? user.lesson_views : [];
+            lessonViews.forEach(view => {
+                if (view.lesson_id) {
+                    lessonUserWatchedCounts_MainShow[view.lesson_id] = (lessonUserWatchedCounts_MainShow[view.lesson_id] || 0) + 1;
+                }
+                if (view.completion_percentage >= 100) {
+                    lessonUserFinishedCounts_MainShow[view.lesson_id] = (lessonUserFinishedCounts_MainShow[view.lesson_id] || 0) + 1;
+                }
+            });
+        });
+    }
 
     function setupTabs() {
         const tabButtons = document.querySelectorAll('.tab-trigger');
         const firstTab = tabButtons[0]?.dataset.tabTarget;
+
+        // Thêm event listener cho các nút tab
         tabButtons.forEach(button => {
             button.addEventListener('click', () => activateTab(button.dataset.tabTarget));
         });
-        if (firstTab) {
+
+        // Lắng nghe sự kiện hashchange để hỗ trợ nút back/forward của browser
+        window.addEventListener('hashchange', () => {
+            const hash = window.location.hash.slice(1); // Bỏ ký tự #
+            if (hash && document.querySelector(`[data-tab-target="${hash}"]`)) {
+                activateTab(hash, false); // false = không cập nhật URL lại
+            }
+        });
+
+        // Kiểm tra URL hash để active đúng tab khi load trang
+        const urlHash = window.location.hash.slice(1);
+        if (urlHash && document.querySelector(`[data-tab-target="${urlHash}"]`)) {
+            activateTab(urlHash, false);
+        } else if (firstTab) {
             activateTab(firstTab);
         }
     }
 
-    function activateTab(target) {
+    function activateTab(target, updateUrl = true) {
         const tabButtons = document.querySelectorAll('.tab-trigger');
         const tabPanels = document.querySelectorAll('.tab-panel');
+
         tabButtons.forEach(button => {
             const isActive = button.dataset.tabTarget === target;
             button.classList.toggle('bg-white', isActive);
@@ -185,125 +156,46 @@
             button.classList.toggle('text-gray-500', !isActive);
             button.classList.toggle('dark:text-gray-400', !isActive);
             button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            button.classList.toggle('hover:text-gray-900', !isActive);
+            button.classList.toggle('dark:hover:text-gray-100', !isActive);
+            button.classList.toggle('hover:bg-white/70', !isActive);
+            button.classList.toggle('dark:hover:bg-gray-800/90', !isActive);
         });
+
         tabPanels.forEach(panel => {
             const isActive = panel.dataset.tabContent === target;
             panel.classList.toggle('hidden', !isActive);
         });
+
+        // Cập nhật URL hash nếu cần
+        if (updateUrl) {
+            window.history.replaceState(null, '', `#${target}`);
+        }
+
+        // Khởi tạo biểu đồ khi tab Statistics được active
+        if (target === 'tab-statistics' && courseData_MainShow) {
+            setTimeout(() => {
+                renderCharts();
+            }, 50);
+        }
     }
 
     async function loadCourseData() {
         try {
             const data = await apiRequest(`/courses/${courseId}`);
             if (data?.success) {
-                displayCourseData(data.data);
+                courseData_MainShow = data.data;
             } else {
-                showError(data?.message || 'Không thể tải thông tin khóa học');
+                showNotificationModel_Global('Lỗi', data?.message || 'Không thể tải thông tin khóa học', 'error');
             }
         } catch (error) {
-            showError(error.message || 'Đã xảy ra lỗi khi tải thông tin');
+            showNotificationModel_Global('Lỗi', data?.message || 'Không thể tải thông tin khóa học', 'error');
         }
     }
 
     function toggleStates({ loading = false, detail = false, error = false }) {
         document.getElementById('loadingState').classList.toggle('hidden', !loading);
         document.getElementById('courseDetailCard').classList.toggle('hidden', !detail);
-        // document.getElementById('errorState').classList.toggle('hidden', !error);
-    }
-
-    function displayCourseData(course) {
-        toggleStates({ loading: false, detail: true, error: false });
-        const pageTitleEl = document.getElementById('coursePageTitle');
-        if (pageTitleEl) pageTitleEl.textContent = course.title || 'Chi tiết khóa học';
-        document.getElementById('editButton').href = `/admin/courses/${course.id}/edit`;
-        document.getElementById('manageLessonsButton').href = `/admin/courses/${course.id}/edit`;
-        document.getElementById('manageUsersButton').href = `/admin/courses/${course.id}/edit`;
-        setText('courseId', course.id);
-        setText('courseTitle', course.title || 'Chưa có tiêu đề');
-        setText('courseDescription', course.description || 'Chưa có mô tả');
-        setDate('courseStartDate', course.start_date);
-        setDate('courseEndDate', course.end_date);
-        setDate('courseCreatedAt', course.created_at);
-        setDate('courseUpdatedAt', course.updated_at);
-
-        // Hiển thị thumbnail
-        const thumbnailEl = document.getElementById('courseThumbnail');
-        if (thumbnailEl) {
-            if (course.thumbnail_path) {
-                thumbnailEl.src = course.thumbnail_path;
-                thumbnailEl.classList.remove('hidden');
-            } else {
-                thumbnailEl.classList.add('hidden');
-            }
-        }
-
-        const lessonsCount = Array.isArray(course.lessons) ? course.lessons.length : 0;
-        setText('courseLessonsCount', lessonsCount);
-        updateTabBadge('lessonsTabCount', lessonsCount);
-
-        const usersCount = Array.isArray(course.users) ? course.users.length : 0;
-        setText('courseUsersCount', usersCount);
-        updateTabBadge('usersTabCount', usersCount);
-
-        const lessons = Array.isArray(course.lessons) ? course.lessons : [];
-        const lessonsList = document.getElementById('lessonsList');
-        if (!lessons.length) {
-            lessonsList.innerHTML = `<p class=" text-gray-500 dark:text-gray-400 italic">Khóa học chưa có bài học nào</p>`;
-        } else {
-            lessonsList.innerHTML = lessons.map(lesson => `
-                <div class="group flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 p-4 hover:bg-gray-100 dark:hover:bg-gray-800">
-                    <div class="flex items-center gap-4 flex-1 min-w-0">
-                        <div class="flex-shrink-0 rounded-lg bg-gray-200 dark:bg-gray-700 grid place-items-center">
-                            <img src="${lesson.thumbnail_path}" alt="" class="w-[70px] aspect-video object-cover rounded-lg">
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class=" font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(lesson.title ?? 'Không có tên')}</h4>
-                            <p class= text-gray-500 dark:text-gray-400 mt-1">ID: ${escapeHtml_Global(String(lesson.id ?? '-'))} | Thứ tự: ${escapeHtml_Global(String(lesson.display_order ?? '-'))}</p>
-                        </div>
-                    </div>
-                    ${lesson.description ? `
-                        <div class="hidden md:block ml-4 max-w-xs">
-                            <span class= text-gray-500 dark:text-gray-400 truncate block">${escapeHtml_Global(String(lesson.description)).slice(0, 80)}${String(lesson.description).length > 80 ? '…' : ''}</span>
-                        </div>` : ''
-                    }
-                </div>
-            `).join('');
-        }
-
-        const users = Array.isArray(course.users) ? course.users : [];
-        const usersList = document.getElementById('usersList');
-        if (!users.length) {
-            usersList.innerHTML = `<p class=" text-gray-500 dark:text-gray-400 italic">Khóa học chưa có học viên nào</p>`;
-        } else {
-            usersList.innerHTML = users.map(user => `
-                <div class="group flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 p-4 hover:bg-gray-100 dark:hover:bg-gray-800">
-                    <div class="flex items-center gap-4 flex-1 min-w-0">
-                        <div class="flex-shrink-0 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 grid place-items-center">
-                            <img src="${user.avatar_path}" alt="" class="w-[50px] aspect-square object-cover">
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class=" font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(user.fullname || user.email || 'Không có tên')}</h4>
-                            <p class= text-gray-500 dark:text-gray-400 mt-1">${escapeHtml_Global(user.email || '')}</p>
-                        </div>
-                    </div>
-                    <div class="ml-4">
-                        <span class= text-gray-500 dark:text-gray-400">ID: ${escapeHtml_Global(String(user.id ?? '-'))}</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-    }
-
-    function showError(message) {
-        toggleStates({ loading: false, detail: false, error: true });
-        setText('errorMessage', message || 'Đã xảy ra lỗi');
-    }
-
-    function setText(id, value) {
-        const el = document.getElementsByClassName(id);
-        for (let i=0; i<el.length; i++) {
-            if (el[i]) el[i].textContent = value != null && value !== '' ? value : '-';
-        }
     }
 
     function updateTabBadge(id, count) {
@@ -316,6 +208,13 @@
         }
         el.textContent = count;
         el.classList.remove('hidden');
+    }
+
+    function setText(id, value) {
+        const el = document.getElementsByClassName(id);
+        for (let i=0; i<el.length; i++) {
+            if (el[i]) el[i].textContent = value != null && value !== '' ? value : '-';
+        }
     }
 
     function setDate(id, raw, opts = {}) {
@@ -333,13 +232,31 @@
         }
     }
 
-    function escapeHtml_Global(str) {
-        return String(str)
-            .replaceAll('&', '&amp;')
-            .replaceAll('<', '&lt;')
-            .replaceAll('>', '&gt;')
-            .replaceAll('"', '&quot;')
-            .replaceAll("'", '&#039;');
+    function renderInfoInTab() {
+        // const lessonsCount = Array.isArray(courseData_MainShow.lessons) ? courseData_MainShow.lessons.length : 0;
+        // setText('courseLessonsCount', lessonsCount);
+        // updateTabBadge('lessonsTabCount', lessonsCount);
+
+        // const usersCount = Array.isArray(courseData_MainShow.users) ? courseData_MainShow.users.length : 0;
+        // setText('courseUsersCount', usersCount);
+        // updateTabBadge('usersTabCount', usersCount);
     }
+
+    // Hàm gọi các hàm cần thiết của tất cả các tab
+    function hubToCallActionAllSubPage(course) {
+        toggleStates({ loading: false, detail: true, error: false });
+
+        renderInfoInTab();
+
+        renderCourse();
+
+        renderLessons();
+
+        renderUsers();
+
+        renderStatistics();
+    }
+
 </script>
+
 @endsection

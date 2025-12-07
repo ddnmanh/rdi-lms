@@ -19,6 +19,7 @@ class CreateLessonViewsTable extends Migration
             $table->unsignedBigInteger('lesson_id')->nullable();
             $table->unsignedInteger('watched_duration')->nullable()->default(0);
             $table->unsignedInteger('last_position')->nullable()->default(0)->comment('giây để resume');
+            $table->unsignedInteger('completion_percentage')->nullable()->default(0)->comment('phần trăm hoàn thành');
             $table->timestamp('last_watched_at')->nullable();
             $table->timestamps();
             

@@ -126,6 +126,7 @@
 }
 
 /* Modern scrollbars */
+/* Modern scrollbars */
 *::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -136,26 +137,24 @@
 }
 
 *::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, rgba(99, 102, 241, 0.4), rgba(139, 92, 246, 0.4));
+    background: rgba(156, 163, 175, 0.2); /* Màu xám nhạt hơn */
     border-radius: 10px;
     border: 2px solid transparent;
     background-clip: padding-box;
 }
 
-
-
 *::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, rgba(99, 102, 241, 0.6), rgba(139, 92, 246, 0.6));
+    background: rgba(156, 163, 175, 0.5); /* Màu xám đậm khi hover */
     background-clip: padding-box;
 }
 
 .dark *::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, rgba(99, 102, 241, 0.5), rgba(139, 92, 246, 0.5));
+    background: rgba(75, 85, 99, 0.25); /* Màu xám nhạt cho dark mode */
     background-clip: padding-box;
 }
 
 .dark *::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, rgba(99, 102, 241, 0.7), rgba(139, 92, 246, 0.7));
+    background: rgba(75, 85, 99, 0.6); /* Màu xám đậm khi hover dark mode */
     background-clip: padding-box;
 }
 

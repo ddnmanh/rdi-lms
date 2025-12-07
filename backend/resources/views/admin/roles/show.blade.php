@@ -57,7 +57,7 @@
         </div>
     </div>
 
-    <div class="flex-1 flex flex-row items-stretch gap-4 3xl:gap-6 min-h-0 overflow-hidden"> 
+    <div class="flex-1 flex flex-row items-stretch gap-4 3xl:gap-6 min-h-0 overflow-hidden">
 
         {{-- Permissions --}}
         <div class="flex-1 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col flex-shrink-0 min-h-0 overflow-hidden">
@@ -165,7 +165,7 @@
 
         roleData = await loadRoleDetail();
 
-        roleUsers = roleData?.users || []; 
+        roleUsers = roleData?.users || [];
 
         if (!roleData) {
             return;
@@ -203,7 +203,7 @@
             showNotificationModel_Global(error.message, 'error', handleBackToList);
             return null;
         }
-    } 
+    }
 
 
     function renderRoleInfo() {
@@ -217,7 +217,7 @@
         document.getElementById('roleIdLabel').textContent = roleData.id ?? '-';
         document.getElementById('roleLevelLabel').textContent = level;
         document.getElementById('roleCreatedAtLabel').textContent = formatDate_Global(roleData.created_at);
-        document.getElementById('roleUpdatedAtLabel').textContent = formatDate_Global(roleData.updated_at); 
+        document.getElementById('roleUpdatedAtLabel').textContent = formatDate_Global(roleData.updated_at);
     }
 
     function renderPermissionsTable(filterText = '') {
@@ -277,7 +277,7 @@
             <div class="overflow-x-auto h-full">
                 <table class="w-full table-fixed border-separate border-spacing-0">
                     <colgroup>
-                        <col class="w-[40px] 3xl:w-[60px]">
+                        <col class="w-[45px] 3xl:w-[60px]">
                         <col class="">
                         <col class="">
                         <col class="w-[80px] 3xl:w-[100px]">
@@ -433,7 +433,7 @@
             <div class="overflow-x-auto h-full">
                 <table class="w-full table-fixed border-separate border-spacing-0">
                     <colgroup>
-                        <col class="w-[40px] 3xl:w-[60px]">
+                        <col class="w-[45px] 3xl:w-[60px]">
                         <col class="w-[80px] 3xl:w-[100px]">
                         <col class="w-auto">
                         <col class="w-auto">

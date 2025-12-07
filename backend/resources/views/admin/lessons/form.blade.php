@@ -63,7 +63,7 @@
                         class="flex flex-col items-stretch justify-start gap-4 p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg"
                     >
 
-                        <div class="h-[106px] flex flex-row items-start gap-4">
+                        <div class="h-[110px] flex flex-row items-start gap-4">
                             <div id="videoPreviewContainer" class="h-full flex flex-col gap-2">
                                 <div class="relative h-full aspect-video bg-gray-100 dark:bg-gray-900 rounded-lg overflow-hidden flex items-center justify-center">
                                     <video id="videoFilePreview" controls class="hidden w-full h-full object-cover bg-black"></video>

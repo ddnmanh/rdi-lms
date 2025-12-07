@@ -1,0 +1,33 @@
+# Root EditorConfig
+root = true
+
+# --- Global defaults ---
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Flutter/Dart: 2-space indent
+[*.dart]
+indent_style = space
+indent_size = 2
+
+# YAML (pubspec.yaml, analysis_options.yaml,...)
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# JSON, HTML, CSS, JS — dùng indent 2 cho đồng bộ Flutter
+[*.{json,html,css,js}]
+indent_style = space
+indent_size = 2
+
+# Markdown cho phép giữ trailing spaces
+[*.md]
+trim_trailing_whitespace = false
+
+# Docker compose thường dùng 2 spaces (có thể giữ 4 nếu bạn quen)
+[docker-compose.yml]
+indent_style = space
+indent_size = 2

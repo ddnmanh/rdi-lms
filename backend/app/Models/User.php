@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
@@ -58,7 +59,10 @@ class User extends Authenticatable implements JWTSubject
 
     public function courses()
     {
-        return $this->belongsToMany(Course::class, 'course_user', 'user_id', 'course_id');
+        return $this->belongsToMany(Course::class, 'course_user', 'user_id', 'course_id')
+            ->withPivot('is_passed')
+            ->withPivot('completion_percentage')
+            ->withTimestamps();
     }
 
     public function lessonViews()
@@ -113,13 +117,35 @@ class User extends Authenticatable implements JWTSubject
     {
         if ($this->isRoot()) return true;
 
-        $this->loadMissing('roles.permissions');
-
         $method = strtoupper($method);
 
-        $permissions = $this->roles
-            ->flatMap(fn($role) => $role->permissions)
-            ->unique('id');
+        // B1: Lấy các role của user
+        $userRoles = $this->roles;
+
+
+        // B2: Lọc các role có is_block = false
+        $activeRoles = $userRoles->filter(function($role) {
+            return $role->is_block === false || $role->is_block === 0;
+        });
+
+        // B3: Gộp tất cả permissions của các role active
+        $permissions = collect();
+        foreach ($activeRoles as $role) {
+            $rolePermissions = $role->permissions;
+            foreach ($rolePermissions as $permission) {
+                // Thêm vào collection nếu chưa có (unique by id)
+                if (!$permissions->contains('id', $permission->id)) {
+                    $permissions->push($permission);
+                }
+            }
+        }
+
+        // Log::info('User permissions', [
+        //     'user_id' => $this->id,
+        //     'total_roles' => $userRoles->count(),
+        //     'permission_count' => $permissions->count(),
+        //     'permissions' => $permissions->pluck('id')->toArray()
+        // ]);
 
         foreach ($permissions as $permission) {
             if (strtoupper((string)$permission->method) !== $method) continue;

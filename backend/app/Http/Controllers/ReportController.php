@@ -105,7 +105,7 @@ class ReportController extends Controller
                 'fullname' => $student->fullname,
                 'total_watched_duration' => $totalWatchedDuration,
                 'overall_percentage' => $overallPercentage,
-                'is_completed' => $overallPercentage >= 80,
+                'is_completed' => $overallPercentage > 80,
             ];
         });
 
@@ -250,7 +250,7 @@ class ReportController extends Controller
                 'total_duration' => $totalDuration,
                 'total_watched_duration' => $totalWatchedDuration,
                 'overall_percentage' => $overallPercentage,
-                'is_completed' => $overallPercentage >= 80,
+                'is_completed' => $overallPercentage > 80,
                 'lesson_progress' => $lessonProgress,
             ]
         ]);

@@ -8,9 +8,9 @@ services:
       dockerfile: Dockerfile
     container_name: lms_app
     restart: unless-stopped
-    working_dir: /home/ducmanh/rdi
+    working_dir: /COURCE
     volumes:
-      - .:/home/ducmanh/rdi
+      - .:/COURCE
     networks:
       - lms_network
     extra_hosts:
@@ -24,7 +24,7 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - .:/home/ducmanh/rdi
+      - .:/COURCE
       - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
     networks:
       - lms_network

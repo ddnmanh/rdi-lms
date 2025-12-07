@@ -4,7 +4,7 @@
 @section('description', 'Xem thông tin chi tiết của người dùng')
 
 @section('content')
-<div class="w-full h-full flex flex-col overflow-hidden"> 
+<div class="w-full h-full flex flex-col overflow-hidden">
 
     {{-- Loading State (Flat Skeleton) --}}
     <div id="loadingState" class="flex-1 overflow-auto p-6 sm:p-8">
@@ -47,7 +47,7 @@
             <div class="flex-1 min-h-0 h-full bg-white dark:bg-gray-800 rounded-b-xl overflow-hidden">
                 {{-- user Information --}}
                 <div class="tab-panel h-full max-h-full overflow-y-auto" data-tab-content="TAB_USER_INFO">
-                    
+
                     {{-- <div class="w-[70%] max-w-[800px] p-6 mx-auto translate-y-[25%] flex flex-col items-stretch justify-start gap-6 bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden"> --}}
                     <div class="p-10 pt-20 flex flex-col items-stretch justify-start gap-6 bg-white dark:bg-gray-800 overflow-hidden">
 
@@ -71,7 +71,7 @@
 
 
                         {{-- Details Grid --}}
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6"> 
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             @php
                                 $infoField = function($label, $id) {
                                     return <<<HTML
@@ -85,7 +85,7 @@
                                 };
                             @endphp
 
-                            
+
                             {!! $infoField('ID người dùng', 'userId') !!}
                             {!! $infoField('Email', 'userEmail') !!}
                             {!! $infoField('Họ và tên', 'userFullname') !!}
@@ -99,21 +99,13 @@
                 </div>
 
                 {{-- Courses --}}
-                <div class="tab-panel hidden h-full flex flex-col items-stretch justify-start" data-tab-content="TAB_COURSES">
-                    <div class="px-6 py-4 flex items-center justify-between gap-3 rounded-t-none">
-                        <div class="flex items-center gap-3"></div>
-                        <a id="manageCoursesButton" href="#"
-                            class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5  font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
-                            <i class="fa-solid fa-pen"></i>
-                            <span>Quản lý khóa học</span>
-                        </a>
-                    </div>
-                    <div class="flex-1 min-h-0 p-6 pt-0">
+                <div class="tab-panel px-6 py-6 hidden h-full flex flex-col items-stretch justify-start" data-tab-content="TAB_COURSES">
+                    <div class="flex-1 min-h-0">
                         <div id="coursesList" class="space-y-2 h-full overflow-y-auto">
 
                         </div>
                     </div>
-                </div> 
+                </div>
             </div>
         </div>
     </div>
@@ -148,12 +140,16 @@
             button.classList.toggle('text-gray-500', !isActive);
             button.classList.toggle('dark:text-gray-400', !isActive);
             button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            button.classList.toggle('hover:text-gray-900', !isActive);
+            button.classList.toggle('dark:hover:text-gray-100', !isActive);
+            button.classList.toggle('hover:bg-white/70', !isActive);
+            button.classList.toggle('dark:hover:bg-gray-800/90', !isActive);
         });
         tabPanels.forEach(panel => {
             const isActive = panel.dataset.tabContent === target;
             panel.classList.toggle('hidden', !isActive);
         });
-    }    
+    }
 </script>
 
 <script>
@@ -217,7 +213,7 @@
         // Set avatar preview
         const avatarEl = document.getElementById('userAvatar');
         avatarEl.src = userData.avatar_path || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(userData.fullname || 'User') + '&background=random';
-    } 
+    }
 
     function renderCourses() {
         const courses = Array.isArray(userData.courses) ? userData.courses : [];
@@ -228,19 +224,39 @@
             coursesList.innerHTML = courses.map(c => `
                 <div class="group flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 p-4 hover:bg-gray-100 dark:hover:bg-gray-800">
                     <div class="flex items-center gap-4 flex-1 min-w-0">
-                        <div class="h-10 w-10 flex-shrink-0 rounded bg-emerald-600 grid place-items-center">
-                            <svg class="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6c-1.657-1-3.657-1.5-6-1.5V19c2.343 0 4.343.5 6 1.5M12 6c1.657-1 3.657-1.5 6-1.5V19c-2.343 0-4.343.5-6 1.5M12 6v14"/>
-                            </svg>
+                        <div class="w-[80px] 3xl:w-[100px]">
+                            <img src="${c.thumbnail_path}" class="w-full aspect-video m-auto object-cover rounded-lg bg-gray-200 dark:bg-gray-700" >
                         </div>
                         <div class="flex-1 min-w-0">
                             <h4 class=" font-bold text-gray-900 dark:text-gray-100 truncate">${escapeHtml_Global(c.title ?? 'Không có tên')}</h4>
-                            <p class=" text-gray-500 dark:text-gray-400 mt-1">ID: ${escapeHtml_Global(String(c.id ?? '-'))}</p>
+                            <span class=" text-gray-500 dark:text-gray-400 truncate block">
+                                ${
+                                    c.description
+                                    ? (escapeHtml_Global(String(c.description)).slice(0, 80) + (String(c.description).length > 80 ? '…' : ''))
+                                    : '-'
+                                }
+                            </span>
                         </div>
                     </div>
-                    ${c.description ? `
-                        <div class="hidden md:block ml-4 max-w-xs">
-                            <span class=" text-gray-500 dark:text-gray-400 truncate block">${escapeHtml_Global(String(c.description)).slice(0, 80)}${String(c.description).length > 80 ? '…' : ''}</span>
+                    ${c.progress ? `
+                        <div class="flex items-center gap-3 flex-shrink-0">
+                            <div class="relative w-12 h-12 flex-shrink-0">
+                                <div class="w-full h-full rounded-full flex items-center justify-center"
+                                    style="background: conic-gradient(
+                                        ${
+                                            Math.min(Math.max(c.progress.completion_percentage || 0, 0), 100) > 80
+                                                ? '#10b981'
+                                                : Math.min(Math.max(c.progress.completion_percentage || 0, 0), 100) >= 50
+                                                    ? '#3b82f6'
+                                                    : '#f59e0b'
+                                        } ${Math.min(Math.max(c.progress.completion_percentage || 0, 0), 100) * 3.6}deg,
+                                        rgb(229 231 235 / 0.3) 0deg
+                                    );">
+                                    <div class="w-[calc(100%-7px)] aspect-square rounded-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+                                        <span class="text-xs font-semibold text-gray-900 dark:text-gray-100">${Math.round(Math.min(Math.max(c.progress.completion_percentage || 0, 0), 100))}%</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>` : ''
                     }
                 </div>
@@ -253,7 +269,7 @@
         for (let i=0; i<el.length; i++) {
             if (el[i]) el[i].textContent = value != null && value !== '' ? value : '-';
         }
-    } 
+    }
 
 </script>
 @endsection

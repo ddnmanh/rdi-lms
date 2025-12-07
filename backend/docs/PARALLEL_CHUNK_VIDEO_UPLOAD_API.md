@@ -46,9 +46,45 @@ Tính năng **Upload nền video bài học** cho phép quản trị viên tải
 
 ## 🔄 Luồng tổng quát
 
-### Giai đoạn 1: Khởi tạo phiên upload
+```
+┌─────────────┐  1. Chọn video & tạo session  ┌─────────────┐
+│             │ ──────────────────────────────►│             │
+│   Browser   │                                │   Laravel   │
+│  (Admin UI) │ ◄──────────────────────────────│   Backend   │
+│             │  2. Return upload_id + config  │             │
+└─────────────┘                                └─────────────┘
+       │
+       │ 3. Upload chunks (1→N)
+       │    POST /chunks with binary data
+       ▼
+┌─────────────┐
+│             │ ──► 4. Save chunks to temp/
+│   Laravel   │ ──► 5. Track progress
+│  API Server │ ──► 6. Update uploaded_chunks
+│             │
+└─────────────┘
+       │
+       │ 7. Complete request (lesson_id)
+       ▼
+┌─────────────┐
+│             │ ──► 8. Dispatch background job
+│ Queue Worker│ ──► 9. Merge all chunks
+│ (Background)│ ──► 10. Upload to storage/public
+│             │ ──► 11. Update lesson.video_path
+│             │ ──► 12. Cleanup temp files
+└─────────────┘
+       │
+       │ 13. Poll status every 5s
+       ▼
+┌─────────────┐
+│             │ ──► Status: processing → completed
+│   Browser   │ ──► Display badge & allow navigation
+│  (Admin UI) │
+│             │
+└─────────────┘
+```
 
-**Chọn chế độ upload nền trong form bài học** (`resources/views/admin/lessons/form.blade.php`)
+### Giai đoạn 1: Tạo sesion upload
 
 Người dùng chọn video → JavaScript gọi `POST /lessons/video-uploads/sessions`
 
@@ -56,7 +92,7 @@ Người dùng chọn video → JavaScript gọi `POST /lessons/video-uploads/se
 ```json
 {
   "upload_id": "uuid-string",
-  "chunk_size": 52428800,
+  "chunk_size": 52428800, // Đơn vị byte
   "total_chunks": 20,
   "status": "pending"
 }
@@ -66,7 +102,7 @@ Người dùng chọn video → JavaScript gọi `POST /lessons/video-uploads/se
 
 ### Giai đoạn 2: Upload từng chunk
 
-Trình duyệt cắt file thành chunk 50 MB và gửi tuần tự qua `POST /lessons/video-uploads/{upload}/chunks`
+Trình duyệt cắt file thành chunk có độ dài được chỉ định ở phản hồi của "Giai đoạn 1" và gửi tuần tự qua `POST /lessons/video-uploads/{upload}/chunks`
 
 **Progress tracking:**
 - Chunk 1/20 → 5%

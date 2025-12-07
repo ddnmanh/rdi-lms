@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\roles\BlockRequest;
 use App\Http\Requests\roles\DestroyRequest;
 use App\Http\Requests\roles\GetAllRequest;
 use App\Http\Requests\roles\StoreRequest;
@@ -25,6 +26,7 @@ class RoleController extends Controller
      * - level_to: Lọc đến level (1-255)
      * - user_id: Lọc các roles có user này
      * - permission_id: Lọc các roles có permission này
+     * - is_block: Lọc các roles có trạng thái khóa
      * - sort_by: Sắp xếp theo (id, name, level, created_at) - mặc định: level
      * - order_by: Thứ tự (asc, desc) - mặc định: asc
      * - per_page: Số lượng mỗi trang - mặc định: 15
@@ -68,6 +70,11 @@ class RoleController extends Controller
                 $query->whereHas('permissions', function ($q) use ($body) {
                     $q->where('permissions.id', $body['permission_id']);
                 });
+            }
+
+            // Lọc theo is_block
+            if (isset($body['is_block'])) {
+                $query->where('is_block', filter_var($body['is_block'], FILTER_VALIDATE_BOOLEAN));
             }
 
             // Sắp xếp
@@ -183,7 +190,7 @@ class RoleController extends Controller
                     'success' => false,
                     'message' => 'Không tìm thấy role'
                 ], 404);
-            } 
+            }
 
             $role->update([
                 'name' => $body['name'] ?? $role->name,
@@ -232,7 +239,7 @@ class RoleController extends Controller
                 if ($role->name !== 'ROOT') { // Không xóa role ROOT
                     $role->delete();
                 }
-            } 
+            }
 
             return response()->json([
                 'success' => true,
@@ -242,6 +249,66 @@ class RoleController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Đã xảy ra lỗi khi xóa roles',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Khóa/Mở khóa roles
+     *
+     * Body params:
+     * - role_ids: array - Danh sách ID của roles cần khóa/mở khóa
+     * - is_block: boolean - true = khóa, false = mở khóa
+     */
+    public function block(BlockRequest $request): JsonResponse
+    {
+        try {
+            $body = $request->validated();
+
+            $roles = Role::whereIn('id', $body['role_ids'])->get();
+
+            if ($roles->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Không tìm thấy role nào'
+                ], 404);
+            }
+
+            $blockedCount = 0;
+            $skippedRoles = [];
+            $action = $body['is_block'] ? 'khóa' : 'mở khóa';
+
+            foreach ($roles as $role) {
+                // Không cho phép khóa role ROOT
+                if ($role->name === 'ROOT') {
+                    $skippedRoles[] = $role->name;
+                    continue;
+                }
+
+                $role->update(['is_block' => $body['is_block']]);
+                $blockedCount++;
+            }
+
+            $message = "Đã {$action} {$blockedCount} role thành công";
+
+            if (!empty($skippedRoles)) {
+                $message .= '. Bỏ qua: ' . implode(', ', $skippedRoles);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'data' => [
+                    'blocked_count' => $blockedCount,
+                    'skipped_roles' => $skippedRoles
+                ]
+            ]);
+        } catch (\Exception $e) {
+            $action = isset($body['is_block']) && $body['is_block'] ? 'khóa' : 'mở khóa';
+            return response()->json([
+                'success' => false,
+                'message' => "Đã xảy ra lỗi khi {$action} roles",
                 'error' => $e->getMessage()
             ], 500);
         }

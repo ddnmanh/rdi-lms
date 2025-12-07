@@ -10,7 +10,7 @@ main {
     font-family: 'UTM Avo', sans-serif;
 }
 
-@media (min-width: 1536px) {
+@media (min-width: 1400px) {
     html,
     body,
     input,
@@ -19,7 +19,8 @@ main {
     }
 } 
 
-@media (min-width: 2000px) {
+/* Màn hình PC cơ bản */
+@media (min-width: 1900px) {
     html,
     body,
     input,

@@ -5,6 +5,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\LessonVideoStreamController;
 use App\Http\Controllers\LessonVideoUploadController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StudentController;
@@ -158,10 +159,24 @@ Route::middleware('auth:api')->group(function () {
             'name' => 'Xóa Vai trò',
             'description' => 'Cho phép xóa vai trò khỏi hệ thống'
         ]);
+        routeWithPermission('post', '/block', [RoleController::class, 'block'], [
+            'group' => 'Vai trò',
+            'name' => 'Khóa/Mở khóa Vai trò',
+            'description' => 'Cho phép khóa hoặc mở khóa vai trò trong hệ thống'
+        ]);
         routeWithPermission('post', '/{id}/permissions', [RoleController::class, 'assignPermissions'], [
             'group' => 'Vai trò',
             'name' => 'Gán phân quyền cho Vai trò',
             'description' => 'Cho phép gán hoặc thay đổi phân quyền của vai trò'
+        ]);
+    });
+
+    // Permission Management (Admin) - yêu cầu permission
+    Route::middleware('check.permission')->prefix('permissions')->group(function () {
+        routeWithPermission('get', '/', [PermissionController::class, 'index'], [
+            'group' => 'Phân quyền',
+            'name' => 'Xem danh sách Phân quyền',
+            'description' => 'Cho phép xem danh sách tất cả phân quyền trong hệ thống'
         ]);
     });
 
@@ -242,14 +257,25 @@ Route::middleware('auth:api')->group(function () {
             'description' => 'Cho phép xóa bài học, không thể xóa bài học đang thuộc về một khóa học'
         ]);
 
-        routeWithPermission('get', '/{lesson}/stream', [LessonVideoStreamController::class, 'stream'], [
+        routeWithPermission('get', '/{lesson}/auto-signature', [LessonVideoStreamController::class, 'getUriWithSignatureForVideo'], [
             'group' => 'Bài học',
-            'name' => 'Stream video Bài học',
-            'description' => 'Cho phép stream video bài học với hỗ trợ HTTP range để ứng dụng Flutter có thể phát mà không cần tải toàn bộ file'
+            'name' => 'Lấy chữ ký cho video (tự chọn HLS hoặc mp4)',
+            'description' => 'Cấp chữ ký (signed token) cho video (tự động chọn HLS hoặc MP4) để truy cập qua Nginx secure link'
+        ]);
+
+        routeWithPermission('get', '/{lesson}/hls-signature', [LessonVideoStreamController::class, 'getUriWithSignatureForHlsVideo'], [
+            'group' => 'Bài học',
+            'name' => 'Lấy chữ ký cho HLS video',
+            'description' => 'Cấp chữ ký (signed token) cho video HLS để truy cập qua Nginx secure link'
+        ]);
+
+        routeWithPermission('get', '/{lesson}/mp4-signature', [LessonVideoStreamController::class, 'getUriWithSignatureForMp4Video'], [
+            'group' => 'Bài học',
+            'name' => 'Lấy chữ ký cho mp4 video',
+            'description' => 'Cấp chữ ký (signed token) cho video mp4 để truy cập qua Nginx secure link'
         ]);
 
 
-        // Lesson video uploads - upload bất đồng bộ
         Route::prefix('video-uploads')->group(function () {
             routeWithPermission('post', '/sessions', [LessonVideoUploadController::class, 'createSession'], [
                 'group' => 'Upload video bài học',

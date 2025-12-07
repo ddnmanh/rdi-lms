@@ -16,7 +16,7 @@ class StoreRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'email' => 'required|email:rfc,dns|unique:users,email',
+            'email' => 'required|email:rfc|unique:users,email',
             'password' => 'required|string|min:6',
             'fullname' => 'required|string|max:150',
             'birthday' => 'nullable|date',
@@ -62,9 +62,10 @@ class StoreRequest extends FormRequest
                     }
 
                     // Kiểm tra kích thước (max 10240 KB = 10MB)
-                    $sizeInKB = $value->getSize() / 1024;
-                    if ($sizeInKB > 10240) {
-                        $fail('Ảnh đại diện không được vượt quá 10240 kilobytes.');
+                    $sizeInBytes = $value->getSize();
+                    $maxSizeInBytes = 10 * 1024 * 1024; // 10MB
+                    if ($sizeInBytes > $maxSizeInBytes) {
+                        $fail('Ảnh đại diện không được vượt quá 10MB.');
                         return;
                     }
                 },

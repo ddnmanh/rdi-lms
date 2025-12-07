@@ -20,7 +20,7 @@ class UserSeederProduction extends Seeder
         $this->command->info('Đang tạo user root cho production...');
 
         $userData = [
-            'email' => 'root@rdi.tvu.vn',
+            'email' => 'root@lms.vn',
             'password' => '123123123',
             'fullname' => 'Root Administrator',
             'birthday' => '1990-01-01',

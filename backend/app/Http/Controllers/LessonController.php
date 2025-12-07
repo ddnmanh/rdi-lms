@@ -35,6 +35,18 @@ class LessonController extends Controller
 
             $query = Lesson::with('course');
 
+            // Nếu không phải root/admin thì chỉ thấy các bài học thỏa điều kiện sau:
+            // Do mình tạo
+            // Thuộc khóa học do mình tạo
+            if (!$request->user()->hasRole('ROOT') && !$request->user()->hasRole('ADMIN')) {
+                $query->where(function ($q) use ($request) {
+                    $q->where('created_by', $request->user()->id)
+                        ->orWhereHas('course', function ($q) use ($request) {
+                            $q->where('created_by', $request->user()->id);
+                        });
+                });
+            }
+
             // Lọc theo khóa học
             if (isset($body['course_id']) && $body['course_id']) {
                 $query->where('course_id', $body['course_id']);
@@ -136,20 +148,13 @@ class LessonController extends Controller
         try {
             $body = $request->validated();
 
-            // Validate that either video_path or video is provided
-            if (!isset($body['video_path']) && !isset($body['video_file'])) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Vui lòng cung cấp video path hoặc upload file video'
-                ], 422);
-            }
-
             $lessonData = [
-                'course_id' => $body['course_id'] ?? null,
+                'course_id' => null,
                 'title' => $body['title'] ?? null,
                 'description' => $body['description'] ?? null,
-                'duration' => $body['duration'] ?? null,
-                'display_order' => $body['display_order'] ?? 0,
+                'duration' => null,
+                'display_order' => 0,
+                'created_by' => $request->user()->id ?? null,
             ];
 
             $lesson = Lesson::create($lessonData);
@@ -157,9 +162,9 @@ class LessonController extends Controller
 
             // Sau khi tạo khóa học thành công, mới xử lý upload thumbnail nếu có
             // Sử dụng $request->hasFile() để kiểm tra file thực sự, tránh trường hợp chuỗi "null"
-            if ($request->hasFile('thumbnail_file')) {
+            if ($request->hasFile('thumbnail')) {
                 try {
-                    $thumbnailFile = $request->file('thumbnail_file');
+                    $thumbnailFile = $request->file('thumbnail');
                     $extension = $thumbnailFile->getClientOriginalExtension();
                     $slugTitle = $this->createSlug($lesson->title);
                     $customFileName = 'lesson_' . $lesson->id . '_' . $slugTitle . '_' . time() . '.' . $extension;
@@ -174,28 +179,14 @@ class LessonController extends Controller
                 } catch (\Exception $e) {
                     report($e);
                 }
+            } else {
+                // Nếu không upload thumbnail, đặt giá trị thumbnail_path là null
+                $lesson->update(['thumbnail_path' => '/static/defaults/video-not-available.jpg']);
             }
 
-            // Xử lý upload video nếu có
-            // Sử dụng $request->hasFile() để kiểm tra file thực sự, tránh trường hợp chuỗi "null"
-            if ($request->hasFile('video_file')) {
-                try {
-                    $videoFile = $request->file('video_file');
-                    $extension = $videoFile->getClientOriginalExtension();
-                    $slugTitle = $this->createSlug($lesson->title);
-                    $customFileName = 'lesson_' . $lesson->id . '_' . $slugTitle . '_' . time() . '.' . $extension;
-                    $storedPath = $videoFile->storeAs('lesson/videos', $customFileName, 'public');
-                    $publicUrl = Storage::url($storedPath); // ví dụ: /storage/lesson/videos/lesson_1_<slug title>_1697059200.mp4
-
-                    // Cập nhật video path vào bài học đã tạo
-                    $lesson->update(['video_path' => $publicUrl]);
-
-                    // Refresh để lấy dữ liệu mới nhất
-                    $lesson->refresh();
-                } catch (\Exception $e) {
-                    report($e);
-                }
-            } elseif (isset($body['video_path']) && $body['video_path']) {
+            // Lưu video_path nếu có
+            // File video sẽ được upload qua route khác, nên ở đây chỉ lưu video_path tạm thời
+            if (isset($body['video_path']) && $body['video_path']) {
                 $lesson->update(['video_path' => $body['video_path']]);
             }
 
@@ -233,35 +224,15 @@ class LessonController extends Controller
                 ], 404);
             }
 
-            // Validate that either video_path or video is provided (or keep existing)
-            // if (!isset($body['video_path']) && !isset($body['video_file'])) {
-            //     return response()->json([
-            //         'success' => false,
-            //         'message' => 'Vui lòng cung cấp video path hoặc upload file video'
-            //     ], 422);
-            // }
-
             $updateData = [
                 'title' => $body['title'] ?? null,
                 'description' => $body['description'] ?? null,
-                'duration' => $body['duration'] ?? 0
+                'updated_by' => $request->user()->id ?? null,
             ];
-
-            // Cập nhật course_id nếu có
-            if (isset($body['course_id']) && $body['course_id']) {
-                $existingCourseId = Course::find($lesson->course_id)?->id;
-                if ($existingCourseId) {
-                    $updateData['course_id'] = $body['course_id'];
-                }
-            }
-
-            // Ghi vào database
-            $lesson->update($updateData);
-            $lesson->refresh();
 
             // Xử lý upload thumbnail nếu có
             // Sử dụng $request->hasFile() để kiểm tra file thực sự, tránh trường hợp chuỗi "null"
-            if ($request->hasFile('thumbnail_file')) {
+            if ($request->hasFile('thumbnail')) {
                 // Xóa thumbnail cũ nếu có
                 if ($lesson->thumbnail_path) {
                     $oldPath = str_replace('/storage/', '', $lesson->thumbnail_path);
@@ -269,7 +240,7 @@ class LessonController extends Controller
                 }
 
                 try {
-                    $thumbnailFile = $request->file('thumbnail_file');
+                    $thumbnailFile = $request->file('thumbnail');
                     $extension = $thumbnailFile->getClientOriginalExtension();
                     $slugTitle = $this->createSlug($lesson->title);
                     $customFileName = 'lesson_' . $lesson->id . '_' . $slugTitle . '_' . time() . '.' . $extension;
@@ -277,52 +248,29 @@ class LessonController extends Controller
                     $publicUrl = Storage::url($storedPath); // ví dụ: /storage/lesson/thumbnails/lesson_1_<slug title>_1697059200.jpg
 
                     // Cập nhật thumbnail vào khóa học đã tạo
-                    $lesson->update(['thumbnail_path' => $publicUrl]);
+                    $updateData['thumbnail_path'] = $publicUrl;
                 } catch (\Exception $e) {
                     report($e);
                 }
             }
 
-            // Xử lý upload video nếu có
-            // Sử dụng $request->hasFile() để kiểm tra file thực sự, tránh trường hợp chuỗi "null"
-            if ($request->hasFile('video_file')) {
-                try {
-                    $videoFile = $request->file('video_file');
-                    $extension = $videoFile->getClientOriginalExtension();
-                    $slugTitle = $this->createSlug($lesson->title);
-                    $customFileName = 'lesson_' . $lesson->id . '_' . $slugTitle . '_' . time() . '.' . $extension;
-                    $storedPath = $videoFile->storeAs('lesson/videos', $customFileName, 'public');
-                    $publicUrl = Storage::url($storedPath); // ví dụ: /storage/lesson/videos/lesson_1_<slug title>_1697059200.mp4
+            if (isset($body['video_path']) && $body['video_path'] != $lesson->video_path) {
+                // Lưu video path cũ để xóa sau
+                $oldVideoPath = $lesson->video_path;
 
-                    // Xóa video cũ sau khi upload thành công
-                    if ($lesson->video_path && $this->isLocalStorageFile($lesson->video_path)) {
-                        $oldPath = str_replace('/storage/', '', $lesson->video_path);
-                        Storage::disk('public')->delete($oldPath);
-                    }
+                // Cập nhật video path mới
+                $updateData['video_path'] = $body['video_path'];
 
-                    // Cập nhật video path vào bài học đã tạo
-                    $lesson->update(['video_path' => $publicUrl]);
-                } catch (\Exception $e) {
-                    report($e);
-                }
-            } else {
-                if (isset($body['video_path']) && $body['video_path'] != $lesson->video_path) {
-                    // Lưu video path cũ để xóa sau
-                    $oldVideoPath = $lesson->video_path;
-                    
-                    // Cập nhật video path mới
-                    $lesson->update(['video_path' => $body['video_path']]);
-                    
-                    // Xóa video cũ nếu là file local storage (không phải URL bên ngoài hoặc background upload)
-                    // Chỉ xóa sau khi cập nhật thành công
-                    if ($oldVideoPath && $this->isLocalStorageFile($oldVideoPath)) {
-                        $oldPath = str_replace('/storage/', '', $oldVideoPath);
-                        Storage::disk('public')->delete($oldPath);
-                    }
+                // Xóa video cũ nếu là file local storage (không phải URL bên ngoài hoặc background upload)
+                // Chỉ xóa sau khi cập nhật thành công
+                if ($oldVideoPath && $this->isLocalStorageFile($oldVideoPath)) {
+                    $oldPath = str_replace('/storage/', '', $oldVideoPath);
+                    Storage::disk('public')->delete($oldPath);
                 }
             }
 
-            // Refresh để lấy dữ liệu mới nhất
+            // Ghi vào database
+            $lesson->update($updateData);
             $lesson->refresh();
 
             return response()->json([
@@ -363,6 +311,13 @@ class LessonController extends Controller
                 if ($lesson->video_path) {
                     $oldPath = str_replace('/storage/', '', $lesson->video_path);
                     Storage::disk('public')->delete($oldPath);
+                }
+
+                // Xóa thư mục HLS nếu có
+                if ($lesson->hls_path) {
+                    $oldPath = explode('playlist.m3u8', $lesson->hls_path)[0];
+                    $folderPath = str_replace('/storage/', '', $oldPath);
+                    Storage::disk('public')->deleteDirectory($folderPath);
                 }
 
                 // Xóa mềm

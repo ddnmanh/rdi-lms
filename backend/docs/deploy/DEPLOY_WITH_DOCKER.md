@@ -13,13 +13,13 @@
 
 - [Tổng quan](#-tổng-quan)
 - [Yêu cầu hệ thống](#-yêu-cầu-hệ-thống)
-- [Cấu trúc file liên quan](#-cấu-trúc-file-liên-quan)
+- [Cấu trúc file liên quan](#-cấu-trúc-files-liên-quan)
 - [Các bước deploy thủ công](#-các-bước-deploy-thủ-công)
-- [Các bước deploy tự động](#-các-bước-deploy-tự-động)
-- [Cấu hình Nginx ngoài server](#-cấu-hình-nginx-ngoài-server)
-- [Kiểm tra sau deploy](#-kiểm-tra-sau-deploy)
-- [Các lệnh thường dùng](#-các-lệnh-thường-dùng)
-- [Deploy lại khi có thay đổi](#deploy-lại-khi-có-thay-đổi)
+- [Cấu hình Nginx ngoài server](#️⃣-cấu-hình-nginx-ngoài-server)
+- [Kiểm tra sau deploy](#️⃣-kiểm-tra-sau-deploy)
+- [Các lệnh thường dùng](#️-các-lệnh-thường-dùng)
+- [Deploy lại khi có sự thay đổi về code](#-deploy-lại-khi-có-sự-thay-đổi-về-code)
+- [Deploy lại khi có sự thay đổi cấu hình Nginx trong Docker](#-deploy-lại-khi-có-sự-thay-đổi-cấu-hình-nginx-trong-docker)
 - [Troubleshooting](#-troubleshooting) 
 
 ---
@@ -39,102 +39,105 @@ Tài liệu này hướng dẫn triển khai dự án lên Ubuntu Server có cà
 | Ubuntu Server | 24.04+ | Hệ điều hành |
 | MySQL | 8.0+ | Cơ sở dữ liệu |
 | Docker | 28.5+ | Môi trường chạy dự án |
-| Docker Compose | 1.29+ | Môi trường chạy dự án theo cụm |
+| Docker-Compose | 1.29+ | Môi trường chạy dự án theo cụm |
 | Nginx | 1.24+ | Web Server cho server ngoài |
-| rdi.sotech.io.vn |  | Domain truy cập dự án (Đã trỏ IP về server) | 
+| lms.domain.vn |  | Domain truy cập dự án (Đã trỏ IP về server) | 
+| FFmpeg | latest | Dùng trong container PHP để tạo HLS |
 
 ## 📁 Cấu trúc files liên quan
 ```
-  source/
-  ├── docker/
-  │   └── nginx/
-  │       └── nginx.conf          # Nginx cho docker (khác với nginx ngoài server)
-  ├── .env.example                # Biến môi trường mẫu
-  ├── Dockerfile                  # PHP 8.0-FPM container
-  ├── docker-compose.yml          # Orchestration cho Nginx và PHP-FPM
-  ├── nginx-host.conf             # Cấu hình nginx cho server (Điều hướng truy cập bên ngoài trỏ vào docker)
-  └── deploy.sh                   # Script deploy tự động
+    source/
+    ├── ⚙️ .env.example                         # Biến môi trường mẫu
+    ├── 🐳 Dockerfile                           # PHP 8.0-FPM container
+    ├── 🐳 docker-compose.yml                   # Orchestration cho Nginx và PHP-FPM
+    ├── 🌐 nginx-host.conf                      # Cấu hình nginx cho server (Điều hướng truy cập bên ngoài trỏ vào docker)
+    ├── 🔧 verify-deployment-with-docker.sh     # Script tự động kiểm tra deploy đã thành công hay chưa
+    └── docker/
+        ├── nginx/
+        │   └── nginx.conf                      # Nginx config trong Docker
+        └── php-fpm/
+            └── www.conf                        # PHP-FPM config
 ```
 
 **Lưu ý:** MySQL sử dụng MySQL đã có sẵn trên Ubuntu Server, không chạy trong Docker.
 
 ## 🔧 Các bước deploy thủ công
 
+### Quy ước các giá trị làm mẫu
+-   Đặt tên thư mục chưa source là `lms`
+-   Chọn thư mục `/home/ducmanh` làm nơi đặt lưu source ở Ubuntu Server
+-   Chọn domain `lms.domain.vn` làm domain truy cập app
+
 ### 1️⃣ Chuẩn bị trên Server
 
-```bash
-# Clone hoặc copy code lên server
-cd /home/ducmanh
-git clone <your-repo> rdi-lms
-cd rdi-lms/backend
-
-# Hoặc sử dụng scp/rsync để copy code
+Đặt source backend vào `/home/ducmanh`, di chuyển vào source
+``` bash
+cd lms
 ```
 
 ### 2️⃣ Cấu hình Domain
 
-Đảm bảo domain `rdi.sotech.io.vn` đã trỏ về IP server của bạn.
+Đảm bảo domain `lms.domain.vn` đã trỏ về IP server.
 
 ### 3️⃣ Cấu hình Environment
 
+Đổi tên `.evn.example` thành `.env` và sửa lại các giá trị quan trọng sau
 ```bash
-# Copy file environment
 cp .env.example .env
-
-# Chỉnh sửa các thông tin quan trọng
-vim .env
 ```
 
 **Các biến cần sửa:**
 
 | Biến | Giá trị | Mô tả |
 |------|---------|-------|
+| `APP_KEY` | *Auto-generate* | Sẽ được tự động generate bằng `php artisan key:generate` |
+| `APP_ENV` | `production` | Môi trường sản phẩm |
+| `APP_DEBUG` | `false` | Tắt chế độ debug |
+| `APP_URL` | `http://lms.domain.vn` | URL của ứng dụng |
 | `DB_HOST` | `host.docker.internal` | Giữ nguyên để Docker container kết nối với MySQL trên host |
 | `DB_DATABASE` | `lms_database` | Tên database đã tạo trên MySQL server |
 | `DB_USERNAME` | `lms_user` | User MySQL |
 | `DB_PASSWORD` | `your_secure_password` | Mật khẩu MySQL |
 | `JWT_SECRET` | `base64:abcdef123456...` | Secret key cho JWT |
-| `APP_KEY` | *Auto-generate* | Sẽ được tự động generate bằng `php artisan key:generate` |
-| `APP_ENV` | `production` | Môi trường sản phẩm |
-| `APP_DEBUG` | `false` | Tắt chế độ debug |
-| `APP_URL` | `http://rdi.sotech.io.vn` | URL của ứng dụng |
+| `FFMPEG_PATH` | `ffmpeg` | Binary ffmpeg bên trong container |
+| `STATIC_SOURCE_SECRET_KEY` | `...` | Secret dùng ký URL HLS (phải trùng với Nginx HLS `/docker/nginx/nginx.conf`) |
+| `STATIC_SOURCE_DEFAULT_EXPIRY` | `3600` | Thời gian hết hạn URL HLS (giây) |
+| `STATIC_SOURCE_BASE_URL` | `https://lms.domain.vn` | Base URL cho HLS playlist/segment |
 
-**Chuẩn bị MySQL trên Ubuntu Server:**
+**Lưu ý cho FFmpeg/HLS khi chạy trong Docker:**
 
-```bash
-# Đăng nhập MySQL
-sudo mysql -u root -p
+- Image PHP (xem `Dockerfile`) đã cài sẵn ffmpeg bằng `apt-get`, nên bên trong container lệnh `ffmpeg` đã khả dụng.
+- Trong `.env` trên server bạn nên để:
 
-# Tạo database và user
-CREATE DATABASE lms_database CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'lms_user'@'%' IDENTIFIED BY 'your_secure_password';
-GRANT ALL PRIVILEGES ON lms_database.* TO 'lms_user'@'%';
-FLUSH PRIVILEGES;
-EXIT;
-
-# Cho phép MySQL listen từ Docker (sửa bind-address)
-sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
-# Tìm dòng: bind-address = 127.0.0.1
-# Đổi thành: bind-address = 0.0.0.0
-
-# Restart MySQL
-sudo systemctl restart mysql
+```env
+FFMPEG_PATH=ffmpeg
 ```
 
-### 4️⃣ Deploy Thủ Công (Từng Bước)
+- Các biến `HLS_*` cần được set đúng domain thật (`APP_URL`) để signed URL khi trả về cho frontend có thể play được.
 
-#### Bước 1: Stop containers cũ (nếu có)
+### 4️⃣ Sửa cấu hình Nginx container
+Mở file cấu hình tại `docker/nginx/nginx.conf` và sửa lại giá trị của biến `secure_link_secret` phải giống với giá trị của biến `STATIC_SOURCE_SECRET_KEY` trong `.env`.
+```bash
+vim docker/nginx/nginx.conf
+```
+
+### 5️⃣ Deploy Docker chính thức qua các bước
+
+#### Bước 1: Đảm bảo đang đứng ở thư mục gốc của source
+Bước này là bắt buộc vì các lệnh deploy được viết ở trạng thái đứng ở thư mục gốc của source để Docker tham chiếu đến các file cấu hình tự động mà không cần phải chỉ định tên rõ ràng.
+
+#### Bước 2: Stop containers cũ (nếu có)
 ```bash
 docker-compose down
 ```
 
-#### Bước 2: Build Docker images
+#### Bước 3: Build Docker images
 ```bash
 # Build lại images từ Dockerfile
 docker-compose build --no-cache
 ```
 
-#### Bước 3: Khởi động các containers
+#### Bước 4: Khởi động các containers
 ```bash
 # Khởi động tất cả services (nginx, app)
 docker-compose up -d
@@ -143,7 +146,23 @@ docker-compose up -d
 docker-compose ps
 ```
 
-#### Bước 4: Test kết nối MySQL
+#### Bước 5: Kiểm tra FFmpeg trong container
+Đảm bảo binary `ffmpeg` sẵn sàng bên trong container `app`:
+
+```bash
+# Kiểm tra phiên bản
+docker-compose exec app ffmpeg -version
+
+# Kiểm tra đường dẫn đầy đủ
+docker-compose exec app which ffmpeg
+```
+
+
+- Nếu lệnh trên in ra version FFmpeg thì OK.
+- Nếu báo `ffmpeg: command not found` thì kiểm tra lại `Dockerfile` phải có bước `apt-get install -y ffmpeg` và thực hiện lại từ Bước 2
+
+#### Bước 6: Test kết nối MySQL
+Nếu chắc chắn các thông tin kết nối là đúng thì có thể bỏ qua, hoặc chỉ cần chạy migration thì có thể thấy lỗi nếu không kết nối được.
 ```bash
 # Test kết nối từ container đến MySQL host
 docker-compose exec app php -r "new PDO('mysql:host=host.docker.internal;dbname=lms_database', 'lms_user', 'your_password');"
@@ -151,25 +170,28 @@ docker-compose exec app php -r "new PDO('mysql:host=host.docker.internal;dbname=
 # Nếu thành công sẽ không có lỗi
 ```
 
-#### Bước 5: Cài đặt dependencies
+#### Bước 7: Cài đặt dependencies cho Laravel
 ```bash
 # Vào container và cài đặt Composer packages
 docker-compose exec app composer install --optimize-autoloader --no-dev
 ```
 
-#### Bước 6: Generate application key
+#### Bước 8: Generate key
 ```bash
-# Tạo APP_KEY trong file .env
+# Tự động tạo APP_KEY trong file .env
 docker-compose exec app php artisan key:generate
+
+# Tự động tạo JWT_SECRET trong file .env
+docker-compose exec app php artisan jwt:secret
 ```
 
-### Bước 7: Tạo symplink
+### Bước 9: Tạo symplink
 Tạo symlink để ánh xạ thư mục `public/storage` -> `storage/app/public`
 ```bash
 docker-compose exec app php artisan storage:link
 ```
 
-#### Bước 8: Chạy database migrations
+#### Bước 10: Chạy database migrations
 ```bash
 # Tạo tables trong database
 docker-compose exec app php artisan migrate --force
@@ -178,7 +200,7 @@ docker-compose exec app php artisan migrate --force
 docker-compose exec app php artisan db:seed --force
 ```
 
-#### Bước 9: Cache configurations
+#### Bước 11: Cache configurations
 ```bash
 # Cache config để tăng performance
 docker-compose exec app php artisan config:cache
@@ -190,42 +212,29 @@ docker-compose exec app php artisan route:cache
 docker-compose exec app php artisan view:cache
 ```
 
-#### Bước 10: Set permissions
+#### Bước 12: Set permissions
 ```bash
 # Cấp quyền cho thư mục storage và cache
-docker-compose exec app chown -R www-data:www-data /home/ducmanh/rdi/storage
-docker-compose exec app chown -R www-data:www-data /home/ducmanh/rdi/bootstrap/cache
-docker-compose exec app chmod -R 775 /home/ducmanh/rdi/storage
-docker-compose exec app chmod -R 775 /home/ducmanh/rdi/bootstrap/cache
+docker-compose exec app chown -R www-data:www-data /COURCE/storage
+docker-compose exec app chown -R www-data:www-data /COURCE/bootstrap/cache
+docker-compose exec app chmod -R 775 /COURCE/storage
+docker-compose exec app chmod -R 775 /COURCE/bootstrap/cache
 ```
 
-#### Bước 11: Restart để áp dụng changes
+#### Bước 13: Restart để áp dụng changes
 ```bash
 docker-compose restart
 ```
 
-## ⚡ Các bước deploy tự động
+## 6️⃣ Cấu hình Nginx ngoài server
 
-```bash
-# Cấp quyền thực thi cho script
-chmod +x deploy.sh
+Đảm bảo domain `lms.domain.vn` đã trỏ về IP server của bạn.
 
-# Chạy deploy
-./deploy.sh
-```
-
-Script `deploy.sh` sẽ tự động thực hiện tất cả 10 bước ở trên.
-
-## 🌐 Cấu hình Nginx ngoài server
-
-Đảm bảo domain `rdi.sotech.io.vn` đã trỏ về IP server của bạn.
-
-### 1. Đăng ký ssl cho `rdi.sotech.io.vn`
+### 1. Đăng ký ssl cho `lms.domain.vn`
 Hành động này là bắt buộc, xem tài liệu bên ngoài
 
 ### 2. Tạo file cấu hình
-
-Di chuyển vào thư mục `/etc/nginx/sites-available` và tạo file cấu hình sau:
+Copy cấu hình nginx từ source vào thư mục cấu hình Nginx ở Host (Ubuntu server)
 ```bash
 vim /etc/nginx/sites-available/rdi.sotech.io.vn
 ```
@@ -292,11 +301,31 @@ server {
 }
 ```
 
-### 1. Kích hoạt cấu hình
+### 3. Sử lại file cấu hình
+#### 3.1 Thay đổi domain truy cập qua internet.
+Tìm các giá trị `lms.domain.vn` và thay thế bằng domain mà bạn cần.
+
+#### 3.2 Sửa lại điều hướng domain internet vào port docker
+```bash
+# Kiểm tra port docker
+docker-compose ps
+```
+
+Kết quả tương tự như sau là app trên docker đang chạy ở port `8080`:
+```bash
+NAME        IMAGE          COMMAND                  SERVICE   CREATED      STATUS      PORTS
+lms_app     rdi_app        "docker-php-entrypoi…"   app       4 days ago   Up 4 days   9000/tcp
+lms_nginx   nginx:alpine   "/docker-entrypoint.…"   nginx     4 days ago   Up 4 days   0.0.0.0:8080->80/tcp, [::]:8080->80/tcp
+```
+
+Sửa lại post tại `proxy_pass http://localhost:8080;` sao cho đúng với port vừa tìm ở trên.
+
+
+### 4. Kích hoạt cấu hình
 
 ```bash
 # Link sang thư mục cấu hình chính
-sudo ln -s /etc/nginx/sites-available/rdi.sotech.io.vn /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/lms.domain.vn /etc/nginx/sites-enabled/
 
 # Kiểm tra cấu hình
 sudo nginx -t
@@ -306,25 +335,17 @@ sudo systemctl restart nginx
 ```
 
 
-## ✅ Kiểm tra sau deploy
+## 7️⃣ Kiểm tra sau deploy
 
 ```bash
-# Xem logs
-docker-compose logs -f
+# Cấp quyền thực thi cho script
+chmod +x verify-deployment-with-docker.sh
 
-# Kiểm tra containers đang chạy
-docker-compose ps
-
-# Test kết nối database từ container
-docker-compose exec app php artisan migrate:status
-
-# Test từ host
-curl http://localhost:8080
-# Hoặc
-curl -I http://localhost:8080
+# Chạy deploy
+./verify-deployment-with-docker.sh
 ```
 
-Mở trình duyệt và truy cập: `http://rdi.sotech.io.vn`
+Mở trình duyệt và truy cập: `http://lms.domain.vn` hoặc `https://lms.domain.vn`
 
 ## 🛠️ Các lệnh thường dùng
 
@@ -424,7 +445,7 @@ Thực hiện bước cấu hình theo hướng dẫn [Cấu hình Nginx ngoài 
 
 ```bash
 # 1. Kiểm tra config hiện tại
-cd /home/ducmanh/rdi
+cd /COURCE
 docker-compose exec nginx cat /etc/nginx/conf.d/default.conf | grep client_max_body_size
 
 # 2. Nếu không thấy hoặc giá trị nhỏ, cần pull code mới

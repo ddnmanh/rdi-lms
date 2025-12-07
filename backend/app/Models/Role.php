@@ -14,10 +14,16 @@ class Role extends Model
         'name',
         'description',
         'level', // Level của role: quyền cao nhất là 1, quyền thấp nhất là 255 (tỉ lệ nghịch)
+        'is_block',
     ];
 
     protected $casts = [
         'level' => 'integer',
+        'is_block' => 'boolean',
+    ];
+
+    protected $attributes = [
+        'is_block' => false,
     ];
 
     public function users()
@@ -33,7 +39,7 @@ class Role extends Model
     /**
      * Kiểm tra role này có quyền cao hơn role khác không
      * Level thấp hơn = quyền cao hơn
-     * 
+     *
      * @param Role|int $otherRole Role hoặc level cần so sánh
      * @return bool
      */
@@ -46,7 +52,7 @@ class Role extends Model
     /**
      * Kiểm tra role này có quyền thấp hơn role khác không
      * Level cao hơn = quyền thấp hơn
-     * 
+     *
      * @param Role|int $otherRole Role hoặc level cần so sánh
      * @return bool
      */

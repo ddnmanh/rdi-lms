@@ -96,22 +96,22 @@
         }
     }
 </style>
-<div class="max-w-[1600px] mx-auto flex flex-col items-stretch justify-start gap-4 2xl:gap-6"> 
+<div class="max-w-[1600px] mx-auto flex flex-col items-stretch justify-start gap-4 3xl:gap-6"> 
 
     {{-- Form Card --}}
     <form id="courseForm" onsubmit="saveCourse(event)" class="h-full w-full p-4 md:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
         <input type="hidden" id="courseId" value="{{ $mode === 'EDIT_COURSE' ? ($courseId ?? '') : '' }}">
 
-        <div class="h-full flex flex-col items-stretch justify-between gap-4 2xl:gap-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 2xl:gap-6">
+        <div class="h-full flex flex-col items-stretch justify-between gap-4 3xl:gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 3xl:gap-6">
                 {{-- Thumbnail Preview + Upload --}}
-                <div class="col-span-1 md:col-span-2">
+                <div class="col-span-1 md:col-span-2 row-span-2">
                     <label class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Ảnh thumbnail</label>
                     <div
                         id="thumbnailDropZone"
                         class="flex flex-row flex-wrap items-center gap-4 p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg"
                     >
-                        <div class="w-[200px] aspect-video rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
+                        <div class="w-[150px] aspect-video rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
                             <img id="thumbnailPreview" alt="thumbnail preview" class="h-full w-full object-cover hidden">
                             <svg id="thumbnailPlaceholder" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-12 w-12 text-gray-400">
                                 <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z"/>
@@ -138,7 +138,7 @@
                                     class="hidden"
                                 />
                             </div>
-                            <div class="mt-2  text-gray-500 dark:text-gray-400">Hỗ trợ PNG, JPG, WEBP, GIF — Tối đa 2MB</div>
+                            <div class="mt-2  text-gray-500 dark:text-gray-400">Hỗ trợ PNG, JPG, WEBP — Tối đa 10MB</div>
                         </div>
                     </div>
                 </div>
@@ -155,11 +155,7 @@
                     <label name="start_date_LABEL" for="start_date" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Ngày bắt đầu</label>
                     <input type="datetime-local" id="start_date"
                         class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
-                    <span id="start_date_MSG" class="ml-4 text-sm mt-1 italic hidden"></span>
-                    {{-- <p class=" text-gray-500 dark:text-gray-400 mt-1 ml-3">
-                        Ngày và giờ bắt đầu khóa học
-                        <span id="timezoneIndicator" class="text-blue-600 dark:text-blue-400 font-medium"></span>
-                    </p> --}}
+                    <span id="start_date_MSG" class="ml-4 text-sm mt-1 italic hidden"></span> 
                 </div>
 
                 <div class="col-span-1">
@@ -170,7 +166,7 @@
                     <span id="end_date_MSG" class="ml-4 text-sm mt-1 italic hidden"></span>
                 </div>
 
-                <div class="md:col-span-2">
+                <div class="md:col-span-4">
                     <label for="description" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Mô tả</label>
                     <textarea id="description" rows="3"
                         class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none resize-none"
@@ -206,7 +202,7 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-col items-center justify-center w-[60px] 2xl:w-[80px]">
+                    <div class="flex flex-col items-center justify-center w-[60px] 3xl:w-[80px]">
                         <i class="fa-solid fa-arrow-left"></i>
                         <i class="fa-solid fa-arrow-right"></i>
                     </div>
@@ -241,7 +237,7 @@
                             </div>
                         </div>
 
-                        <div class="flex flex-col items-stretch justify-center gap-3 w-[60px] 2xl:w-[80px] h-full">
+                        <div class="flex flex-col items-stretch justify-center gap-3 w-[60px] 3xl:w-[80px] h-full">
                             <button
                                 type="button"
                                 id="moveStudentsToCourseBtn"

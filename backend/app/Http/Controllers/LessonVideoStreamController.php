@@ -3,133 +3,230 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lesson;
+use App\Services\HlsSignedUrlService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 class LessonVideoStreamController extends Controller
 {
+    protected HlsSignedUrlService $hlsSignedUrlService;
+
+    public function __construct(HlsSignedUrlService $hlsSignedUrlService)
+    {
+        $this->hlsSignedUrlService = $hlsSignedUrlService;
+    }
+
     /**
-     * Stream lesson video with HTTP range support so the Flutter app
-     * can play without downloading the entire file.
+     * Cấp chữ ký (signed token) cho video của bài học (tự động chọn HLS hoặc MP4).
+     * 
+     * Client sẽ dùng token này kèm theo request tới Nginx để truy cập video.
+     * Nginx sẽ xác thực token bằng module ngx_http_secure_link_module.
+     * 
+     * @param Request $request
+     * @param Lesson $lesson
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function stream(Request $request, Lesson $lesson)
+    public function getUriWithSignatureForVideo(Request $request, Lesson $lesson)
     {
         $user = $request->user();
 
-        // dump($user->toArray());
-
-        if (!$lesson->video_path) {
+        // 1. Kiểm tra tồn tại video
+        if (!$lesson->video_path && !$lesson->hls_path) {
             return response()->json([
                 'success' => false,
                 'message' => 'Bài học chưa có video.'
             ], 404);
         }
 
-        if (Str::startsWith($lesson->video_path, 'background-upload://')) {
+        // 2. Video đang được xử lý nền
+        if (Str::startsWith($lesson->video_path, 'background-upload://') || Str::startsWith($lesson->video_path, 'background-upload://')) {
             return response()->json([
                 'success' => false,
                 'message' => 'Video đang được xử lý. Vui lòng thử lại sau.'
             ], 409);
-        } 
+        }
 
-        // Chỉ cho phép người dùng thuộc khóa học của bài học này
-        if (!$user->isRoot() && ($lesson->course_id == null || !$user->courses()->where('courses.id', $lesson->course_id)->exists()) ) {
+        // 3. Phân quyền: chỉ root hoặc user thuộc khóa học mới xem được
+        if (
+            !$user->isRoot()
+            && (
+                $lesson->course_id === null
+                || !$user->courses()->where('courses.id', $lesson->course_id)->exists()
+            )
+        ) {
             return response()->json([
                 'success' => false,
                 'message' => 'Bạn không có quyền truy cập video này.'
             ], 403);
         }
 
-        if ($this->isExternalUrl($lesson->video_path)) {
-            // return response()->json([
-            //     'success' => false,
-            //     'message' => 'Video được lưu ở nguồn bên ngoài, không thể stream nội bộ.'
-            // ], 422);
-            return redirect($lesson->video_path);
-        }
+        // 4. Chuẩn hóa đường dẫn video
+        $baseUrl = config('static-source.base_url'); 
+        $videoUri = $lesson->hls_path ?? $lesson->video_path;
+        
+        // 5. Tạo signed URL
+        $signedData = $this->hlsSignedUrlService->generateSignedUrl(
+            $baseUrl,
+            $videoUri,
+            null, // Sử dụng default expiry
+        );
 
-        $relativePath = Str::after($lesson->video_path, '/storage/');
-        $fullPath = storage_path('app/public/' . $relativePath);
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã tạo chữ ký thành công.',
+            'data' => [
+                'type' => $lesson->hls_path ? 'hls' : 'mp4',
+                'lesson_id' => $lesson->id,
+                'base_url' => $baseUrl,
+                'uri' => $videoUri,
+                'signed_uri' => $signedData['signed_uri'],
+                'signature' => $signedData['signature'],
+                'expires' => $signedData['expires'],
+                'expires_at' => $signedData['expires_at'],
+            ]
+        ]);
+    }
 
-        if (!File::exists($fullPath)) {
+    /**
+     * Cấp chữ ký (signed token) cho video MP4 của bài học.
+     * 
+     * Client sẽ dùng token này kèm theo request tới Nginx để truy cập video.
+     * Nginx sẽ xác thực token bằng module ngx_http_secure_link_module.
+     * 
+     * @param Request $request
+     * @param Lesson $lesson
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getUriWithSignatureForMp4Video(Request $request, Lesson $lesson)
+    {
+        $user = $request->user();
+
+        // 1. Kiểm tra tồn tại video
+        if (!$lesson->video_path) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy file video.'
+                'message' => 'Bài học chưa có video dạng MP4.'
             ], 404);
         }
 
-        $fileSize = File::size($fullPath);
-        $mimeType = File::mimeType($fullPath) ?: 'video/mp4';
-        $rangeHeader = $request->header('Range');
-
-        [$start, $end, $status] = $this->resolveRange($rangeHeader, $fileSize);
-        $length = $end - $start + 1;
-
-        $headers = [
-            'Content-Type' => $mimeType,
-            'Content-Length' => $length,
-            'Accept-Ranges' => 'bytes',
-        ];
-
-        if ($status === 206) {
-            $headers['Content-Range'] = "bytes {$start}-{$end}/{$fileSize}";
+        // 2. Video đang được xử lý nền
+        if (Str::startsWith($lesson->video_path, 'background-upload://') || Str::startsWith($lesson->video_path, 'background-upload://')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Video đang được xử lý. Vui lòng thử lại sau.'
+            ], 409);
         }
 
-        $streamCallback = function () use ($fullPath, $start, $length) {
-            $chunkSize = 1024 * 1024; // 1MB
-            $bytesRemaining = $length;
-
-            $handle = fopen($fullPath, 'rb');
-            fseek($handle, $start);
-
-            while ($bytesRemaining > 0 && !feof($handle)) {
-                $readLength = min($chunkSize, $bytesRemaining);
-                $buffer = fread($handle, $readLength);
-                echo $buffer;
-                flush();
-
-                $bytesRemaining -= strlen($buffer);
-            }
-
-            fclose($handle);
-        };
-
-        return response()->stream($streamCallback, $status, $headers);
-    }
-
-    private function resolveRange(?string $rangeHeader, int $fileSize): array
-    {
-        $start = 0;
-        $end = $fileSize - 1;
-        $status = 200;
-
-        if ($rangeHeader && preg_match('/bytes=(\d*)-(\d*)/', $rangeHeader, $matches)) {
-            if ($matches[1] !== '') {
-                $start = (int) $matches[1];
-            }
-
-            if ($matches[2] !== '') {
-                $end = (int) $matches[2];
-            }
-
-            if ($end >= $fileSize) {
-                $end = $fileSize - 1;
-            }
-
-            if ($start > $end || $start < 0) {
-                $start = 0;
-            }
-
-            $status = 206;
+        // 3. Phân quyền: chỉ root hoặc user thuộc khóa học mới xem được
+        if (
+            !$user->isRoot()
+            && (
+                $lesson->course_id === null
+                || !$user->courses()->where('courses.id', $lesson->course_id)->exists()
+            )
+        ) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bạn không có quyền truy cập video này.'
+            ], 403);
         }
 
-        return [$start, $end, $status];
+        // 4. Chuẩn hóa đường dẫn HLS
+        $baseUrl = config('static-source.base_url'); 
+        $mp4Uri = $lesson->video_path ?? '';
+
+        // 5. Tạo signed URL
+        $signedData = $this->hlsSignedUrlService->generateSignedUrl(
+            $baseUrl,
+            $mp4Uri,
+            null, // Sử dụng default expiry
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã tạo chữ ký thành công.',
+            'data' => [
+                'type' => 'mp4',
+                'lesson_id' => $lesson->id,
+                'base_url' => $baseUrl,
+                'uri' => $mp4Uri,
+                'signed_uri' => $signedData['signed_uri'],
+                'signature' => $signedData['signature'],
+                'expires' => $signedData['expires'],
+                'expires_at' => $signedData['expires_at'],
+            ]
+        ]);
     }
 
-    private function isExternalUrl(string $path): bool
+    /**
+     * Cấp chữ ký (signed token) cho video HLS của bài học.
+     * 
+     * Client sẽ dùng token này kèm theo request tới Nginx để truy cập video.
+     * Nginx sẽ xác thực token bằng module ngx_http_secure_link_module.
+     * 
+     * @param Request $request
+     * @param Lesson $lesson
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getUriWithSignatureForHlsVideo(Request $request, Lesson $lesson)
     {
-        return Str::startsWith($path, ['http://', 'https://']);
+        $user = $request->user();
+
+        // 1. Kiểm tra tồn tại video
+        if (!$lesson->hls_path) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bài học chưa có video dạng HLS.'
+            ], 404);
+        }
+
+        // 2. Video đang được xử lý nền
+        if (Str::startsWith($lesson->hls_path, 'background-upload://') || Str::startsWith($lesson->video_path, 'background-upload://')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Video đang được xử lý. Vui lòng thử lại sau.'
+            ], 409);
+        }
+
+        // 3. Phân quyền: chỉ root hoặc user thuộc khóa học mới xem được
+        if (
+            !$user->isRoot()
+            && (
+                $lesson->course_id === null
+                || !$user->courses()->where('courses.id', $lesson->course_id)->exists()
+            )
+        ) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bạn không có quyền truy cập video này.'
+            ], 403);
+        }
+
+        // 4. Chuẩn hóa đường dẫn HLS
+        $baseUrl = config('static-source.base_url'); 
+        $hlsUri = $lesson->hls_path ?? '';
+
+        // 5. Tạo signed URL
+        $signedData = $this->hlsSignedUrlService->generateSignedUrl(
+            $baseUrl,
+            $hlsUri,
+            null, // Sử dụng default expiry
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã tạo chữ ký thành công.',
+            'data' => [
+                'type' => 'hls',
+                'lesson_id' => $lesson->id,
+                'base_url' => $baseUrl,
+                'uri' => $hlsUri,
+                'signed_uri' => $signedData['signed_uri'],
+                'signature' => $signedData['signature'],
+                'expires' => $signedData['expires'],
+                'expires_at' => $signedData['expires_at'],
+            ]
+        ]);
     }
 }
-

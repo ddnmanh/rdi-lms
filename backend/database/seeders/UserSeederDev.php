@@ -66,7 +66,7 @@ class UserSeederDev extends Seeder
 
         // 1 ROOT user
         $users[] = [
-            'email' => 'root@rdi.tvu.vn',
+            'email' => 'root@lms.vn',
             'password' => '123123123',
             'fullname' => 'Root Administrator',
             'birthday' => '1990-01-01',
@@ -89,6 +89,7 @@ class UserSeederDev extends Seeder
                 'fullname' => $name[0] . ' ' . $name[1],
                 'birthday' => $this->randomDate('1985-01-01', '1995-12-31'),
                 'roles' => ['ADMIN'],
+                'avatar_path' => '/static/defaults/avatar-not-available.jpg',
             ];
         }
 

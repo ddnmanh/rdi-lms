@@ -5,7 +5,7 @@
 @section('description', 'Quản lý tất cả người dùng trong hệ thống')
 
 @section('content') 
-<div class="h-full flex flex-col items-stretch justify-start gap-2.5 2xl:gap-4">
+<div class="h-full flex flex-col items-stretch justify-start gap-2.5 3xl:gap-4">
     <div class="flex flex-col items-stretch justify-start gap-2.5">
         {{-- Actions Bar --}}
         <div class="flex items-center justify-start gap-3">
@@ -27,7 +27,7 @@
         </div>
 
         {{-- Filter Section --}}
-        <form onsubmit="return handleSubmitFilter(event)" class="max-w-1/2 p-3 2xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col lg:flex-row justify-start gap-4">
+        <form onsubmit="return handleSubmitFilter(event)" class="max-w-1/2 p-3 3xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col lg:flex-row justify-start gap-4">
             <div class="flex flex-col lg:flex-row justify-start flex-wrap gap-4 flex-1">
                 {{-- Role Filter --}}
                 <div class="min-w-32 flex flex-col items-stretch justify-start gap-0.5">
@@ -320,14 +320,14 @@
 
         const headTable = `
             <colgroup>
-                <col class="w-[40px] 2xl:w-[80px]">
-                <col class="w-[80px] 2xl:w-[110px]">
-                <col class="w-[80px] 2xl:w-[150px]">
-                <col class="w-[250px] 2xl:w-[400px]">
-                <col class="w-[350px] 2xl:w-[500px]">
+                <col class="w-[40px] 3xl:w-[80px]">
+                <col class="w-[60px] 3xl:w-[110px]">
+                <col class="w-[80px] 3xl:w-[110px]">
+                <col class="w-[250px] 3xl:w-[400px]">
                 <col class="">
-                <col class="w-[120px] 2xl:w-[180px]">
-                <col class="w-[130px] 2xl:w-[230px]">
+                <col class="">
+                <col class="w-[140px] 3xl:w-[160px]">
+                <col class="w-[120px] 3xl:w-[150px]">
             </colgroup>
             <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
                 <tr>
@@ -398,7 +398,7 @@
 
             const isChecked = selectedUserIds.has(user.id);
             html += `
-                <tr class="border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                <tr class="border border-gray-100 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
                     <td class="px-4 py-3 text-center">
                         <input type="checkbox"
                             class="user-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
@@ -427,19 +427,19 @@
                     <td class="px-4 py-3 align-top">
                         <div class="flex flex-nowrap items-center justify-end gap-2 overflow-x-auto">
                             <a href="/admin/users/${user.id}"
-                                class="inline-flex shrink-0 size-7 2xl:size-8 items-center justify-center rounded-md border border-blue-500 hover:border-blue-600 text-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300"
+                                class="inline-flex shrink-0 size-7 3xl:size-8 items-center justify-center rounded-md border border-blue-500 hover:border-blue-600 text-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300"
                                 title="Xem chi tiết">
-                                <i class="fas fa-eye  2xl:"></i>
+                                <i class="fas fa-eye  3xl:"></i>
                             </a>
                             <a href="/admin/users/${user.id}/edit"
-                                class="inline-flex shrink-0 size-7 2xl:size-8 items-center justify-center rounded-md border border-amber-500 hover:border-amber-600 text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-300"
+                                class="inline-flex shrink-0 size-7 3xl:size-8 items-center justify-center rounded-md border border-amber-500 hover:border-amber-600 text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-300"
                                 title="Chỉnh sửa">
-                                <i class="fa-solid fa-pen  2xl:"></i>
+                                <i class="fa-solid fa-pen  3xl:"></i>
                             </a>
                             <button onclick="openSingleDeleteModal(${user.id}, '${(user.fullname || '').replace(/'/g, "\\'")}', '${user.email.replace(/'/g, "\\'")}')"
-                                class="inline-flex shrink-0 size-7 2xl:size-8 items-center justify-center rounded-md border border-red-500 hover:border-red-600 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300"
+                                class="inline-flex shrink-0 size-7 3xl:size-8 items-center justify-center rounded-md border border-red-500 hover:border-red-600 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300"
                                 title="Xóa">
-                                <i class="fas fa-trash  2xl:"></i>
+                                <i class="fas fa-trash  3xl:"></i>
                             </button>
                         </div>
                     </td>

@@ -24,6 +24,7 @@ class CourseSeeder extends Seeder
                 'thumbnail_path' => '/static/defaults/image-not-available.jpg',
                 'start_date' => Carbon::now()->subMonths(2),
                 'end_date' => Carbon::now()->addMonths(4),
+                'created_by' => 1,
             ],
             [
                 'title' => 'JavaScript và React.js từ Zero đến Hero',
@@ -31,6 +32,7 @@ class CourseSeeder extends Seeder
                 'thumbnail_path' => '/static/defaults/image-not-available.jpg',
                 'start_date' => Carbon::now()->subMonth(),
                 'end_date' => Carbon::now()->addMonths(5),
+                'created_by' => 1,
             ],
             [
                 'title' => 'Python cho Data Science và Machine Learning',
@@ -38,6 +40,7 @@ class CourseSeeder extends Seeder
                 'thumbnail_path' => '/static/defaults/image-not-available.jpg',
                 'start_date' => Carbon::now()->subWeeks(2),
                 'end_date' => Carbon::now()->addMonths(6),
+                'created_by' => 1,
             ],
             [
                 'title' => 'Node.js và Express.js - Backend Development',
@@ -45,6 +48,7 @@ class CourseSeeder extends Seeder
                 'thumbnail_path' => '/static/defaults/image-not-available.jpg',
                 'start_date' => Carbon::now()->subWeeks(3),
                 'end_date' => Carbon::now()->addMonths(3),
+                'created_by' => 1,
             ],
             [
                 'title' => 'Vue.js - Framework JavaScript hiện đại',
@@ -52,6 +56,7 @@ class CourseSeeder extends Seeder
                 'thumbnail_path' => '/static/defaults/image-not-available.jpg',
                 'start_date' => Carbon::now()->subDays(10),
                 'end_date' => Carbon::now()->addMonths(4),
+                'created_by' => 1,
             ],
             [
                 'title' => 'Flutter - Phát triển ứng dụng di động',
@@ -59,6 +64,7 @@ class CourseSeeder extends Seeder
                 'thumbnail_path' => '/static/defaults/image-not-available.jpg',
                 'start_date' => Carbon::now()->subDays(5),
                 'end_date' => Carbon::now()->addMonths(5),
+                'created_by' => 1,
             ],
             [
                 'title' => 'Docker và Kubernetes - Containerization',
@@ -66,6 +72,7 @@ class CourseSeeder extends Seeder
                 'thumbnail_path' => '/static/defaults/image-not-available.jpg',
                 'start_date' => Carbon::now()->subWeek(),
                 'end_date' => Carbon::now()->addMonths(3),
+                'created_by' => 1,
             ],
             [
                 'title' => 'MySQL và Database Design',
@@ -73,6 +80,7 @@ class CourseSeeder extends Seeder
                 'thumbnail_path' => '/static/defaults/image-not-available.jpg',
                 'start_date' => Carbon::now()->subMonths(1),
                 'end_date' => Carbon::now()->addMonths(2),
+                'created_by' => 1,
             ],
         ];
 

@@ -104,17 +104,17 @@ Mở file cấu hình trong editor và thêm/sửa các thông số sau:
 upload_max_filesize = 256M
 
 ; Giới hạn tổng dung lượng dữ liệu POST (phải >= upload_max_filesize)
-post_max_size = 256M
+post_max_size = 10240M
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # ⏱️ CẤU HÌNH TIMEOUT
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-; Thời gian tối đa script được phép chạy (2 giờ)
-max_execution_time = 7200
+; Thời gian tối đa script được phép chạy (30 phút)
+max_execution_time = 1800
 
-; Thời gian tối đa để parse input (2 giờ)
-max_input_time = 7200
+; Thời gian tối đa để parse input (30 phút)
+max_input_time = 1800
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # 🧠 CẤU HÌNH BỘ NHỚ

@@ -20,8 +20,18 @@ class ApiConstants {
 
   // Lessons
   static const String streamLesson = '/api/lessons/'; // + id + /stream
-  static const String hlsSignature = '/api/lessons/'; // + id + /hls-signature
+  static const String hlsSignature = '/api/lessons/'; // + id + /hls-signature (deprecated)
+  static const String autoSignature = '/api/lessons/'; // + id + /auto-signature
 
-  /// Lấy endpoint HLS signature cho lesson
+  /// Lấy chi tiết lesson
+  static String getLessonDetail(int lessonId) => '/api/student/lessons/$lessonId';
+
+  // Progress
+  static const String studentProgress = '/api/student/progress';
+
+  /// Lấy endpoint HLS signature cho lesson (deprecated)
   static String getHlsSignatureUrl(int lessonId) => '/api/lessons/$lessonId/hls-signature';
+
+  /// Lấy endpoint auto signature cho lesson (hỗ trợ cả HLS và MP4)
+  static String getAutoSignatureUrl(int lessonId) => '/api/lessons/$lessonId/auto-signature';
 }

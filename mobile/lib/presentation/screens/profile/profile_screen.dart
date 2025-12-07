@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile/core/constants/api_constants.dart';
+import 'package:LMS/core/constants/api_constants.dart';
+import 'package:LMS/presentation/screens/notification/notification_screen.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../theme/ios_widgets.dart';
@@ -168,27 +170,6 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           // ignore: deprecated_member_use
-                          color: Colors.orange.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.notifications_outlined,
-                          color: Colors.orange,
-                          size: 20,
-                        ),
-                      ),
-                      title: 'Thông báo',
-                      trailing: const Icon(
-                        Icons.chevron_right_rounded,
-                        color: Color(0xFFCCCCCC),
-                      ),
-                      onTap: () {},
-                    ),
-                    IOSListTile(
-                      leading: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          // ignore: deprecated_member_use
                           color: Colors.blue.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -199,7 +180,7 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                         ),
                       ),
                       title: 'Ngôn ngữ',
-                      subtitle: 'English',
+                      subtitle: 'Tiếng Việt',
                       trailing: const Icon(
                         Icons.chevron_right_rounded,
                         color: Color(0xFFCCCCCC),

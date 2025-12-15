@@ -4,9 +4,9 @@
 
 @section('description', 'Thông tin hồ sơ cá nhân của bạn.')
 
-@section('content') 
+@section('content')
 
-<div class="w-full h-full flex flex-col overflow-hidden"> 
+<div class="w-full h-full flex flex-col overflow-hidden">
 
     {{-- Loading State (Flat Skeleton) --}}
     <div id="loadingState" class="flex-1 overflow-auto p-6 sm:p-8">
@@ -19,11 +19,13 @@
                     </div>
                 </div>
                 <div id="SPINNER_LOADING_ICON">
-                    <i class="fas fa-graduation-cap"></i>
+                    <svg class="w-6 h-6" viewBox="0 0 640 640" fill="currentColor">
+                        <path d="M80 259.8L289.2 345.9C299 349.9 309.4 352 320 352C330.6 352 341 349.9 350.8 345.9L593.2 246.1C602.2 242.4 608 233.7 608 224C608 214.3 602.2 205.6 593.2 201.9L350.8 102.1C341 98.1 330.6 96 320 96C309.4 96 299 98.1 289.2 102.1L46.8 201.9C37.8 205.6 32 214.3 32 224L32 520C32 533.3 42.7 544 56 544C69.3 544 80 533.3 80 520L80 259.8zM128 331.5L128 448C128 501 214 544 320 544C426 544 512 501 512 448L512 331.4L369.1 390.3C353.5 396.7 336.9 400 320 400C303.1 400 286.5 396.7 270.9 390.3L128 331.4z"/>
+                    </svg>
                 </div>
             </div>
         </div>
-    </div> 
+    </div>
 
     <div id="userInfoPanel" class="hidden w-ful h-full overflow-y-auto p-4 sm:p-6">
         <div class="w-[70%] max-w-[800px] p-6 mx-auto translate-y-[25%] flex flex-col items-stretch justify-start gap-6 bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
@@ -41,14 +43,16 @@
                 </div>
                 <a id="editButton" href="/admin/profile/edit"
                     class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5  font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
-                    <i class="fa-solid fa-pen"></i>
+                    <svg class="w-4 h-4" viewBox="0 0 512 512" fill="currentColor">
+        <path d="M352.9 21.2L308 66.1 445.9 204 490.8 159.1C504.4 145.6 512 127.2 512 108s-7.6-37.6-21.2-51.1L455.1 21.2C441.6 7.6 423.2 0 404 0s-37.6 7.6-51.1 21.2zM274.1 100L58.9 315.1c-10.7 10.7-18.5 24.1-22.6 38.7L.9 481.6c-2.3 8.3 0 17.3 6.2 23.4s15.1 8.5 23.4 6.2l127.8-35.5c14.6-4.1 27.9-11.8 38.7-22.6L412 237.9 274.1 100z"/>
+    </svg>
                     <span>Cập nhật</span>
                 </a>
             </div>
 
 
             {{-- Details Grid --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6"> 
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 @php
                     $infoField = function($label, $id) {
                         return <<<HTML
@@ -62,7 +66,7 @@
                     };
                 @endphp
 
-                
+
                 {!! $infoField('ID người dùng', 'userId') !!}
                 {!! $infoField('Email', 'userEmail') !!}
                 {!! $infoField('Họ và tên', 'userFullname') !!}
@@ -72,9 +76,9 @@
 
             </div>
         </div>
-    </div> 
+    </div>
 
-</div> 
+</div>
 
 <script>
     let userData = null;
@@ -92,11 +96,11 @@
             if (data?.success) {
                 return data.data;
             } else {
-                showNotificationModel_Global(data?.message || 'Không thể tải thông tin người dùng', 'error');
+                NotificationModal.show(data?.message || 'Không thể tải thông tin người dùng', 'error');
                 return null;
             }
         } catch (error) {
-            showNotificationModel_Global(error.message || 'Đã xảy ra lỗi khi tải thông tin', 'error');
+            NotificationModal.show(error.message || 'Đã xảy ra lỗi khi tải thông tin', 'error');
             return null;
         }
     }
@@ -143,13 +147,13 @@
 
         // Set avatar preview
         const avatarEl = document.getElementById('userAvatar');
-        avatarEl.src = userData.avatar_path || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(userData.fullname || 'User') + '&background=random';  
-    } 
+        avatarEl.src = userData.avatar_path || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(userData.fullname || 'User') + '&background=random';
+    }
 
     function renderCourses() {
         const courses = Array.isArray(userCourses) ? userCourses : [];
         const coursesList = document.getElementById('coursesList');
-        
+
         const lessonsTabCount = document.getElementById('lessonsTabCount');
         if (lessonsTabCount) {
             lessonsTabCount.textContent = courses.length;
@@ -187,7 +191,7 @@
         for (let i=0; i<el.length; i++) {
             if (el[i]) el[i].textContent = value != null && value !== '' ? value : '-';
         }
-    } 
+    }
 
 </script>
 @endsection

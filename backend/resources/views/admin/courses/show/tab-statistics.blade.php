@@ -13,8 +13,10 @@
                     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-900/40 backdrop-blur p-5 shadow-sm hover:shadow-md transition-shadow">
                         <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-2">
-                                <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/30">
-                                    <i class="fa-solid fa-book text-purple-600 dark:text-purple-400"></i>
+                                <span class="inline-flex p-3 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">
+                                    <svg class="w-4 h-4" viewBox="0 0 512 512" fill="currentColor">
+                                        <path d="M0 256a256 256 0 1 1 512 0 256 256 0 1 1 -512 0zM188.3 147.1c-7.6 4.2-12.3 12.3-12.3 20.9l0 176c0 8.7 4.7 16.7 12.3 20.9s16.8 4.1 24.3-.5l144-88c7.1-4.4 11.5-12.1 11.5-20.5s-4.4-16.1-11.5-20.5l-144-88c-7.4-4.5-16.7-4.7-24.3-.5z"/>
+                                    </svg>
                                 </span>
                                 <span class="text-sm font-semibold text-purple-700 dark:text-purple-300">Tổng bài học</span>
                             </div>
@@ -26,8 +28,10 @@
                     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-900/40 backdrop-blur p-5 shadow-sm hover:shadow-md transition-shadow">
                         <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-2">
-                                <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
-                                    <i class="fa-solid fa-users text-blue-600 dark:text-blue-400"></i>
+                                <span class="inline-flex p-3 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+                                    <svg class="w-4 h-4" viewBox="0 0 640 640" fill="currentColor">
+                                        <path d="M320 80C377.4 80 424 126.6 424 184C424 241.4 377.4 288 320 288C262.6 288 216 241.4 216 184C216 126.6 262.6 80 320 80zM96 152C135.8 152 168 184.2 168 224C168 263.8 135.8 296 96 296C56.2 296 24 263.8 24 224C24 184.2 56.2 152 96 152zM0 480C0 409.3 57.3 352 128 352C140.8 352 153.2 353.9 164.9 357.4C132 394.2 112 442.8 112 496L112 512C112 523.4 114.4 534.2 118.7 544L32 544C14.3 544 0 529.7 0 512L0 480zM521.3 544C525.6 534.2 528 523.4 528 512L528 496C528 442.8 508 394.2 475.1 357.4C486.8 353.9 499.2 352 512 352C582.7 352 640 409.3 640 480L640 512C640 529.7 625.7 544 608 544L521.3 544zM472 224C472 184.2 504.2 152 544 152C583.8 152 616 184.2 616 224C616 263.8 583.8 296 544 296C504.2 296 472 263.8 472 224zM160 496C160 407.6 231.6 336 320 336C408.4 336 480 407.6 480 496L480 512C480 529.7 465.7 544 448 544L192 544C174.3 544 160 529.7 160 512L160 496z"/>
+                                    </svg>
                                 </span>
                                 <span class="text-sm font-semibold text-blue-700 dark:text-blue-300">Tổng học viên</span>
                             </div>
@@ -38,8 +42,10 @@
                     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-900/40 backdrop-blur p-5 shadow-sm hover:shadow-md transition-shadow">
                         <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-2">
-                                <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/30">
-                                    <i class="fa-solid fa-check-circle text-green-600 dark:text-green-400"></i>
+                                <span class="inline-flex p-3 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400">
+                                    <svg class="w-4 h-4" viewBox="0 0 512 512" fill="currentColor">
+                                        <path d="M256 512a256 256 0 1 1 0-512 256 256 0 1 1 0 512zM374 145.7c-10.7-7.8-25.7-5.4-33.5 5.3L221.1 315.2 169 263.1c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l72 72c5 5 11.8 7.5 18.8 7s13.4-4.1 17.5-9.8L379.3 179.2c7.8-10.7 5.4-25.7-5.3-33.5z"/>
+                                    </svg>
                                 </span>
                                 <span class="text-sm font-semibold text-green-700 dark:text-green-300">Sinh viên đạt</span>
                             </div>
@@ -51,8 +57,10 @@
                     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-900/40 backdrop-blur p-5 shadow-sm hover:shadow-md transition-shadow">
                         <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-2">
-                                <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/30">
-                                    <i class="fa-solid fa-chart-line text-amber-600 dark:text-amber-400"></i>
+                                <span class="inline-flex p-3 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
+                                    <svg class="w-4 h-4" viewBox="0 0 512 512" fill="currentColor">
+                                        <path d="M64 64c0-17.7-14.3-32-32-32S0 46.3 0 64L0 400c0 44.2 35.8 80 80 80l400 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 416c-8.8 0-16-7.2-16-16L64 64zm406.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L320 210.7 262.6 153.4c-12.5-12.5-32.8-12.5-45.3 0l-96 96c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l73.4-73.4 57.4 57.4c12.5 12.5 32.8 12.5 45.3 0l128-128z"/>
+                                    </svg>
                                 </span>
                                 <span class="text-sm font-semibold text-amber-700 dark:text-amber-300">Tiến độ SV hoàn thành khóa học</span>
                             </div>
@@ -63,8 +71,10 @@
                     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-900/40 backdrop-blur p-5 shadow-sm hover:shadow-md transition-shadow">
                         <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-2">
-                                <span id="statCourseTimeIcon" class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/30">
-                                    <i class="fa-solid fa-calendar-days text-amber-600 dark:text-amber-400"></i>
+                                <span id="statCourseTimeIcon" class="inline-flex p-3 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
+                                    <svg class="w-4 h-4" viewBox="0 0 448 512" fill="currentColor">
+                                        <path d="M128 0C110.3 0 96 14.3 96 32l0 32-32 0C28.7 64 0 92.7 0 128l0 48 448 0 0-48c0-35.3-28.7-64-64-64l-32 0 0-32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 32-128 0 0-32c0-17.7-14.3-32-32-32zM0 224L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-192-448 0z"/>
+                                    </svg>
                                 </span>
                                 <span id="statCourseTimeLabel" class="text-sm font-semibold text-amber-700 dark:text-amber-300">Thời gian khóa học</span>
                             </div>
@@ -99,7 +109,6 @@
                     <div class="xl:col-span-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-sm">
                         <div class="flex items-center justify-between mb-4">
                             <h4 class="text-base font-semibold text-gray-900 dark:text-gray-100">
-                                <i class="fa-solid fa-clock text-cyan-500 mr-2"></i>
                                 Phân bổ thời lượng bài học
                             </h4>
                             <span class="text-xs text-gray-500 dark:text-gray-400">Phút</span>
@@ -111,7 +120,6 @@
                     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-sm">
                         <div class="flex items-center justify-between mb-4">
                             <h4 class="text-base font-semibold text-gray-900 dark:text-gray-100">
-                                <i class="fa-solid fa-chart-column text-blue-500 mr-2"></i>
                                 Bài học theo sinh viên tham gia
                             </h4>
                             <span class="text-xs text-gray-500 dark:text-gray-400">Số SV đã xem</span>
@@ -123,7 +131,6 @@
                     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-sm">
                         <div class="flex items-center justify-between mb-4">
                             <h4 class="text-base font-semibold text-gray-900 dark:text-gray-100">
-                                <i class="fa-solid fa-chart-column text-green-500 mr-2"></i>
                                 Bài học theo sinh viên hoàn thành
                             </h4>
                             <span class="text-xs text-gray-500 dark:text-gray-400">Số SV hoàn thành</span>
@@ -146,7 +153,6 @@
                     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-sm">
                         <div class="flex items-center justify-between mb-4">
                             <h4 class="text-base font-semibold text-gray-900 dark:text-gray-100">
-                                <i class="fa-solid fa-chart-pie text-purple-500 mr-2"></i>
                                 Phân bổ tiến độ học viên
                             </h4>
                             <span class="text-xs text-gray-500 dark:text-gray-400">Theo %</span>
@@ -158,7 +164,6 @@
                     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-sm">
                         <div class="flex items-center justify-between mb-4">
                             <h4 class="text-base font-semibold text-gray-900 dark:text-gray-100">
-                                <i class="fa-solid fa-ranking-star text-amber-500 mr-2"></i>
                                 Top học viên xuất sắc
                             </h4>
                             <span class="text-xs text-gray-500 dark:text-gray-400">Top 10</span>
@@ -197,7 +202,7 @@
         const endDate = courseData_MainShow.end_date ? new Date(courseData_MainShow.end_date) : null;
         const now = new Date();
 
-        const iconEl = document.querySelector('#statCourseTimeIcon i');
+        const iconEl = document.getElementById('statCourseTimeIcon');
         const labelEl = document.getElementById('statCourseTimeLabel');
         const valueEl = document.getElementById('statCourseTimeValue');
         const statusBadgeEl = document.getElementById('statCourseStatusBadge');
@@ -230,7 +235,7 @@
         const totalDays = Math.ceil(totalDuration / (1000 * 60 * 60 * 24));
 
         // Xác định trạng thái và tính toán
-        let status, statusText, statusClass, timeValue, iconClass, labelText, progressPercent;
+        let status, statusText, statusClass, timeValue, labelText, progressPercent;
 
         if (now < startDate) {
             // Sắp diễn ra
@@ -262,7 +267,6 @@
             }
 
             labelText = 'Bắt đầu sau';
-            iconClass = 'fa-solid fa-hourglass-start';
             progressPercent = 0;
 
         } else if (now >= startDate && now <= endDate) {
@@ -295,7 +299,6 @@
             }
 
             labelText = 'Còn lại';
-            iconClass = 'fa-solid fa-clock';
 
             // Tính % tiến độ thời gian
             const elapsed = now - startDate;
@@ -323,12 +326,11 @@
             }
 
             labelText = 'Đã kết thúc';
-            iconClass = 'fa-solid fa-calendar-check';
             progressPercent = 100;
         }
 
         // Update UI
-        iconEl.className = `${iconClass} text-amber-600 dark:text-amber-400`;
+        iconEl.className = `text-amber-600 dark:text-amber-400`;
         labelEl.textContent = labelText;
         valueEl.textContent = timeValue;
         statusBadgeEl.textContent = statusText;

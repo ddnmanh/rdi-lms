@@ -5,7 +5,7 @@
 @section('description', 'Chỉnh sửa thông tin hồ sơ cá nhân của bạn.')
 
 @section('content')
-<div class="w-full max-w-[900px] my-10 mx-auto p-4 md:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg text-[12px] 3xl:text-[14px]"> 
+<div class="w-full max-w-[900px] my-10 mx-auto p-4 md:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg text-[12px] 3xl:text-[14px]">
     <form class="space-y-6" onsubmit="handleUpdateUser(event)">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="md:col-span-2">
@@ -55,7 +55,11 @@
             </div>
             <div>
                 <label class="block ml-4  font-semibold text-blue-700 dark:text-gray-300 mb-2">Ngày sinh</label>
-                <input name="birthday" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none" placeholder="Nhập ngày sinh" type="date" >
+                {{-- <input name="birthday" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none" placeholder="Nhập ngày sinh" type="date" > --}}
+                @include('components.date-picker', [
+                    'id' => 'birthday',
+                    'placeholder' => 'Chọn ngày sinh...'
+                ])
             </div>
         </div>
         <div class="flex items-center justify-end gap-3">
@@ -65,7 +69,7 @@
     </form>
 </div>
 
-<script> 
+<script>
 
     let userData = null;
     let existingUserAvatar = null;
@@ -74,12 +78,16 @@
 
     document.addEventListener('DOMContentLoaded', async function() {
         userData = await loadUserData();
+
+        DatePicker.init('birthday', {
+            minDate: DatePicker.addYears(DatePicker.today(), -120), // Không cho chọn trước năm 120 tuổi
+            maxDate: DatePicker.addYears(DatePicker.today(), -18), // Không cho chọn ngày dưới 18 tuổi
+        });
+
         if (userData) {
             existingUserAvatar = userData.avatar_path || null;
         }
 
-        console.log(userData);
-        
         renderUserData();
         initAvatarPreviewForm();
     });
@@ -98,9 +106,9 @@
             if (!data.success) {
                 throw new Error('Network response was not ok');
             }
-            
+
             return data.data;
-            
+
         } catch (error) {
             console.error('Error fetching user data:', error);
             return null;
@@ -121,9 +129,10 @@
 
         document.querySelector('input[name="email"]').value = userData.email || '';
         document.querySelector('input[name="fullname"]').value = userData.fullname || '';
-        let birthday = formatDateTimeLocal(userData.birthday);
-        birthday = birthday ? birthday.split('T')[0] : '';
-        document.querySelector('input[name="birthday"]').value = birthday;
+        // let birthday = formatDateTimeLocal(userData.birthday);
+        // birthday = birthday ? birthday.split('T')[0] : '';
+        // document.querySelector('input[name="birthday"]').value = birthday;
+        DatePicker.setValue('birthday', userData.birthday);
 
     }
 
@@ -132,7 +141,7 @@
         const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
         console.log('Handle thumbnail file:', file);
-        
+
 
         if (avatarPreview) {
             try {
@@ -163,12 +172,12 @@
         }
 
         if (!ALLOWED_TYPES.includes(file.type)) {
-            showNotificationModel_Global('Định dạng không hỗ trợ. Hãy chọn ảnh PNG, JPG, WEBP hoặc GIF.', 'error');
+            NotificationModal.show('Định dạng không hỗ trợ. Hãy chọn ảnh PNG, JPG, WEBP hoặc GIF.', 'error');
             return;
         }
 
         if (file.size > MAX_SIZE) {
-            showNotificationModel_Global('Ảnh quá lớn. Kích thước tối đa 2MB.', 'error');
+            NotificationModal.show('Ảnh quá lớn. Kích thước tối đa 2MB.', 'error');
             return;
         }
 
@@ -260,7 +269,7 @@
             const fileInput = document.getElementById('avatar');
             const avatarFile = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
 
-            if (avatarFile) { 
+            if (avatarFile) {
                 formData.append('avatar', avatarFile);
             }
             const response = await fetch('/api/auth/update-profile', {
@@ -269,9 +278,9 @@
             });
             const data = await response.json();
             if (data.success) {
-                showNotificationModel_Global('Cập nhật hồ sơ thành công!', 'success', handleBackPrevPage); 
+                NotificationModal.show('Cập nhật hồ sơ thành công!', 'success', handleBackPrevPage);
             } else {
-                showNotificationModel_Global('Cập nhật hồ sơ thất bại. Vui lòng thử lại.', 'error');
+                NotificationModal.show('Cập nhật hồ sơ thất bại. Vui lòng thử lại.', 'error');
             }
         } catch (error) {
             console.error('Error updating user profile:', error);
@@ -281,7 +290,7 @@
     function handleBackPrevPage() {
         window.location.href = '/admin/profile';
     }
-    
+
 </script>
 @endsection
 

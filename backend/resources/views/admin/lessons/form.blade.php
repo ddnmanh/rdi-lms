@@ -7,6 +7,31 @@
 @section('content')
 <div class="w-full max-w-[1600px] mx-auto flex flex-col items-stretch justify-start gap-4 3xl:gap-6">
 
+    {{-- Header Bar --}}
+    <div class="p-3 3xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-row justify-between gap-4">
+
+        <div class="flex items-center justify-start gap-3">
+            <button onclick="handleCancelUpdateLesson()"
+                type="button"
+                class="group px-2.5 py-2.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 rounded-xl transition-all duration-300 font-medium flex items-center justify-center gap-2 cursor-pointer text-[18px]">
+                <svg class="h-6" viewBox="0 0 320 512" fill="currentColor">
+                    <path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"/>
+                </svg>
+            </button>
+            <div class="flex flex-col gap-0 min-w-0 flex-1">
+                <h2
+                    class="font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent truncate">
+                    @yield('title', 'Admin Panel')
+                </h2>
+                @hasSection('description')
+                    <p class="text-xs 3xl:text-sm text-gray-600 dark:text-gray-400 truncate">
+                        @yield('description')
+                    </p>
+                @endif
+            </div>
+        </div>
+    </div>
+
     {{-- Form Card --}}
     <form id="lessonForm" onsubmit="saveLesson(event)" class="w-full bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <input type="hidden" id="lessonId" value="{{ $mode === 'EDIT' ? ($lessonId ?? '') : '' }}">
@@ -22,7 +47,11 @@
                 >
                     <div class="h-full aspect-video rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
                         <img id="thumbnailPreview" alt="thumbnail preview" class="h-full w-full object-cover hidden">
-                        <i id="thumbnailIconPlaceholder" class="fa-solid fa-image text-[20px] text-gray-400"></i>
+                        <span id="thumbnailIconPlaceholder" class="text-gray-400">
+                            <svg class="w-6" viewBox="0 0 448 512" fill="currentColor">
+                                <path d="M64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32zm64 80a48 48 0 1 1 0 96 48 48 0 1 1 0-96zM272 224c8.4 0 16.1 4.4 20.5 11.5l88 144c4.5 7.4 4.7 16.7 .5 24.3S368.7 416 360 416L88 416c-8.9 0-17.2-5-21.3-12.9s-3.5-17.5 1.6-24.8l56-80c4.5-6.4 11.8-10.2 19.7-10.2s15.2 3.8 19.7 10.2l26.4 37.8 61.4-100.5c4.4-7.1 12.1-11.5 20.5-11.5z"/>
+                            </svg>
+                        </span>
                     </div>
 
                     <div class="flex-1">
@@ -68,7 +97,11 @@
                                 <div class="relative h-full aspect-video bg-gray-100 dark:bg-gray-900 rounded-lg overflow-hidden flex items-center justify-center">
                                     <video id="videoFilePreview" controls class="hidden w-full h-full object-cover bg-black"></video>
                                     <iframe id="videoUrlPreview" class="hidden w-full h-full" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
-                                    <i id="videoIconPlaceholder" class="fa-solid fa-video text-[20px] text-gray-400 dark:text-gray-400"></i>
+                                    <span id="videoIconPlaceholder" class="text-gray-400 dark:text-gray-400">
+                                        <svg class="w-6" viewBox="0 0 576 512" fill="currentColor">
+                                            <path d="M96 64c-35.3 0-64 28.7-64 64l0 256c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-256c0-35.3-28.7-64-64-64L96 64zM464 336l73.5 58.8c4.2 3.4 9.4 5.2 14.8 5.2 13.1 0 23.7-10.6 23.7-23.7l0-240.6c0-13.1-10.6-23.7-23.7-23.7-5.4 0-10.6 1.8-14.8 5.2L464 176 464 336z"/>
+                                        </svg>
+                                    </span>
                                 </div>
                             </div>
 
@@ -81,6 +114,7 @@
                                     <button
                                         id="btnClearNewVideo"
                                         type="button"
+                                        onclick="handleClearVideoFile()"
                                         class="hidden px-3 py-2 rounded-md border border-red-300 text-red-600 hover:bg-red-50 dark:border-red-600 dark:hover:bg-gray-700  transition"
                                     >
                                         <span id="btnClearVideoText">Xóa video</span>
@@ -127,7 +161,7 @@
 
                     </div>
 
-                </div> 
+                </div>
 
             </div>
 
@@ -149,13 +183,19 @@
         </div>
 
         <div class="flex items-center justify-end gap-3 pt-6">
-            <button type="button"
+            <button
                 id="lessonFormCancelButton"
-                class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">
+                type="button"
+                onclick="handleCancelUpdateLesson()"
+                class="px-4 py-2.5 font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300">
                 <span>Hủy</span>
             </button>
             <button type="submit" id="lessonFormSubmitButton" class="min-w-[100px] px-4 py-2 flex flex-row items-center justify-center gap-2 rounded-md border border-blue-600 hover:border-blue-500 bg-blue-600 hover:bg-blue-500 text-white transition-all duration-300">
-                <i class="fa-solid fa-floppy-disk" id="lessonFormSubmitButton_saveIcon"></i>
+                {{-- <span id="lessonFormSubmitButton_saveIcon">
+                    <svg class="w-4 h-4" viewBox="0 0 448 512" fill="currentColor">
+                        <path d="M64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-242.7c0-17-6.7-33.3-18.7-45.3L352 50.7C340 38.7 323.7 32 306.7 32L64 32zm32 96c0-17.7 14.3-32 32-32l160 0c17.7 0 32 14.3 32 32l0 64c0 17.7-14.3 32-32 32l-160 0c-17.7 0-32-14.3-32-32l0-64zM224 288a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"/>
+                    </svg>
+                </span> --}}
                 <span class="LOADING_IN_BTN hidden" id="lessonFormSubmitButton_loadingIcon"></span>
                 <span id="lessonFormSubmitButton_text">Cập nhật</span>
             </button>
@@ -246,7 +286,7 @@
         // Cập nhật số ký tự mô tả
         const descriptionInput = document.getElementById('description');
         const descCountWord = document.getElementById('description_COUNT_WORDS');
-        
+
         const updateDescriptionCount = () => {
             if (descCountWord) {
                 descCountWord.textContent = `(${descriptionInput.value.length}/255)`;
@@ -278,7 +318,7 @@
             }
         } catch (error) {
             console.log(error);
-            showNotificationModel_Global('Không thể tải thông tin bài học: ' + error.message, 'error', handleBackToPrevPage);
+            NotificationModal.show('Không thể tải thông tin bài học: ' + error.message, 'error', handleGotoBackPage_Global);
         }
     }
 
@@ -415,12 +455,12 @@
         }
 
         if (!ALLOWED_TYPES.includes(file.type)) {
-            showNotificationModel_Global('Định dạng không hỗ trợ. Hãy chọn ảnh PNG, JPG, WEBP hoặc GIF.', 'error');
+            NotificationModal.show('Định dạng không hỗ trợ. Hãy chọn ảnh PNG, JPG, WEBP hoặc GIF.', 'error');
             return;
         }
 
         if (file.size > MAX_SIZE) {
-            showNotificationModel_Global('Ảnh quá lớn. Kích thước tối đa 10MB.', 'error');
+            NotificationModal.show('Ảnh quá lớn. Kích thước tối đa 10MB.', 'error');
             return;
         }
 
@@ -466,14 +506,14 @@
 
         // Kiểm tra định dạng file
         if (!ALLOWED_TYPES.includes(file.type)) {
-            showNotificationModel_Global('Định dạng không hỗ trợ. Chỉ chấp nhận file MP4 hoặc MOV.', 'error');
+            NotificationModal.show('Định dạng không hỗ trợ. Chỉ chấp nhận file MP4 hoặc MOV.', 'error');
             const input = document.getElementById('video_file');
             if (input) input.value = '';
             return;
         }
 
         if (file.size > MAX_BACKGROUND_VIDEO_SIZE) {
-            showNotificationModel_Global('Video quá lớn, Tối đa 10GB.', 'error');
+            NotificationModal.show('Video quá lớn, Tối đa 10GB.', 'error');
             const input = document.getElementById('video_file');
             if (input) input.value = '';
             return;
@@ -483,7 +523,7 @@
         const codecValidation = await validateVideoCodecs(file);
         codecValidation.valid = true; // Tạm thời bỏ qua kiểm tra codec do độ tin cậy không cao
         if (!codecValidation.valid) {
-            showNotificationModel_Global(codecValidation.message, 'error');
+            NotificationModal.show(codecValidation.message, 'error');
             const input = document.getElementById('video_file');
             if (input) input.value = '';
             return;
@@ -509,7 +549,7 @@
             const video = document.createElement('video');
             video.preload = 'metadata';
             video.muted = true; // Mute để tránh lỗi autoplay
-            
+
             const objectUrl = URL.createObjectURL(file);
             video.src = objectUrl;
 
@@ -539,7 +579,7 @@
                 try {
                     // Kiểm tra video có audio và video track không
                     const hasVideoTrack = video.videoWidth > 0 && video.videoHeight > 0;
-                    
+
                     if (!hasVideoTrack) {
                         cleanup();
                         resolve({
@@ -568,23 +608,23 @@
                         'video/webm; codecs="av01"',
                         'video/webm; codecs="av01.0.05M.08"'
                     ];
-                    
-                    const hasAV1Support = testAV1Codecs.some(codec => 
+
+                    const hasAV1Support = testAV1Codecs.some(codec =>
                         video.canPlayType(codec) === 'probably' || video.canPlayType(codec) === 'maybe'
                     );
 
                     // VP9 codec detection
-                    const hasVP9Support = video.canPlayType('video/webm; codecs="vp9"') === 'probably' || 
+                    const hasVP9Support = video.canPlayType('video/webm; codecs="vp9"') === 'probably' ||
                                          video.canPlayType('video/webm; codecs="vp9"') === 'maybe';
 
                     // VP8 codec detection
-                    const hasVP8Support = video.canPlayType('video/webm; codecs="vp8"') === 'probably' || 
+                    const hasVP8Support = video.canPlayType('video/webm; codecs="vp8"') === 'probably' ||
                                          video.canPlayType('video/webm; codecs="vp8"') === 'maybe';
 
                     // HEVC/H.265 codec detection
-                    const hasHEVCSupport = video.canPlayType('video/mp4; codecs="hvc1"') === 'probably' || 
+                    const hasHEVCSupport = video.canPlayType('video/mp4; codecs="hvc1"') === 'probably' ||
                                           video.canPlayType('video/mp4; codecs="hvc1"') === 'maybe' ||
-                                          video.canPlayType('video/mp4; codecs="hev1"') === 'probably' || 
+                                          video.canPlayType('video/mp4; codecs="hev1"') === 'probably' ||
                                           video.canPlayType('video/mp4; codecs="hev1"') === 'maybe';
 
                     // H.264/AVC codec detection
@@ -595,7 +635,7 @@
                         'video/mp4; codecs="avc1.640028"'   // H.264 High Profile
                     ];
 
-                    const hasH264Support = testH264Codecs.some(codec => 
+                    const hasH264Support = testH264Codecs.some(codec =>
                         video.canPlayType(codec) === 'probably' || video.canPlayType(codec) === 'maybe'
                     );
 
@@ -609,7 +649,7 @@
                     try {
                         // Seek đến 1 giây để tránh frame đầu đen
                         video.currentTime = Math.min(1, video.duration / 2);
-                        
+
                         await new Promise((resolveSeek, rejectSeek) => {
                             const seekTimeout = setTimeout(() => {
                                 rejectSeek(new Error('Seek timeout'));
@@ -635,13 +675,13 @@
 
                         // Thử vẽ frame lên canvas
                         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                        
+
                         // Kiểm tra xem canvas có dữ liệu không (không phải toàn màu đen hoặc trong suốt)
                         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                         const data = imageData.data;
                         let totalBrightness = 0;
                         let nonZeroPixels = 0;
-                        
+
                         // Kiểm tra nhiều pixel hơn để chính xác hơn
                         for (let i = 0; i < data.length; i += 400) {
                             const brightness = data[i] + data[i+1] + data[i+2];
@@ -920,7 +960,7 @@
             backgroundUploadState.status = backgroundUploadState.cancelRequested ? 'cancelled' : 'failed';
             changeVideoUploadUI();
             if (!backgroundUploadState.cancelRequested) {
-                showNotificationModel_Global(error.message || 'Upload video thất bại.', 'error');
+                NotificationModal.show(error.message || 'Upload video thất bại.', 'error');
             }
         }
     }
@@ -1108,14 +1148,14 @@
             backgroundUploadState.status = response?.data?.status || 'processing';
             backgroundUploadState.lastError = null;
             changeVideoUploadUI();
-            showNotificationModel_Global(response.message || 'Video đang được xử lý, bạn có thể tiếp tục làm việc.', 'success');
+            NotificationModal.show(response.message || 'Video đang được xử lý, bạn có thể tiếp tục làm việc.', 'success');
             startBackgroundStatusPolling();
         } catch (error) {
             console.error('Complete upload error:', error);
             backgroundUploadState.lastError = error.message;
             backgroundUploadState.status = 'failed';
             changeVideoUploadUI();
-            showNotificationModel_Global(error.message || 'Không thể gửi yêu cầu xử lý video.', 'error');
+            NotificationModal.show(error.message || 'Không thể gửi yêu cầu xử lý video.', 'error');
             throw error;
         }
     }
@@ -1133,9 +1173,9 @@
                 stopBackgroundStatusPolling();
                 // Thông báo kết quả
                 if (backgroundUploadState.status === 'completed') {
-                    showNotificationModel_Global('Video đã được xử lý và cập nhật.', 'success');
+                    NotificationModal.show('Video đã được xử lý và cập nhật.', 'success');
                 } else if (backgroundUploadState.lastError) {
-                    showNotificationModel_Global(backgroundUploadState.lastError, 'error');
+                    NotificationModal.show(backgroundUploadState.lastError, 'error');
                 }
             }
         }, 4000);
@@ -1175,7 +1215,7 @@
         if (!videoPreviewContainer || !videoFilePreview || !videoUrlPreview || !videoIconPlaceholder) return;
 
         let finalSrc = null;
-       
+
         if (source instanceof File) {
             finalSrc = URL.createObjectURL(source);
         } else if (source && typeof source === 'string' && mode === 'EDIT' && lessonId) {
@@ -1197,47 +1237,12 @@
         videoFilePreview.classList.remove('hidden');
         videoFilePreview.src = finalSrc;
         videoFilePreview.load();
-    } 
+    }
 
     function initVideoUploadForm() {
         const dropZone = document.getElementById('videoDropZone');
         const input = document.getElementById('video_file');
-        const clearBtn = document.getElementById('btnClearNewVideo');
         const backgroundRetryBtn = document.getElementById('btnRetryBackgroundUpload');
-        const lessonFormCancelButton = document.getElementById('lessonFormCancelButton');
-
-        // Cancel button handler
-        if (lessonFormCancelButton) {
-            lessonFormCancelButton.addEventListener('click', async () => {
-
-                openSingleDeleteModalGeneric_Global({
-                    objectName: lessonData != null ? OBJECTNAMEMODAL.LESSON : OBJECTNAMEMODAL.VIDEO,
-                    title: `Hủy ${mode === 'CREATE' ? 'tạo mới' : 'chỉnh sửa'} bài học`,
-                    message: `Việc ${mode === 'CREATE' ? 'tạo mới' : 'chỉnh sửa'} bài học sẽ bị hủy, video bạn chọn sẽ bị hủy. Bạn có chắc chắn?`,
-                    nameValue: lessonData?.title || '-',
-                    descValue: lessonData?.description || '-',
-                    confirmText: `Hủy ${mode === 'CREATE' ? 'tạo mới' : 'chỉnh sửa'} bài học`,
-                    cancelText: 'Đóng',
-                    actionFuncCallback: async () => {
-                        try {
-                            let isSuccess = true;
-                            // Hủy upload nền nếu đang chạy
-                            if (['creating_session', 'uploading', 'uploaded', 'completing'].includes(backgroundUploadState.status)) {
-                                isSuccess = await cancelBackgroundUpload(true);
-                            }
-                            // handleBackToPrevPage();
-                            return isSuccess;
-                        } catch (error) {
-                            console.error('Error canceling upload:', error);
-                            return false; // Trả về false nếu có lỗi
-                        }
-                    },
-                    successFuncCallback: () => {
-                        handleBackToPrevPage();
-                    }
-                })
-            });
-        } 
 
         // Không set required cho video input vì nó bị ẩn và sẽ gây lỗi validation
         // Sẽ validate bằng JavaScript trong hàm saveLesson
@@ -1297,40 +1302,66 @@
             });
         }
 
-        // Clear button handler - xử lý cả xóa video và hủy upload
-        if (clearBtn) {
-            clearBtn.addEventListener('click', async () => {
-                // Nếu đang upload, hủy upload
-                if (['creating_session', 'uploading'].includes(backgroundUploadState.status)) {
-
-                    openSingleDeleteModalGeneric_Global({
-                        objectName: OBJECTNAMEMODAL.VIDEO,
-                        title: 'Hủy upload video',
-                        message: 'Video đang được upload. Bạn có chắc muốn hủy upload và xóa video đã chọn không?',
-                        nameValue: backgroundUploadState.fileName || 'Video hiện tại',
-                        descValue: formatBytes(backgroundUploadState.fileSize || 0) + ' - ' + backgroundUploadState.mimeType,
-                        confirmText: 'Hủy upload',
-                        cancelText: 'Đóng',
-                        actionFuncCallback: async () => {
-                            try {
-                                await cancelBackgroundUpload();
-                                // Xóa video đã chọn sau khi hủy upload
-                                handleChangeVideoFile(null);
-                                return true; // Trả về true để báo thành công
-                            } catch (error) {
-                                console.error('Error canceling upload:', error);
-                                return false; // Trả về false nếu có lỗi
-                            }
-                        }
-                    })
-                } else {
-                    // Xóa video đã chọn
-                    handleChangeVideoFile(null);
-                }
-            });
-        }
-
         changeVideoUploadUI();
+    }
+
+    function handleClearVideoFile() {
+        // Nếu đang upload, hủy upload
+        if (['creating_session', 'uploading'].includes(backgroundUploadState.status)) {
+
+        DeleteModal.openSingle({
+            objectName: OBJECTNAMEMODAL.VIDEO,
+            title: 'Hủy upload video',
+            message: 'Video đang được upload. Bạn có chắc muốn hủy upload và xóa video đã chọn không?',
+            nameValue: backgroundUploadState.fileName || 'Video hiện tại',
+            descValue: formatBytes(backgroundUploadState.fileSize || 0) + ' - ' + backgroundUploadState.mimeType,
+            confirmText: 'Hủy upload',
+            cancelText: 'Đóng',
+            actionFuncCallback: async () => {
+                try {
+                    await cancelBackgroundUpload();
+                    // Xóa video đã chọn sau khi hủy upload
+                    handleChangeVideoFile(null);
+                    return true; // Trả về true để báo thành công
+                } catch (error) {
+                    console.error('Error canceling upload:', error);
+                    return false; // Trả về false nếu có lỗi
+                }
+            }
+        })
+        } else {
+        // Xóa video đã chọn
+        handleChangeVideoFile(null);
+        }
+    }
+
+    function handleCancelUpdateLesson() {
+        DeleteModal.openSingle({
+            objectName: lessonData != null ? OBJECTNAMEMODAL.LESSON : OBJECTNAMEMODAL.VIDEO,
+            title: `Hủy ${mode === 'CREATE' ? 'tạo mới' : 'chỉnh sửa'} bài học`,
+            message: `Việc ${mode === 'CREATE' ? 'tạo mới' : 'chỉnh sửa'} bài học sẽ bị hủy, video bạn chọn sẽ bị hủy. Bạn có chắc chắn?`,
+            nameValue: lessonData?.title || '-',
+            descValue: lessonData?.description || '-',
+            confirmText: `Hủy ${mode === 'CREATE' ? 'tạo mới' : 'chỉnh sửa'} bài học`,
+            cancelText: 'Đóng',
+            actionFuncCallback: async () => {
+                try {
+                    let isSuccess = true;
+                    // Hủy upload nền nếu đang chạy
+                    if (['creating_session', 'uploading', 'uploaded', 'completing'].includes(backgroundUploadState.status)) {
+                        isSuccess = await cancelBackgroundUpload(true);
+                    }
+                    // handleGotoBackPage_Global();
+                    return isSuccess;
+                } catch (error) {
+                    console.error('Error canceling upload:', error);
+                    return false; // Trả về false nếu có lỗi
+                }
+            },
+            successFuncCallback: () => {
+                handleGotoBackPage_Global();
+            }
+        })
     }
 
     // ========================================
@@ -1355,22 +1386,22 @@
 
         // Validation: Tiêu đề bắt buộc
         if (!title) {
-            showNotificationModel_Global('Vui lòng nhập tiêu đề bài học', 'error');
+            NotificationModal.show('Vui lòng nhập tiêu đề bài học', 'error');
             return;
         }
 
         // Validation: Video bắt buộc khi CREATE
         if (mode === 'CREATE' && !backgroundUploadState.file && !selectedVideoFile) {
-            showNotificationModel_Global('Vui lòng chọn video cho bài học', 'error');
+            NotificationModal.show('Vui lòng chọn video cho bài học', 'error');
             return;
         }
 
         if (backgroundUploadState.file != null && !backgroundUploadState.uploadId) {
-            showNotificationModel_Global('Vui lòng chọn video và upload nền hoàn tất trước khi lưu.', 'warning');
+            NotificationModal.show('Vui lòng chọn video và upload nền hoàn tất trước khi lưu.', 'warning');
             return;
         }
         if (backgroundUploadState.file != null && !['uploaded', 'processing', 'completed'].includes(backgroundUploadState.status)) {
-            showNotificationModel_Global('Video vẫn đang upload. Vui lòng chờ hoàn tất để lưu.', 'warning');
+            NotificationModal.show('Video vẫn đang upload. Vui lòng chờ hoàn tất để lưu.', 'warning');
             return;
         }
 
@@ -1404,14 +1435,14 @@
                 }
             });
             const data = await response.json();
-            
+
             if (!response.ok) {
                 if (response.status === 422) {
                     let errorsField = data.errors || null;
                     renderInputErrors_Global(errorsField);
                 } else {
                     throw new Error(data.message || 'Có lỗi xảy ra');
-                } 
+                }
             }
 
             if (data.success) {
@@ -1433,32 +1464,32 @@
                 }
 
                 handleChangeStateButtonSubmitting(false);
-                showNotificationModel_Global(data.message || 'Lưu thành công', 'success', handleBackToPrevPage);
+                NotificationModal.show(data.message || 'Lưu thành công', 'success', handleGotoBackPage_Global);
             }
         } catch (error) {
             handleChangeStateButtonSubmitting(false);
-            showNotificationModel_Global(error.message, 'error', handleBackToPrevPage);
+            NotificationModal.show(error.message, 'error', handleGotoBackPage_Global);
         }
     }
 
     function handleChangeStateButtonSubmitting(isSubmitting) {
         const submitButton = document.getElementById('lessonFormSubmitButton');
-        const cancelButton = document.getElementById('lessonFormCancelButton');
-        const saveIcon = document.getElementById('lessonFormSubmitButton_saveIcon');
+        // const saveIcon = document.getElementById('lessonFormSubmitButton_saveIcon');
         const loadingIcon = document.getElementById('lessonFormSubmitButton_loadingIcon');
         const submitButtonText = document.getElementById('lessonFormSubmitButton_text');
+        const lessonFormCancelButton = document.getElementById('lessonFormCancelButton');
         if (isSubmitting == true) {
-            cancelButton.disabled = true;
+            lessonFormCancelButton.disabled = true;
             submitButton.disabled = true;
             submitButton.classList.add('cursor-not-allowed', 'opacity-50');
             submitButtonText.textContent = mode === 'CREATE' ? 'Đang tạo...' : 'Đang cập nhật...';
-            saveIcon.classList.add('hidden');
+            // saveIcon.classList.add('hidden');
             loadingIcon.classList.remove('hidden');
         }
         if (isSubmitting == false) {
-            cancelButton.disabled = false;
+            lessonFormCancelButton.disabled = false;
             submitButton.disabled = false;
-            saveIcon.classList.remove('hidden');
+            // saveIcon.classList.remove('hidden');
             loadingIcon.classList.add('hidden');
             initUI();
         }
@@ -1467,13 +1498,6 @@
     // ========================================
     // ĐIỀU HƯỚNG VÀ EVENT HANDLERS
     // ========================================
-
-    /**
-     * Quay lại trang danh sách bài học
-     */
-    function handleBackToPrevPage() {
-        window.location.href = '/admin/lessons';
-    }
 
     /**
      * Cảnh báo người dùng khi thoát trang trong khi đang upload

@@ -4,7 +4,53 @@
 @section('description', 'Xem thông tin chi tiết của bài học')
 
 @section('content')
-<div class="w-full max-w-[1600px] mx-auto flex flex-col gap-4 3xl:gap-6"> 
+<div class="w-full max-w-[1600px] mx-auto flex flex-col gap-4 3xl:gap-6">
+
+    {{-- Header Bar --}}
+    <div class="p-3 3xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-row justify-between gap-4">
+
+        <div class="flex items-center justify-start gap-3">
+            <button onclick="handleGotoBackPage_Global()"
+                type="button"
+                class="group px-2.5 py-2.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 rounded-xl transition-all duration-300 font-medium flex items-center justify-center gap-2 cursor-pointer text-[18px]">
+                <svg class="h-6" viewBox="0 0 320 512" fill="currentColor">
+                    <path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"/>
+                </svg>
+            </button>
+            <div class="flex flex-col gap-0 min-w-0 flex-1">
+                <h2
+                    class="font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent truncate">
+                    @yield('title', 'Admin Panel')
+                </h2>
+                @hasSection('description')
+                    <p class="text-xs 3xl:text-sm text-gray-600 dark:text-gray-400 truncate">
+                        @yield('description')
+                    </p>
+                @endif
+            </div>
+        </div>
+
+        <div class="flex items-center justify-start gap-3">
+            <button
+                onclick="handleGotoOtherPageOfLesson('{{ $lessonId }}', 'EDIT')"
+                class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5  font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300 cursor-pointer">
+                <svg class="w-4 h-4" viewBox="0 0 512 512" fill="currentColor">
+                    <path d="M16 512A32 32 0 0 1 0 480V144A16 16 0 0 1 16 128h80a16 16 0 0 1 16 16v320A16 16 0 0 1 96 512zm352-48a48 48 0 0 1-48 48H80a48 48 0 0 1-48-48V112A48 48 0 0 1 80 64h352a48 48 0 0 1 48 48zM400 0H304a16 16 0 0 0-16 16v320a16 16 0 0 0 16 16h96a16 16 0 0 0 16-16V16a16 16 0 0 0-16-16z"/>
+                </svg>
+                <span>Chỉnh sửa</span>
+            </button>
+            <button
+                id="deleteLessonButton"
+                onclick="openSingleDeleteModal()"
+                disabled
+                class="group px-4 py-2.5 bg-red-600 text-white rounded-xl transition-all duration-300 font-medium flex items-center justify-center gap-2 hover:bg-red-700 opacity-20 cursor-not-allowed">
+                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor">
+                    <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/>
+                </svg>
+                <span>Xóa bài học này</span>
+            </button>
+        </div>
+    </div>
 
     {{-- Loading State (Flat Skeleton) --}}
     <div id="loadingState" class="flex-1 p-6 sm:p-8">
@@ -17,25 +63,16 @@
                     </div>
                 </div>
                 <div id="SPINNER_LOADING_ICON">
-                    <i class="fas fa-graduation-cap"></i>
+                    <svg class="w-6 h-6" viewBox="0 0 640 640" fill="currentColor">
+                        <path d="M80 259.8L289.2 345.9C299 349.9 309.4 352 320 352C330.6 352 341 349.9 350.8 345.9L593.2 246.1C602.2 242.4 608 233.7 608 224C608 214.3 602.2 205.6 593.2 201.9L350.8 102.1C341 98.1 330.6 96 320 96C309.4 96 299 98.1 289.2 102.1L46.8 201.9C37.8 205.6 32 214.3 32 224L32 520C32 533.3 42.7 544 56 544C69.3 544 80 533.3 80 520L80 259.8zM128 331.5L128 448C128 501 214 544 320 544C426 544 512 501 512 448L512 331.4L369.1 390.3C353.5 396.7 336.9 400 320 400C303.1 400 286.5 396.7 270.9 390.3L128 331.4z"/>
+                    </svg>
                 </div>
             </div>
         </div>
     </div>
 
     {{-- Lesson Detail Card (Flat) --}}
-    <div id="lessonDetailCard" class="hidden w-full max-w-[1400px] mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-
-        <div class="flex items-center justify-between mb-6">
-            <div></div>
-            <a id="editButton" href="#"
-                class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5  font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
-                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 3.487a2.25 2.25 0 113.182 3.182L7.5 19.313 3 21l1.687-4.5L16.862 3.487z"/>
-                </svg>
-                <span>Chỉnh sửa</span>
-            </a>
-        </div>
+    <div id="lessonDetailCard" class="hidden w-full mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
 
         <div class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -65,7 +102,11 @@
                                     Trình duyệt của bạn không hỗ trợ video.
                                 </video>
                                 <a id="videoLink" href="#" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline" style="display: none;">
-                                    <i class="fas fa-external-link-alt mr-2"></i>
+                                    <span class="mr-2">
+                                        <svg class="w-4" viewBox="0 0 512 512" fill="currentColor">
+                                            <path d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l82.7 0-201.4 201.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3 448 192c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160c0-17.7-14.3-32-32-32L320 0zM80 96C35.8 96 0 131.8 0 176L0 432c0 44.2 35.8 80 80 80l256 0c44.2 0 80-35.8 80-80l0-80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 80c0 8.8-7.2 16-16 16L80 448c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l80 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 96z"/>
+                                        </svg>
+                                    </span>
                                     <span id="videoLinkText">Mở video trong tab mới</span>
                                 </a>
                             </div>
@@ -96,7 +137,6 @@
                 {!! $infoField('Ngày cập nhật', 'lessonUpdatedAt') !!}
             </div>
 
-            {{-- Description --}}
             <div class="">
                 <label class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Mô tả</label>
                 <div class="px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
@@ -106,88 +146,76 @@
         </div>
     </div>
 
-    {{-- Error State --}}
-    <div id="errorState" class="hidden flex-1 items-center justify-center min-h-[520px] mt-[20dvh] mx-auto">
-        <div class="flex flex-col items-center text-center max-w-md px-6">
-            <div class="relative mb-6">
-                <div class="h-20 w-20 rounded-full bg-red-600 grid place-items-center">
-                    <svg class="h-10 w-10 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01"/>
-                    </svg>
-                </div>
-            </div>
-            <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">Xảy ra lỗi khi lấy thông tin</h3>
-            <p id="errorMessage" class="errorMessage  text-gray-600 dark:text-gray-400 mb-6">-</p>
-            <a href="{{ route('admin.lessons.list') }}"
-               class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5  font-semibold text-white hover:bg-blue-700">
-                <svg class="h-4 w-4 -ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                </svg>
-                <span>Quay lại danh sách</span>
-            </a>
-        </div>
-    </div>
 </div>
 
-{{-- Scripts --}}
 <script>
     const lessonId = {{ $lessonId }};
+    let lessonData = null;
+
+    const detailLessonRouteSystemName = '{{ route('admin.lessons.show', ['id' => ':id']) }}';
+    const editLessonRouteSystemName = '{{ route('admin.lessons.edit', ['id' => ':id']) }}';
+    const createLessonRouteSystemName = '{{ route('admin.lessons.create') }}';
 
     document.addEventListener('DOMContentLoaded', async () => {
-        await loadLessonData();
+        lessonData = await loadLessonData();
+        if (lessonData != null) {
+            displayLessonData();
+        } else {
+            NotificationModal.show('Không thể tải thông tin bài học', 'error', handleGotoBackPage_Global);
+        }
     });
 
     async function loadLessonData() {
         try {
             const data = await apiRequest(`/lessons/${lessonId}`);
             if (data?.success) {
-                displayLessonData(data.data);
+                return data.data;
             } else {
-                showError(data?.message || 'Không thể tải thông tin bài học');
+                return null;
             }
         } catch (error) {
-            showError(error.message || 'Đã xảy ra lỗi khi tải thông tin');
+            return null;
         }
     }
 
-    function toggleStates({ loading = false, detail = false, error = false }) {
+    function toggleStates({ loading = false, detail = false }) {
         document.getElementById('loadingState').classList.toggle('hidden', !loading);
         document.getElementById('lessonDetailCard').classList.toggle('hidden', !detail);
-        document.getElementById('errorState').classList.toggle('hidden', !error);
     }
 
-    async function displayLessonData(lesson) {
-        toggleStates({ loading: false, detail: true, error: false });
+    async function displayLessonData() {
+        toggleStates({ loading: false, detail: true });
 
-        document.getElementById('editButton').href = `/admin/lessons/${lesson.id}/edit`;
+        document.getElementById('deleteLessonButton').disabled = lessonData.course_id !== null;
+        document.getElementById('deleteLessonButton').classList.toggle('opacity-20', lessonData.course_id !== null);
+        document.getElementById('deleteLessonButton').classList.toggle('cursor-not-allowed', lessonData.course_id !== null);
 
         // Set avatar preview
         const avatarEl = document.getElementById('userAvatar');
         const placeholderEl = document.getElementById('avatarPlaceholder');
-        if (lesson.thumbnail_path) {
-            avatarEl.src = lesson.thumbnail_path;
+        if (lessonData.thumbnail_path) {
+            avatarEl.src = lessonData.thumbnail_path;
             avatarEl.classList.remove('hidden');
             placeholderEl.classList.add('hidden');
         }
 
-        setText('lessonId', lesson.id);
-        setText('lessonTitle', lesson.title || '-');
-        setText('lessonDescription', lesson.description || '-');
-        setText('lessonDisplayOrder', lesson.display_order || 0);
-        setDate('lessonCreatedAt', lesson.created_at);
-        setDate('lessonUpdatedAt', lesson.updated_at);
+        setText('lessonId', lessonData.id);
+        setText('lessonTitle', lessonData.title || '-');
+        setText('lessonDescription', lessonData.description || '-');
+        setText('lessonDisplayOrder', lessonData.display_order || 0);
+        setDate('lessonCreatedAt', lessonData.created_at);
+        setDate('lessonUpdatedAt', lessonData.updated_at);
 
         // Course information
-        if (lesson.course) {
-            setText('lessonCourse', lesson.course.title || 'N/A');
+        if (lessonData.course) {
+            setText('lessonCourse', lessonData.course.title || 'N/A');
         } else {
             setText('lessonCourse', '-');
         }
- 
-        setText('lessonDuration', formatSecondsToHHMMSS_Global(lesson.duration || 0, true) || '0 giây');
 
-        setText('lessonVideoUrl', lesson.video_path || 'Chưa có video');
+        setText('lessonDuration', formatSecondsToHHMMSS_Global(lessonData.duration || 0, true) || '0 giây');
+
+        setText('lessonVideoUrl', lessonData.video_path || 'Chưa có video');
 
         // Video preview
         const videoContainer = document.getElementById('videoContainer');
@@ -196,28 +224,28 @@
         const videoLink = document.getElementById('videoLink');
 
         // Hiển thị video, ưu tiên HLS nếu có
-        const videoPath = lesson.hls_path || lesson.video_path;
-        const isBackgroundUpload = lesson.video_path?.startsWith('background-upload://');
+        const videoPath = lessonData.hls_path || lessonData.video_path;
+        const isBackgroundUpload = lessonData.video_path?.startsWith('background-upload://');
         if (!videoPath || isBackgroundUpload) {
             videoElement.style.display = 'none';
             videoLink.style.display = 'none';
             return;
         }
-        const endpoint = lesson.hls_path 
-            ? `/lessons/${lesson.id}/hls-signature`
-            : `/lessons/${lesson.id}/mp4-signature`;
-        
+        const endpoint = lessonData.hls_path
+            ? `/lessons/${lessonData.id}/hls-signature`
+            : `/lessons/${lessonData.id}/mp4-signature`;
+
         let data = await apiRequest(endpoint);
-        if (!data?.success && lesson.hls_path) {
-            data = await apiRequest(`/lessons/${lesson.id}/mp4-signature`);
+        if (!data?.success && lessonData.hls_path) {
+            data = await apiRequest(`/lessons/${lessonData.id}/mp4-signature`);
         }
-        if (data?.success && data?.data?.signed_uri) { 
+        if (data?.success && data?.data?.signed_uri) {
             videoSource.src = data.data.base_url + data.data.signed_uri;
             // Set đúng MIME type cho HLS hoặc MP4
-            if (lesson.hls_path) {
+            if (lessonData.hls_path) {
                 videoSource.type = 'application/x-mpegURL';
             } else {
-                videoSource.type = getVideoMimeType(lesson.video_path);
+                videoSource.type = getVideoMimeType(lessonData.video_path);
             }
             videoElement.load();
             videoElement.style.display = 'block';
@@ -227,11 +255,6 @@
             videoLink.style.display = 'none';
         }
 
-    }
-
-    function showError(message) {
-        toggleStates({ loading: false, detail: false, error: true });
-        setText('errorMessage', message || 'Xảy ra lỗi khi lấy thông tin');
     }
 
     function setText(id, value) {
@@ -277,6 +300,59 @@
         };
 
         return mimeTypes[extension] || 'video/mp4';
+    }
+
+    // Di chuyển đến trang khác của bài học, đồng thời gửi kèm url hiện tại
+    function handleGotoOtherPageOfLesson(lessonId = null, targetPage = 'DETAIL') {
+        let url = '';
+
+        switch (targetPage) {
+            case 'DETAIL':
+                url = detailLessonRouteSystemName.replace(':id', lessonId);
+                break;
+            case 'EDIT':
+                url = editLessonRouteSystemName.replace(':id', lessonId);
+                break;
+            case 'CREATE':
+                url = createLessonRouteSystemName;
+                break;
+            default:
+                url = detailLessonRouteSystemName.replace(':id', lessonId);
+                break;
+        }
+        const currentRoute = window.location.pathname + (window.location.search || '');
+        window.location.href = url + '?prev_page_url=' + encodeURIComponent(currentRoute);
+    }
+
+    // Xử lý khi xóa một mục
+    async function openSingleDeleteModal(lessonId = lessonData.id || null, lessonTitle = lessonData.title || '-', courseName = lessonData.course?.title || '') {
+        DeleteModal.openSingle({
+            objectName: OBJECTNAMEMODAL.LESSON,
+            idDelete: lessonId,
+            nameValue: lessonTitle || '-',
+            descValue: courseName || '',
+            actionFuncCallback: () => handleDeleteLessons([lessonId]),
+            successFuncCallback: () => NotificationModal.show('Đã xóa bài học thành công', 'success', handleGotoBackPage_Global),
+            failFuncCallback: () => NotificationModal.show('Không thể xóa bài học', 'error')
+        });
+    }
+
+    async function handleDeleteLessons(arrayIds = []) {
+        try {
+            const data = await apiRequest(`/lessons/`, {
+                method: 'DELETE',
+                body: JSON.stringify({
+                    lesson_ids: [...arrayIds]
+                })
+            });
+            if (data.success) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (error) {
+            return false;
+        }
     }
 </script>
 @endsection

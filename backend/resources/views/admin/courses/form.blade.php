@@ -96,7 +96,32 @@
         }
     }
 </style>
-<div class="max-w-[1600px] mx-auto flex flex-col items-stretch justify-start gap-4 3xl:gap-6"> 
+<div class="max-w-[1600px] mx-auto flex flex-col items-stretch justify-start gap-4 3xl:gap-6">
+
+    {{-- Header Bar --}}
+    <div class="max-w-1/2 p-3 3xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-row justify-between gap-4">
+
+        <div class="flex items-center justify-start gap-3">
+            <button onclick="handleGotoBackPage_Global()"
+                type="button"
+                class="group px-2.5 py-2.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 rounded-xl transition-all duration-300 font-medium flex items-center justify-center gap-2 cursor-pointer text-[18px]">
+                <svg class="h-6" viewBox="0 0 320 512" fill="currentColor">
+                    <path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"/>
+                </svg>
+            </button>
+            <div class="flex flex-col gap-0 min-w-0 flex-1">
+                <h2
+                    class="font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent truncate">
+                    @yield('title', 'Admin Panel')
+                </h2>
+                @hasSection('description')
+                    <p class="text-xs 3xl:text-sm text-gray-600 dark:text-gray-400 truncate">
+                        @yield('description')
+                    </p>
+                @endif
+            </div>
+        </div>
+    </div>
 
     {{-- Form Card --}}
     <form id="courseForm" onsubmit="saveCourse(event)" class="h-full w-full p-4 md:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
@@ -153,16 +178,22 @@
 
                 <div class="col-span-1">
                     <label name="start_date_LABEL" for="start_date" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Ngày bắt đầu</label>
-                    <input type="datetime-local" id="start_date"
-                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
-                    <span id="start_date_MSG" class="ml-4 text-sm mt-1 italic hidden"></span> 
+                    {{-- <input type="datetime-local" id="start_date"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none"> --}}
+                    @include('components.datetime-picker', [
+                        'id' => 'start_date',
+                        'placeholder' => 'Thời gian bắt đầu...',
+                    ])
+                    <span id="start_date_MSG" class="ml-4 text-sm mt-1 italic hidden"></span>
                 </div>
 
                 <div class="col-span-1">
                     <label name="end_date_LABEL" for="end_date" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Ngày kết thúc</label>
-                    <input type="datetime-local" id="end_date"
-                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
-                    {{-- <p class=" text-gray-500 dark:text-gray-400 mt-1 ml-3">Ngày và giờ kết thúc khóa học (phải sau ngày bắt đầu)</p> --}}
+                    {{-- <input type="datetime-local" id="end_date" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none"> --}}
+                    @include('components.datetime-picker', [
+                        'id' => 'end_date',
+                        'placeholder' => 'Thời gian kết thúc...',
+                    ])
                     <span id="end_date_MSG" class="ml-4 text-sm mt-1 italic hidden"></span>
                 </div>
 
@@ -195,7 +226,9 @@
                                         </div>
                                     </div>
                                     <div id="SPINNER_LOADING_ICON">
-                                        <i class="fas fa-graduation-cap"></i>
+                                        <svg class="w-6 h-6" viewBox="0 0 640 640" fill="currentColor">
+                                            <path d="M80 259.8L289.2 345.9C299 349.9 309.4 352 320 352C330.6 352 341 349.9 350.8 345.9L593.2 246.1C602.2 242.4 608 233.7 608 224C608 214.3 602.2 205.6 593.2 201.9L350.8 102.1C341 98.1 330.6 96 320 96C309.4 96 299 98.1 289.2 102.1L46.8 201.9C37.8 205.6 32 214.3 32 224L32 520C32 533.3 42.7 544 56 544C69.3 544 80 533.3 80 520L80 259.8zM128 331.5L128 448C128 501 214 544 320 544C426 544 512 501 512 448L512 331.4L369.1 390.3C353.5 396.7 336.9 400 320 400C303.1 400 286.5 396.7 270.9 390.3L128 331.4z"/>
+                                        </svg>
                                     </div>
                                 </div>
                             </div>
@@ -203,8 +236,12 @@
                     </div>
 
                     <div class="flex flex-col items-center justify-center w-[60px] 3xl:w-[80px]">
-                        <i class="fa-solid fa-arrow-left"></i>
-                        <i class="fa-solid fa-arrow-right"></i>
+                        <svg class="w-4" viewBox="0 0 512 512" fill="currentColor">
+                            <path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 288 480 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-370.7 0 105.4-105.4c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/>
+                        </svg>
+                        <svg class="w-4" viewBox="0 0 512 512" fill="currentColor">
+                            <path d="M502.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l370.7 0-105.4 105.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z"/>
+                        </svg>
                     </div>
 
                     <div class="flex-1 min-h-0 flex flex-col items-stretch justify-start">
@@ -281,7 +318,7 @@
             <div class="flex items-center justify-end gap-3">
                 <button
                     type="button"
-                    onclick="handleBackToPrevPage()"
+                    onclick="handleGotoBackPage_Global()"
                     class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
                 >
                     Hủy
@@ -328,6 +365,14 @@
         //     timezoneIndicator.textContent = `(Múi giờ: ${clientTimezone})`;
         // }
 
+        DateTimePicker.init('start_date', {
+            onChange: (value) => {
+                DateTimePicker.setMinDateTime('end_date', value || null);
+            }
+        });
+
+        DateTimePicker.init('end_date', {});
+
         if (mode === 'EDIT_COURSE' && courseId) {
             await Promise.all([
                 loadCourseData(),
@@ -342,6 +387,8 @@
             }
 
         } else {
+            DateTimePicker.setMinDateTime('start_date', DateTimePicker.today());
+            DateTimePicker.setMinDateTime('end_date', DateTimePicker.today());
             // For create mode, still load orphaned lessons
             await loadOrphanedLessons();
             renderOrphanedLessons();
@@ -354,10 +401,6 @@
         updateStudentActionButtons();
 
     });
-
-    function handleBackToPrevPage() {
-        window.location.href = '{{ route('admin.courses.list') }}';
-    }
 
     function handleThumbnailFile(file) {
         const MAX_SIZE = 2 * 1024 * 1024; // 2MB
@@ -392,12 +435,12 @@
         }
 
         if (!ALLOWED_TYPES.includes(file.type)) {
-            showNotificationModel_Global('Định dạng không hỗ trợ. Hãy chọn ảnh PNG, JPG, WEBP hoặc GIF.', 'error');
+            NotificationModal.show('Định dạng không hỗ trợ. Hãy chọn ảnh PNG, JPG, WEBP hoặc GIF.', 'error');
             return;
         }
 
         if (file.size > MAX_SIZE) {
-            showNotificationModel_Global('Ảnh quá lớn. Kích thước tối đa 2MB.', 'error');
+            NotificationModal.show('Ảnh quá lớn. Kích thước tối đa 2MB.', 'error');
             return;
         }
 
@@ -479,8 +522,10 @@
         try {
             document.getElementById('title').value = courseData.title || '';
             document.getElementById('description').value = courseData.description || '';
-            document.getElementById('start_date').value = formatDateTimeLocal(courseData.start_date);
-            document.getElementById('end_date').value = formatDateTimeLocal(courseData.end_date);
+            // document.getElementById('start_date').value = formatDateTimeLocal(courseData.start_date);
+            // document.getElementById('end_date').value = formatDateTimeLocal(courseData.end_date);
+            DateTimePicker.setValue('start_date', courseData.start_date);
+            DateTimePicker.setValue('end_date', courseData.end_date);
 
             // Load thumbnail
             const thumbnailEl = document.getElementById('thumbnailPreview');
@@ -495,7 +540,7 @@
                 placeholderEl.classList.remove('hidden');
             }
         } catch (error) {
-            showNotificationModel_Global('Không thể tải thông tin khóa học: ' + error.message, 'error', handleBackToPrevPage);
+            NotificationModal.show('Không thể tải thông tin khóa học: ' + error.message, 'error', handleGotoBackPage_Global);
         }
     }
 
@@ -541,7 +586,9 @@
                             <span class=" text-gray-500 dark:text-gray-400 truncate block">${orphanedLesson.description ? escapeHtml_Global(orphanedLesson.description.slice(0, 40) + (orphanedLesson.description.length > 40 ? '…' : '')) : ''}</span>
                         </div>
                         <div class="flex flex-row items-center gap-0.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer">
-                            <i class="fa-solid fa-grip-vertical"></i>
+                            <svg class="w-3" viewBox="0 0 320 512" fill="currentColor">
+                                <path d="M128 40c0-22.1-17.9-40-40-40L40 0C17.9 0 0 17.9 0 40L0 88c0 22.1 17.9 40 40 40l48 0c22.1 0 40-17.9 40-40l0-48zm0 192c0-22.1-17.9-40-40-40l-48 0c-22.1 0-40 17.9-40 40l0 48c0 22.1 17.9 40 40 40l48 0c22.1 0 40-17.9 40-40l0-48zM0 424l0 48c0 22.1 17.9 40 40 40l48 0c22.1 0 40-17.9 40-40l0-48c0-22.1-17.9-40-40-40l-48 0c-22.1 0-40 17.9-40 40zM320 40c0-22.1-17.9-40-40-40L232 0c-22.1 0-40 17.9-40 40l0 48c0 22.1 17.9 40 40 40l48 0c22.1 0 40-17.9 40-40l0-48zM192 232l0 48c0 22.1 17.9 40 40 40l48 0c22.1 0 40-17.9 40-40l0-48c0-22.1-17.9-40-40-40l-48 0c-22.1 0-40 17.9-40 40zM320 424c0-22.1-17.9-40-40-40l-48 0c-22.1 0-40 17.9-40 40l0 48c0 22.1 17.9 40 40 40l48 0c22.1 0 40-17.9 40-40l0-48z"/>
+                            </svg>
                         </div>
                     </div>
                 </div>
@@ -551,7 +598,7 @@
             attachDragListeners(orphanedLessonsListBox, 'orphaned');
 
         } catch (error) {
-            showNotificationModel_Global('Lỗi khi render các bài học: ' + error.message, 'error', handleBackToPrevPage);
+            NotificationModal.show('Lỗi khi render các bài học: ' + error.message, 'error', handleGotoBackPage_Global);
         }
     }
 
@@ -591,7 +638,9 @@
                             <span class=" text-gray-500 dark:text-gray-400 truncate block">${parentedLesson.description ? escapeHtml_Global(parentedLesson.description.slice(0, 80) + (parentedLesson.description.length > 80 ? '…' : '')) : ''}</span>
                         </div>
                         <div class="flex flex-row items-center gap-0.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 cursor-pointer">
-                            <i class="fa-solid fa-grip-vertical"></i>
+                            <svg class="w-3" viewBox="0 0 320 512" fill="currentColor">
+                                <path d="M128 40c0-22.1-17.9-40-40-40L40 0C17.9 0 0 17.9 0 40L0 88c0 22.1 17.9 40 40 40l48 0c22.1 0 40-17.9 40-40l0-48zm0 192c0-22.1-17.9-40-40-40l-48 0c-22.1 0-40 17.9-40 40l0 48c0 22.1 17.9 40 40 40l48 0c22.1 0 40-17.9 40-40l0-48zM0 424l0 48c0 22.1 17.9 40 40 40l48 0c22.1 0 40-17.9 40-40l0-48c0-22.1-17.9-40-40-40l-48 0c-22.1 0-40 17.9-40 40zM320 40c0-22.1-17.9-40-40-40L232 0c-22.1 0-40 17.9-40 40l0 48c0 22.1 17.9 40 40 40l48 0c22.1 0 40-17.9 40-40l0-48zM192 232l0 48c0 22.1 17.9 40 40 40l48 0c22.1 0 40-17.9 40-40l0-48c0-22.1-17.9-40-40-40l-48 0c-22.1 0-40 17.9-40 40zM320 424c0-22.1-17.9-40-40-40l-48 0c-22.1 0-40 17.9-40 40l0 48c0 22.1 17.9 40 40 40l48 0c22.1 0 40-17.9 40-40l0-48z"/>
+                            </svg>
                         </div>
                     </div>
                 </div>
@@ -601,7 +650,7 @@
             attachDragListeners(parentedLessonsListBox, 'parented');
 
         } catch (error) {
-            showNotificationModel_Global('Lỗi khi render các bài học: ' + error.message, 'error', handleBackToPrevPage);
+            NotificationModal.show('Lỗi khi render các bài học: ' + error.message, 'error', handleGotoBackPage_Global);
         }
     }
 
@@ -621,7 +670,7 @@
                     </div>
                 `;
             }
-            showNotificationModel_Global('Không thể tải danh sách sinh viên: ' + (error.message || ''), 'error');
+            NotificationModal.show('Không thể tải danh sách sinh viên: ' + (error.message || ''), 'error');
         }
     }
 
@@ -1326,7 +1375,7 @@
                 courseData = data.data;
             }
         } catch (error) {
-            showNotificationModel_Global('Không thể tải thông tin khóa học: ' + error.message, 'error', handleBackToPrevPage);
+            NotificationModal.show('Không thể tải thông tin khóa học: ' + error.message, 'error', handleGotoBackPage_Global);
         }
     }
 
@@ -1338,7 +1387,7 @@
                 parentedLessonsList = [...data.data?.data];
             }
         } catch (error) {
-            showNotificationModel_Global('Xảy ra lỗi khi lấy các bài học: ' + error.message, 'error', handleBackToPrevPage);
+            NotificationModal.show('Xảy ra lỗi khi lấy các bài học: ' + error.message, 'error', handleGotoBackPage_Global);
         }
     }
 
@@ -1350,7 +1399,7 @@
                 orphanedLessonsList = [...data.data?.data];
             }
         } catch (error) {
-            showNotificationModel_Global('Xảy ra lỗi khi lấy các bài học: ' + error.message, 'error', handleBackToPrevPage);
+            NotificationModal.show('Xảy ra lỗi khi lấy các bài học: ' + error.message, 'error', handleGotoBackPage_Global);
         }
     }
 
@@ -1369,8 +1418,10 @@
 
         const title = document.getElementById('title').value.trim();
         const description = document.getElementById('description').value.trim();
-        const startDate = document.getElementById('start_date').value;
-        const endDate = document.getElementById('end_date').value;
+        // const startDate = document.getElementById('start_date').value;
+        // const endDate = document.getElementById('end_date').value;
+        const startDate = DateTimePicker.getValue('start_date');
+        const endDate = DateTimePicker.getValue('end_date');
         const fileInput = document.getElementById('thumbnail');
         const thumbnailFile = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
 
@@ -1426,7 +1477,7 @@
                     'Accept': 'application/json'
                     // DO NOT set Content-Type here; browser will set with boundary
                 }
-            }); 
+            });
 
             const data = await response.json();
             if (data.success) {
@@ -1436,17 +1487,17 @@
                 }
                 await handleUpdateLessonsForCourse();
                 await handleUpdateStudentsForCourse();
-                showNotificationModel_Global(mode == 'EDIT_COURSE' ? 'Cập nhật khóa học thành công' : 'Tạo khóa học thành công', 'success', handleBackToPrevPage);
+                NotificationModal.show(mode == 'EDIT_COURSE' ? 'Cập nhật khóa học thành công' : 'Tạo khóa học thành công', 'success', handleGotoBackPage_Global);
             } else if (response.status === 422) {
                 let errorsField = data.errors || null;
                 console.log(errorsField);
                 renderInputErrors_Global(errorsField);
             } else {
                 throw new Error(data.message || 'Có lỗi xảy ra');
-            } 
+            }
 
         } catch (error) {
-            showNotificationModel_Global(error.message || 'Thao tác thất bại', 'error', handleBackToPrevPage);
+            NotificationModal.show(error.message || 'Thao tác thất bại', 'error', handleGotoBackPage_Global);
         } finally {
             // Re-enable submit button
             if (submitBtn) {

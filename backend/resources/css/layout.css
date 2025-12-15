@@ -7,7 +7,6 @@
 }
 
 #sidebar.collapsed {
-    width: -moz-fit-content;
     width: fit-content;
 }
 
@@ -160,5 +159,4 @@
     background: rgba(75, 85, 99, 0.6); /* Màu xám đậm khi hover dark mode */
     background-clip: padding-box;
 }
-
 

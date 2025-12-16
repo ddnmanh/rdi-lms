@@ -239,7 +239,7 @@
                 </div>
             </div>
             <a href="{{ route('admin.dashboard') }}"
-                class="sidebar-item group flex items-center gap-3 px-2 py-2 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.dashboard') ? 'active bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20' }}">
+                class="sidebar-item group px-3 py-2.5 flex items-center gap-3 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.dashboard') ? 'active bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20' }}">
                 <div
                     class="h-7 w-7 rounded-lg {{ request()->routeIs('admin.dashboard') ? 'text-white bg-white/20' : 'text-gray-600 dark:text-gray-400 bg-slate-100 dark:bg-slate-900/30' }} flex items-center justify-center transition-all duration-300">
                     <svg class="w-4 h-4" viewBox="0 0 512 512"  fill="currentColor">
@@ -259,7 +259,7 @@
                 </div>
             </div>
             <a href="{{ route('admin.users.list') }}"
-                class="sidebar-item group flex items-center gap-3 px-2 py-2 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.users.*') ? 'active bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20' }}">
+                class="sidebar-item group px-3 py-2.5 flex items-center gap-3 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.users.*') ? 'active bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20' }}">
                 <div class="h-7 w-7 rounded-lg {{ request()->routeIs('admin.users.*') ? 'text-white bg-white/20' : 'text-gray-600 dark:text-gray-400 bg-slate-100 dark:bg-slate-900/30' }} flex items-center justify-center transition-all duration-300">
                     <svg class="w-4 h-4" viewBox="0 0 640 640" fill="currentColor">
                         <path d="M320 80C377.4 80 424 126.6 424 184C424 241.4 377.4 288 320 288C262.6 288 216 241.4 216 184C216 126.6 262.6 80 320 80zM96 152C135.8 152 168 184.2 168 224C168 263.8 135.8 296 96 296C56.2 296 24 263.8 24 224C24 184.2 56.2 152 96 152zM0 480C0 409.3 57.3 352 128 352C140.8 352 153.2 353.9 164.9 357.4C132 394.2 112 442.8 112 496L112 512C112 523.4 114.4 534.2 118.7 544L32 544C14.3 544 0 529.7 0 512L0 480zM521.3 544C525.6 534.2 528 523.4 528 512L528 496C528 442.8 508 394.2 475.1 357.4C486.8 353.9 499.2 352 512 352C582.7 352 640 409.3 640 480L640 512C640 529.7 625.7 544 608 544L521.3 544zM472 224C472 184.2 504.2 152 544 152C583.8 152 616 184.2 616 224C616 263.8 583.8 296 544 296C504.2 296 472 263.8 472 224zM160 496C160 407.6 231.6 336 320 336C408.4 336 480 407.6 480 496L480 512C480 529.7 465.7 544 448 544L192 544C174.3 544 160 529.7 160 512L160 496z"/>
@@ -268,7 +268,7 @@
                 <span class="sidebar-text">Người dùng</span>
             </a>
             <a href="{{ route('admin.roles.list') }}"
-                class="sidebar-item group flex items-center gap-3 px-2 py-2 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.roles.*') ? 'active bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20' }}">
+                class="sidebar-item group px-3 py-2.5 flex items-center gap-3 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.roles.*') ? 'active bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20' }}">
                 <div class="h-7 w-7 rounded-lg {{ request()->routeIs('admin.roles.*') ? 'text-white bg-white/20' : 'text-gray-600 dark:text-gray-400 bg-slate-100 dark:bg-slate-900/30' }} flex items-center justify-center transition-all duration-300">
                     <svg class="w-4 h-4" viewBox="0 0 576 512" fill="currentColor">
                         <path d="M224 248a120 120 0 1 0 0-240 120 120 0 1 0 0 240zm-29.7 56C95.8 304 16 383.8 16 482.3 16 498.7 29.3 512 45.7 512l251.5 0C261 469.4 240 414.5 240 356.4l0-31.1c0-7.3 1-14.5 2.9-21.3l-48.6 0zm251 184.5l-13.3 6.3 0-188.1 96 32 0 19.6c0 55.8-32.2 106.5-82.7 130.3zM421.9 259.5l-112 37.3c-13.1 4.4-21.9 16.6-21.9 30.4l0 31.1c0 74.4 43 142.1 110.2 173.7l18.5 8.7c4.8 2.2 10 3.4 15.2 3.4s10.5-1.2 15.2-3.4l18.5-8.7C533 500.3 576 432.6 576 358.2l0-31.1c0-13.8-8.8-26-21.9-30.4l-112-37.3c-6.6-2.2-13.7-2.2-20.2 0z"/>
@@ -277,7 +277,7 @@
                 <span class="sidebar-text">Phân quyền</span>
             </a>
             <a href="{{ route('admin.courses.list') }}"
-                class="sidebar-item group flex items-center gap-3 px-2 py-2 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.courses.*') ? 'active bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20' }}">
+                class="sidebar-item group px-3 py-2.5 flex items-center gap-3 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.courses.*') ? 'active bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20' }}">
                 <div
                     class="h-7 w-7 rounded-lg {{ request()->routeIs('admin.courses.*') ? 'text-white bg-white/20' : 'text-gray-600 dark:text-gray-400 bg-slate-100 dark:bg-slate-900/30' }} flex items-center justify-center transition-all duration-300">
                     <svg class="w-4 h-4" viewBox="0 0 448 512" fill="currentColor">
@@ -287,7 +287,7 @@
                 <span class="sidebar-text">Khóa học</span>
             </a>
             <a href="{{ route('admin.lessons.list') }}"
-                class="sidebar-item group flex items-center gap-3 px-2 py-2 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.lessons.*') ? 'active bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20' }}">
+                class="sidebar-item group px-3 py-2.5 flex items-center gap-3 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.lessons.*') ? 'active bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20' }}">
                 <div
                     class="h-7 w-7 rounded-lg {{ request()->routeIs('admin.lessons.*') ? 'text-white bg-white/20' : 'text-gray-600 dark:text-gray-400 bg-slate-100 dark:bg-slate-900/30' }} flex items-center justify-center transition-all duration-300">
                     <svg class="w-4 h-4" viewBox="0 0 512 512" fill="currentColor">
@@ -338,7 +338,7 @@
                     <hr class="border-gray-200 dark:border-gray-700/60" />
                 </div>
             </div>
-            <a href="{{ route('admin.profile.show') }}" class="sidebar-item group flex items-center gap-3 px-2 py-2 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.profile.*') ? 'active bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20' }}">
+            <a href="{{ route('admin.profile.show') }}" class="sidebar-item group px-3 py-2.5 flex items-center gap-3 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.profile.*') ? 'active bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20' }}">
                 <div class="h-7 w-7 rounded-lg {{ request()->routeIs('admin.profile.*') ? 'text-white bg-white/20' : 'text-gray-600 dark:text-gray-400 bg-slate-100 dark:bg-slate-900/30' }} flex items-center justify-center transition-all duration-300">
                     <svg class="w-4 h-4" viewBox="0 0 576 512" fill="currentColor">
                         <path d="M64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l448 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32zm80 256l64 0c44.2 0 80 35.8 80 80 0 8.8-7.2 16-16 16L80 384c-8.8 0-16-7.2-16-16 0-44.2 35.8-80 80-80zm-24-96a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm240-48l112 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-112 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm0 96l112 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-112 0c-13.3 0-24-10.7-24-24s10.7-24 24-24z"/>
@@ -350,13 +350,10 @@
         </nav>
 
         <!-- Sidebar Footer -->
-        <div
-            class="mt-auto border-t border-gray-200/60 dark:border-gray-700/60 flex-shrink-0 bg-gradient-to-t from-gray-50/50 to-transparent dark:from-gray-900/50">
+        <div class="mt-auto border-t border-gray-200/60 dark:border-gray-700/60 flex-shrink-0 bg-gradient-to-t from-gray-50/50 to-transparent dark:from-gray-900/50">
             <!-- Toggle Buttons -->
             <div class="p-3 flex items-center justify-center gap-2">
-                <button id="sidebarToggle" onclick="toggleSidebarCollapse()" class="flex items-center justify-center w-11 h-11 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20 transition-all duration-300 hover:scale-110">
-
-                </button>
+                <button id="sidebarToggle" onclick="toggleSidebarCollapse()" class="flex items-center justify-center w-11 h-11 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20 transition-all duration-300 hover:scale-110"></button>
             </div>
         </div>
     </aside>
@@ -376,84 +373,6 @@
                             @yield('description')
                         </p>
                     @endif
-                </div>
-                <!-- Actions Section -->
-                <div class="flex items-center gap-2 md:gap-3 flex-shrink-0">
-                    <div class="relative" id="user-menu-container">
-                        <button type="button" onclick="toggleUserMenu()"
-                            class="flex items-center gap-2.5 cursor-pointer select-none rounded-full p-1 pl-1.5 pr-2.5 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500/20">
-                            <div class="relative">
-                                <img src="{{ optional(request()->user())->avatar_path }}"
-                                    alt="Avatar"
-                                    class="w-9 h-9 rounded-full object-cover ring-2 ring-white dark:ring-gray-800 shadow-sm">
-                                <div
-                                    class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full">
-                                </div>
-                            </div>
-                            <div class="hidden md:flex flex-col items-start text-left">
-                                <span
-                                    class="text-sm font-semibold text-gray-700 dark:text-gray-200 leading-none">{{ optional(request()->user())->fullname ?? 'User' }}</span>
-                                <span
-                                    class="text-[10px] font-medium text-gray-500 dark:text-gray-400 leading-none mt-1">{{ optional(request()->user())->email ?? 'Member' }}</span>
-                            </div>
-                            <button
-                                id="user-menu-arrow"
-                                type="button"
-                            >
-                                <svg class="w-3 h-3" viewBox="0 0 448 512" fill="currentColor">
-                                    <path d="M201.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 338.7 54.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/>
-                                </svg>
-                            </button>
-                        </button>
-
-                        <!-- Dropdown Menu -->
-                        <div id="user-menu-dropdown"
-                            class="hidden absolute right-0 mt-2 w-72 origin-top-right rounded-2xl bg-white dark:bg-gray-800 shadow-2xl shadow-gray-900/10 dark:shadow-gray-900/30 ring-1 ring-black ring-opacity-5 focus:outline-none transform transition-all duration-200 opacity-0 scale-95 z-50">
-
-                            <!-- Header -->
-                            <div
-                                class="px-5 py-4 border-b border-gray-100 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/50 rounded-t-2xl">
-                                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Truy cập nhanh</p>
-                            </div>
-
-                            <!-- Menu Items -->
-                            <div class="p-2 space-y-1">
-                                <a href="{{ route('admin.dashboard') }}"
-                                    class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200">
-                                    <div
-                                        class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40 flex items-center justify-center transition-colors">
-                                        <i
-                                            class="fas fa-tachometer-alt text-gray-500 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"></i>
-                                    </div>
-                                    Trang chủ
-                                </a>
-
-                                <a href="{{ route('admin.profile.show') }}"
-                                    class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200">
-                                    <div
-                                        class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40 flex items-center justify-center transition-colors">
-                                        <i
-                                            class="fas fa-user-cog text-gray-500 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"></i>
-                                    </div>
-                                    Hồ sơ cá nhân
-                                </a>
-                            </div>
-
-                            <div class="h-px bg-gray-100 dark:bg-gray-700/50 mx-2"></div>
-
-                            <div class="p-2">
-                                <button type="button" onclick="openVerifyLogoutModal(event)"
-                                    class="w-full group flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200">
-                                    <div class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/20 group-hover:bg-red-100 dark:group-hover:bg-red-900/40 flex items-center justify-center transition-colors text-red-500 dark:text-red-400">
-                                        <svg class="w-4 h-4" viewBox="0 0 512 512" fill="currentColor">
-                                            <path d="M160 96c17.7 0 32-14.3 32-32s-14.3-32-32-32L96 32C43 32 0 75 0 128L0 384c0 53 43 96 96 96l64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32l64 0zM502.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224 192 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l210.7 0-73.4 73.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l128-128z"/>
-                                        </svg>
-                                    </div>
-                                    Đăng xuất
-                                </button>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </nav>
@@ -538,45 +457,6 @@
             }
         }
 
-        async function openVerifyLogoutModal(event) {
-            event.preventDefault();
-            openLogoutModalGeneric_Global({
-                title: 'Xác nhận đăng xuất',
-                message: 'Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?',
-                actionFuncCallback: () => handleLogout(),
-                successFuncCallback: () => handleGotoLoginPage(),
-                failFuncCallback: () => {}
-            });
-        }
-
-        function handleGotoLoginPage() {
-            window.location.href = '/admin/login';
-        }
-
-        // Logout function
-        async function handleLogout() {
-            try {
-                const response = await fetch(`/api/auth/logout`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                    },
-                    credentials: 'include'
-                });
-                const data = await response.json();
-                console.log(data);
-
-                if (data.success) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } catch (error) {
-                console.error('Logout error:', error);
-                return false;
-            }
-        }
 
     </script>
 

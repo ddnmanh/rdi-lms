@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreNoteRequest;
+use App\Http\Requests\UpdateNoteRequest;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\LessonView;
+use App\Models\Note;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -410,6 +413,174 @@ class StudentController extends Controller
         }
 
         return $percent;
+    }
+
+    /**
+     * Lấy danh sách ghi chú của sinh viên cho một bài học
+     *
+     * Query params:
+     * - sort_by: Sắp xếp theo (duration_at, created_at) - mặc định: duration_at
+     * - order_by: Thứ tự (asc, desc) - mặc định: asc
+     */
+    public function getNotes(Request $request, $lessonId)
+    {
+        $user = $request->user();
+
+        // Kiểm tra bài học tồn tại
+        $lesson = Lesson::find($lessonId);
+        if (!$lesson) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy bài học'
+            ], 404);
+        }
+
+        // Kiểm tra sinh viên có quyền truy cập khóa học không
+        if (!$user->courses->contains($lesson->course_id)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bạn không có quyền truy cập bài học này'
+            ], 403);
+        }
+
+        // Sắp xếp
+        $sortBy = strtolower($request->get('sort_by', 'duration_at'));
+        $orderBy = strtolower($request->get('order_by', 'asc'));
+
+        if (!in_array($orderBy, ['asc', 'desc'])) {
+            $orderBy = 'asc';
+        }
+
+        if (!in_array($sortBy, ['duration_at', 'created_at'])) {
+            $sortBy = 'duration_at';
+        }
+
+        $notes = Note::where('lesson_id', $lessonId)
+            ->where('user_id', $user->id)
+            ->orderBy($sortBy, $orderBy)
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $notes
+        ]);
+    }
+
+    /**
+     * Tạo ghi chú mới cho bài học
+     */
+    public function storeNote(StoreNoteRequest $request)
+    {
+        $user = $request->user();
+        $validated = $request->validated();
+
+        // Kiểm tra bài học tồn tại
+        $lesson = Lesson::find($validated['lesson_id']);
+        if (!$lesson) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy bài học'
+            ], 404);
+        }
+
+        // Kiểm tra sinh viên có quyền truy cập khóa học không
+        if (!$user->courses->contains($lesson->course_id)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bạn không có quyền truy cập bài học này'
+            ], 403);
+        }
+
+        // Kiểm tra duration_at không vượt quá duration của bài học
+        if ($lesson->duration && $validated['duration_at'] > $lesson->duration) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Thời điểm ghi chú không thể vượt quá thời lượng bài học'
+            ], 422);
+        }
+
+        // Tạo ghi chú
+        $note = Note::create([
+            'lesson_id' => $validated['lesson_id'],
+            'user_id' => $user->id,
+            'duration_at' => $validated['duration_at'],
+            'content' => $validated['content'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tạo ghi chú thành công',
+            'data' => $note
+        ], 201);
+    }
+
+    /**
+     * Cập nhật ghi chú
+     */
+    public function updateNote(UpdateNoteRequest $request, $noteId)
+    {
+        $user = $request->user();
+
+        // Tìm ghi chú
+        $note = Note::where('id', $noteId)
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (!$note) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy ghi chú'
+            ], 404);
+        }
+
+        $validated = $request->validated();
+
+        // Kiểm tra duration_at không vượt quá duration của bài học
+        if (isset($validated['duration_at'])) {
+            $lesson = Lesson::find($note->lesson_id);
+            if ($lesson && $lesson->duration && $validated['duration_at'] > $lesson->duration) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Thời điểm ghi chú không thể vượt quá thời lượng bài học'
+                ], 422);
+            }
+        }
+
+        // Cập nhật ghi chú
+        $note->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cập nhật ghi chú thành công',
+            'data' => $note
+        ]);
+    }
+
+    /**
+     * Xóa ghi chú
+     */
+    public function deleteNote(Request $request, $noteId)
+    {
+        $user = $request->user();
+
+        // Tìm ghi chú
+        $note = Note::where('id', $noteId)
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (!$note) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy ghi chú'
+            ], 404);
+        }
+
+        $note->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Xóa ghi chú thành công'
+        ]);
     }
 }
 

@@ -74,6 +74,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(RefreshToken::class);
     }
 
+    public function notes()
+    {
+        return $this->hasMany(Note::class);
+    }
+
     /** JWT */
     public function getJWTIdentifier()
     {

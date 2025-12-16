@@ -63,7 +63,7 @@
             </div>
         </div>
         <div class="flex items-center justify-end gap-3">
-            <button type="button" class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">Hủy</button>
+            <button type="button" onclick="handleGotoBackPage_Global()" class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">Hủy</button>
             <button type="submit" class="px-4 py-2 rounded-md text-white bg-blue-600 hover:bg-blue-700">Cập nhật</button>
         </div>
     </form>

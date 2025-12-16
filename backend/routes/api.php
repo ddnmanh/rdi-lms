@@ -335,6 +335,28 @@ Route::middleware('auth:api')->group(function () {
             'name' => 'Xem tiến độ Khóa học',
             'description' => 'Cho phép học viên xem tiến độ học tập của một khóa học'
         ]);
+
+        // Note routes
+        routeWithPermission('get', '/lessons/{lessonId}/notes', [StudentController::class, 'getNotes'], [
+            'group' => 'Ghi chú bài học',
+            'name' => 'Xem danh sách ghi chú',
+            'description' => 'Cho phép học viên xem danh sách ghi chú của một bài học'
+        ]);
+        routeWithPermission('post', '/notes', [StudentController::class, 'storeNote'], [
+            'group' => 'Ghi chú bài học',
+            'name' => 'Tạo ghi chú mới',
+            'description' => 'Cho phép học viên tạo ghi chú mới cho bài học tại một thời điểm trong video'
+        ]);
+        routeWithPermission('put', '/notes/{noteId}', [StudentController::class, 'updateNote'], [
+            'group' => 'Ghi chú bài học',
+            'name' => 'Cập nhật ghi chú',
+            'description' => 'Cho phép học viên cập nhật ghi chú của mình'
+        ]);
+        routeWithPermission('delete', '/notes/{noteId}', [StudentController::class, 'deleteNote'], [
+            'group' => 'Ghi chú bài học',
+            'name' => 'Xóa ghi chú',
+            'description' => 'Cho phép học viên xóa ghi chú của mình'
+        ]);
     });
 
     // Report routes (Admin) - yêu cầu permission

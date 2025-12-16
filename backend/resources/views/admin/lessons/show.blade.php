@@ -35,7 +35,7 @@
                 onclick="handleGotoOtherPageOfLesson('{{ $lessonId }}', 'EDIT')"
                 class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5  font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300 cursor-pointer">
                 <svg class="w-4 h-4" viewBox="0 0 512 512" fill="currentColor">
-                    <path d="M16 512A32 32 0 0 1 0 480V144A16 16 0 0 1 16 128h80a16 16 0 0 1 16 16v320A16 16 0 0 1 96 512zm352-48a48 48 0 0 1-48 48H80a48 48 0 0 1-48-48V112A48 48 0 0 1 80 64h352a48 48 0 0 1 48 48zM400 0H304a16 16 0 0 0-16 16v320a16 16 0 0 0 16 16h96a16 16 0 0 0 16-16V16a16 16 0 0 0-16-16z"/>
+                    <path d="M352.9 21.2L308 66.1 445.9 204 490.8 159.1C504.4 145.6 512 127.2 512 108s-7.6-37.6-21.2-51.1L455.1 21.2C441.6 7.6 423.2 0 404 0s-37.6 7.6-51.1 21.2zM274.1 100L58.9 315.1c-10.7 10.7-18.5 24.1-22.6 38.7L.9 481.6c-2.3 8.3 0 17.3 6.2 23.4s15.1 8.5 23.4 6.2l127.8-35.5c14.6-4.1 27.9-11.8 38.7-22.6L412 237.9 274.1 100z"/>
                 </svg>
                 <span>Chỉnh sửa</span>
             </button>

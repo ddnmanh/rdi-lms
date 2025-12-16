@@ -43,6 +43,11 @@ class Lesson extends Model
         return $this->hasMany(LessonView::class);
     }
 
+    public function notes()
+    {
+        return $this->hasMany(Note::class);
+    }
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');

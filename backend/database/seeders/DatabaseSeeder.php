@@ -38,7 +38,9 @@ class DatabaseSeeder extends Seeder
                 LessonSeeder::class,        // 3. Tạo lessons (cần courses)
                 CourseUserSeeder::class,    // 4. Gán users vào courses
                 LessonViewSeeder::class,    // 5. Tạo dữ liệu xem bài học
+                LessonQuizSeeder::class,    // 6. Tạo dữ liệu quiz
             ]);
+
         }
 
         $this->command->info("=== HOÀN TẤT SEEDING ===");

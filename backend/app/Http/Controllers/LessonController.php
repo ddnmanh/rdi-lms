@@ -33,7 +33,7 @@ class LessonController extends Controller
         try {
             $body = $request->validated();
 
-            $query = Lesson::with('course');
+            $query = Lesson::with(['course', 'quizzes']);
 
             // Nếu không phải root/admin thì chỉ thấy các bài học thỏa điều kiện sau:
             // Do mình tạo

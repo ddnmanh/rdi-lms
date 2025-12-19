@@ -1,13 +1,13 @@
 {{-- Students Tab --}}
 <div class="tab-panel h-full flex flex-col overflow-hidden hidden" data-tab-content="tab-students">
     <div class="flex-1 min-h-0 overflow-hidden">
-        <form id="studentsForm" onsubmit="saveStudents(event)" class="h-full flex flex-col">
+        <form id="studentsForm" onsubmit="saveStudents(event)" class="h-full p-6 flex flex-col">
             {{-- <div class="p-6 pb-4">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">Quản lý sinh viên</h3>
                 <p class="text-sm text-gray-500 dark:text-gray-400">Thêm hoặc gỡ sinh viên khỏi khóa học</p>
             </div> --}}
 
-            <div class="flex-1 min-h-0 p-6">
+            <div class="flex-1 min-h-0">
                 <div class="h-full grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4">
                     <div class="pt-1 flex flex-col min-h-0 h-full">
                         {{-- Header với label và nút toggle filter --}}
@@ -252,7 +252,7 @@
                 </div>
             </div>
 
-            <div class="p-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div class="mt-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <div class="flex items-center justify-between">
                     <div class="text-sm text-gray-500 dark:text-gray-400">
                         <span id="enrolledStudentsCount">0</span> sinh viên được chọn
@@ -260,7 +260,7 @@
                     <button
                         type="submit"
                         id="saveStudentsBtn"
-                        class="px-4 py-2 rounded-md text-white bg-purple-600 hover:bg-purple-700"
+                        class="px-4 py-2 rounded-md text-white bg-blue-600 hover:bg-blue-500"
                     >
                         Lưu danh sách sinh viên
                     </button>

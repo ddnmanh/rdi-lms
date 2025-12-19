@@ -2290,6 +2290,320 @@
 			]
 		},
 		{
+			"name": "Lesson Quiz Management",
+			"item": [
+				{
+					"name": "Get Quizzes by Lesson",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{domain_server}}/api/lesson-quizzes/lesson/:lessonId",
+							"host": [
+								"{{domain_server}}"
+							],
+							"path": [
+								"api",
+								"lesson-quizzes",
+								"lesson",
+								":lessonId"
+							],
+							"variable": [
+								{
+									"key": "lessonId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Xem danh sách tất cả quiz của một bài học."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Quiz",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"lesson_id\": 1,\n  \"title\": \"Bài kiểm tra trắc nghiệm\",\n  \"description\": \"Kiểm tra kiến thức bài 1\",\n  \"passing_percent_score\": 80,\n  \"questions\": [\n    {\n      \"content\": \"Laravel là gì?\",\n      \"type\": \"multiple_choice\",\n      \"answers\": [\n        {\n          \"content\": \"PHP Framework\",\n          \"is_correct\": true\n        },\n        {\n          \"content\": \"Javascript Library\",\n          \"is_correct\": false\n        }\n      ]\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{domain_server}}/api/lesson-quizzes",
+							"host": [
+								"{{domain_server}}"
+							],
+							"path": [
+								"api",
+								"lesson-quizzes"
+							]
+						},
+						"description": "Tạo mới quiz cho bài học (có thể kèm câu hỏi và đáp án)."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Quiz Detail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{domain_server}}/api/lesson-quizzes/:quizId",
+							"host": [
+								"{{domain_server}}"
+							],
+							"path": [
+								"api",
+								"lesson-quizzes",
+								":quizId"
+							],
+							"variable": [
+								{
+									"key": "quizId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Xem thông tin chi tiết của một quiz."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Quiz",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Bài kiểm tra trắc nghiệm (Updated)\",\n  \"description\": \"Kiểm tra kiến thức bài 1 update\",\n  \"passing_percent_score\": 90,\n  \"is_published\": true\n}"
+						},
+						"url": {
+							"raw": "{{domain_server}}/api/lesson-quizzes/:quizId",
+							"host": [
+								"{{domain_server}}"
+							],
+							"path": [
+								"api",
+								"lesson-quizzes",
+								":quizId"
+							],
+							"variable": [
+								{
+									"key": "quizId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Cập nhật thông tin quiz."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Quiz",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{domain_server}}/api/lesson-quizzes/:quizId",
+							"host": [
+								"{{domain_server}}"
+							],
+							"path": [
+								"api",
+								"lesson-quizzes",
+								":quizId"
+							],
+							"variable": [
+								{
+									"key": "quizId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Xóa quiz khỏi bài học."
+					},
+					"response": []
+				},
+				{
+					"name": "Add Question to Quiz",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"content\": \"Câu hỏi mới?\",\n  \"type\": \"multiple_choice\",\n  \"answers\": [\n    {\n      \"content\": \"Đáp án A\",\n      \"is_correct\": true\n    },\n    {\n      \"content\": \"Đáp án B\",\n      \"is_correct\": false\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{domain_server}}/api/lesson-quizzes/:quizId/questions",
+							"host": [
+								"{{domain_server}}"
+							],
+							"path": [
+								"api",
+								"lesson-quizzes",
+								":quizId",
+								"questions"
+							],
+							"variable": [
+								{
+									"key": "quizId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Thêm câu hỏi mới vào quiz."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Question",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"content\": \"Câu hỏi đã sửa?\",\n  \"type\": \"single_choice\",\n  \"answers\": [\n    {\n      \"content\": \"Đáp án X\",\n      \"is_correct\": true\n    },\n    {\n      \"content\": \"Đáp án Y\",\n      \"is_correct\": false\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{domain_server}}/api/lesson-quizzes/questions/:questionId",
+							"host": [
+								"{{domain_server}}"
+							],
+							"path": [
+								"api",
+								"lesson-quizzes",
+								"questions",
+								":questionId"
+							],
+							"variable": [
+								{
+									"key": "questionId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Cập nhật nội dung và đáp án của câu hỏi."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Question",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{domain_server}}/api/lesson-quizzes/questions/:questionId",
+							"host": [
+								"{{domain_server}}"
+							],
+							"path": [
+								"api",
+								"lesson-quizzes",
+								"questions",
+								":questionId"
+							],
+							"variable": [
+								{
+									"key": "questionId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Xóa câu hỏi khỏi quiz."
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Student",
 			"item": [
 				{
@@ -2468,6 +2782,166 @@
 									]
 								},
 								"description": "Lấy danh sách ghi chú của sinh viên cho một bài học, sắp xếp theo thời điểm trong video."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "quiz",
+					"item": [
+						{
+							"name": "Check Quiz Status",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{domain_server}}/api/student/lessons/:lessonId/quiz-status",
+									"host": [
+										"{{domain_server}}"
+									],
+									"path": [
+										"api",
+										"student",
+										"lessons",
+										":lessonId",
+										"quiz-status"
+									],
+									"variable": [
+										{
+											"key": "lessonId",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Kiểm tra sinh viên đã pass các quiz của bài học chưa (để cho phép xem tiếp video)."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Quiz Detail",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{domain_server}}/api/student/quizzes/:quizId",
+									"host": [
+										"{{domain_server}}"
+									],
+									"path": [
+										"api",
+										"student",
+										"quizzes",
+										":quizId"
+									],
+									"variable": [
+										{
+											"key": "quizId",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Lấy thông tin chi tiết quiz để làm bài."
+							},
+							"response": []
+						},
+						{
+							"name": "Submit Quiz",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"answers\": [\n    {\n      \"question_id\": 1,\n      \"answer_id\": 2\n    },\n    {\n      \"question_id\": 2,\n      \"answer_id\": 4\n    }\n  ]\n}"
+								},
+								"url": {
+									"raw": "{{domain_server}}/api/student/quizzes/:quizId/submit",
+									"host": [
+										"{{domain_server}}"
+									],
+									"path": [
+										"api",
+										"student",
+										"quizzes",
+										":quizId",
+										"submit"
+									],
+									"variable": [
+										{
+											"key": "quizId",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Nộp bài làm quiz và nhận kết quả/điểm số."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Quiz Attempts",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{domain_server}}/api/student/quizzes/:quizId/attempts",
+									"host": [
+										"{{domain_server}}"
+									],
+									"path": [
+										"api",
+										"student",
+										"quizzes",
+										":quizId",
+										"attempts"
+									],
+									"variable": [
+										{
+											"key": "quizId",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Xem lịch sử các lần làm quiz của sinh viên."
 							},
 							"response": []
 						}

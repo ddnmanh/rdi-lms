@@ -48,6 +48,22 @@ class Lesson extends Model
         return $this->hasMany(Note::class);
     }
 
+    /**
+     * Các quiz của bài học
+     */
+    public function quizzes()
+    {
+        return $this->hasMany(LessonQuiz::class)->orderBy('start_at_seconds');
+    }
+
+    /**
+     * Lấy quiz đang active
+     */
+    public function activeQuizzes()
+    {
+        return $this->quizzes()->where('is_active', true);
+    }
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');

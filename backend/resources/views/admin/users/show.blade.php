@@ -172,15 +172,30 @@
     function setupTabs() {
         const tabButtons = document.querySelectorAll('.tab-trigger');
         const firstTab = tabButtons[0]?.dataset.tabTarget;
+
+        // Thêm event listener cho các nút tab
         tabButtons.forEach(button => {
             button.addEventListener('click', () => activateTab(button.dataset.tabTarget));
         });
-        if (firstTab) {
+
+        // Lắng nghe sự kiện hashchange để hỗ trợ nút back/forward của browser
+        window.addEventListener('hashchange', () => {
+            const hash = window.location.hash.slice(1); // Bỏ ký tự #
+            if (hash && document.querySelector(`[data-tab-target="${hash}"]`)) {
+                activateTab(hash, false); // false = không cập nhật URL lại
+            }
+        });
+
+        // Kiểm tra URL hash để active đúng tab khi load trang
+        const urlHash = window.location.hash.slice(1);
+        if (urlHash && document.querySelector(`[data-tab-target="${urlHash}"]`)) {
+            activateTab(urlHash, false);
+        } else if (firstTab) {
             activateTab(firstTab);
         }
     }
 
-    function activateTab(target) {
+    function activateTab(target, updateUrl = true) {
         const tabButtons = document.querySelectorAll('.tab-trigger');
         const tabPanels = document.querySelectorAll('.tab-panel');
         tabButtons.forEach(button => {
@@ -205,6 +220,11 @@
             const isActive = panel.dataset.tabContent === target;
             panel.classList.toggle('hidden', !isActive);
         });
+
+        // Cập nhật URL hash nếu cần
+        if (updateUrl) {
+            window.history.replaceState(null, '', `#${target}`);
+        }
     }
 </script>
 

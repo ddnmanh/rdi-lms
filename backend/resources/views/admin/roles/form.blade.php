@@ -8,7 +8,7 @@
 <div class="h-full flex flex-col items-stretch justify-start gap-2.5 3xl:gap-4 overflow-hidden">
 
     {{-- Header Bar --}}
-    <div class="max-w-1/2 p-3 3xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-row justify-between gap-4">
+    <div class="w-full max-w-[1800px] mx-auto p-3 3xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-row justify-between gap-4">
 
         <div class="flex items-center justify-start gap-3">
             <button onclick="handleGotoBackPage_Global()"
@@ -398,7 +398,7 @@
                         <col class="w-[60px] 3xl:w-[80px]">
                         <col class="">
                         <col class="">
-                        <col class="w-[80px] 3xl:w-[100px]">
+                        <col class="w-[90px] 3xl:w-[100px]">
                         <col class="">
                     </colgroup>
                     <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">

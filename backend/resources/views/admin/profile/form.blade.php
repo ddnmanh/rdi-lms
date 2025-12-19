@@ -46,15 +46,15 @@
                     </div>
                 </div>
             <div class="col-span-2">
-                <label class="block ml-4  font-semibold text-blue-700 dark:text-gray-300 mb-2">Email</label>
+                <label class="block ml-4 font-semibold text-blue-700 dark:text-gray-300 mb-2">Email</label>
                 <input disabled name="email" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none opacity-50" placeholder="Nhập email" type="email" >
             </div>
             <div class="">
-                <label class="block ml-4  font-semibold text-blue-700 dark:text-gray-300 mb-2">Họ tên</label>
+                <label class="block ml-4 font-semibold text-blue-700 dark:text-gray-300 mb-2">Họ tên</label>
                 <input name="fullname" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none" placeholder="Nhập họ tên" type="text" >
             </div>
             <div>
-                <label class="block ml-4  font-semibold text-blue-700 dark:text-gray-300 mb-2">Ngày sinh</label>
+                <label class="block ml-4 font-semibold text-blue-700 dark:text-gray-300 mb-2">Ngày sinh</label>
                 {{-- <input name="birthday" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none" placeholder="Nhập ngày sinh" type="date" > --}}
                 @include('components.date-picker', [
                     'id' => 'birthday',

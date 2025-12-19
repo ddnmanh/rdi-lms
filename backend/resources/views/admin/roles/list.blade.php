@@ -9,7 +9,7 @@
     <div class="flex flex-col items-stretch justify-start gap-2.5">
 
         {{-- Header Bar --}}
-        <div class="max-w-1/2 p-3 3xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-row justify-between gap-4">
+        <div class="w-full mx-auto p-3 3xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-row justify-between gap-4">
 
             <div class="flex items-center justify-start gap-3">
                 <div class="flex flex-col gap-0 min-w-0 flex-1">
@@ -151,31 +151,14 @@
     let sortOrder = 'asc';
     let selectedRoleIds = new Set();
 
+    const FILTERS_STORAGE_KEY = `FILTERS_${window.location.pathname}`;
+
     const createRoleRouteSystemName = '{{ route('admin.roles.create') }}';
     const detailRoleRouteSystemName = '{{ route('admin.roles.show', ['id' => ':id']) }}';
     const editRoleRouteSystemName = '{{ route('admin.roles.edit', ['id' => ':id']) }}';
 
-    // Hàm đọc URL parameters
-    function getUrlParams() {
-        const params = new URLSearchParams(window.location.search);
-        return {
-            page: params.get('page') || 1,
-            per_page: params.get('per_page') || 50,
-            sort_by: params.get('sort_by') || sortBy,
-            order_by: params.get('order_by') || sortOrder,
-            permission_id: params.get('permission_id') || null,
-            user_id: params.get('user_id') || null,
-            search: decodeURIComponent(params.get('search') ?? ''),
-            level_from: params.get('level_from') || null,
-            level_to: params.get('level_to') || null,
-            is_block: params.get('is_block') || null,
-            created_at_from: params.get('created_at_from') || null,
-            created_at_to: params.get('created_at_to') || null,
-        };
-    }
-
     // Hàm cập nhật URL parameters
-    function updateUrlParams(params) {
+    function updateUrlParamsAndStorage(params) {
         const url = new URL(window.location.href);
         // Xóa tất cả params cũ
         url.search = '';
@@ -191,26 +174,51 @@
 
         // Cập nhật URL mà không reload trang
         window.history.pushState({}, '', url.toString());
+
+        // Cập nhật storage
+        localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(params));
     }
 
     // Hàm khởi tạo filters từ URL
-    function initFiltersFromUrl() {
-        const params = getUrlParams();
+    function initFiltersFromStorageOrUrl() {
+        const pathName = window.location.pathname;
+        const search = window.location.search;
+        let params = null;
+
+        if (search) {
+            const searchParams = new URLSearchParams(window.location.search);
+            params = {
+                page: searchParams.get('page') || 1,
+                per_page: searchParams.get('per_page') || 50,
+                sort_by: searchParams.get('sort_by') || sortBy,
+                order_by: searchParams.get('order_by') || sortOrder,
+                permission_id: searchParams.get('permission_id') || null,
+                user_id: searchParams.get('user_id') || null,
+                search: searchParams.get('search') ?? '',
+                level_from: searchParams.get('level_from') || null,
+                level_to: searchParams.get('level_to') || null,
+                is_block: searchParams.get('is_block') || null,
+                created_at_from: searchParams.get('created_at_from') || null,
+                created_at_to: searchParams.get('created_at_to') || null,
+            };
+        } else {
+            const filters = localStorage.getItem(FILTERS_STORAGE_KEY);
+            params = JSON.parse(filters) || null;
+        }
 
         // Set giá trị cho các input filter
-        console.log(params.is_block);
-        Select.setValue('blockStatusFilter', params.is_block);
-        document.getElementById('nameFilter').value = params.search != null ? params.search : '';
-        document.getElementById('levelFrom').value = params.level_from != null ? params.level_from : '';
-        document.getElementById('levelTo').value = params.level_to != null ? params.level_to : '';
-        DatePicker.setValue('createdFromFilter', params.created_at_from);
-        DatePicker.setValue('createdToFilter', params.created_at_to);
+        Select.setValue('blockStatusFilter', params?.is_block);
+        document.getElementById('nameFilter').value = decodeURIComponent(params?.search ?? '') || '';
+        document.getElementById('levelFrom').value = params?.level_from != null ? params?.level_from : '';
+        document.getElementById('levelTo').value = params?.level_to != null ? params?.level_to : '';
+        DatePicker.setValue('createdFromFilter', params?.created_at_from);
+        DatePicker.setValue('createdToFilter', params?.created_at_to);
 
         // Set giá trị sort
-        sortBy = params.sort_by;
-        sortOrder = params.order_by;
-        currentPage = parseInt(params.page);
-        itemPerPage = parseInt(params.per_page);
+        sortBy = params?.sort_by;
+        sortOrder = params?.order_by;
+        currentPage = parseInt(params?.page) || currentPage;
+        itemPerPage = parseInt(params?.per_page) || itemPerPage;
     }
 
 
@@ -237,13 +245,33 @@
         });
 
         // Khởi tạo filters từ URL trước
-        initFiltersFromUrl();
+        initFiltersFromStorageOrUrl();
 
         await loadRoles(currentPage, itemPerPage);
 
+        // Ngăn chặn hành động mặc định của form khi nhấn enter ở các input
+        const filterInputs = ['nameFilter', 'levelFrom', 'levelTo', 'createdFromFilter', 'createdToFilter'];
+        filterInputs.forEach(inputId => {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        const filterForm = input.closest('form');
+                        if (filterForm) {
+                            filterForm.dispatchEvent(new Event('submit', {
+                                cancelable: true,
+                                bubbles: true
+                            }));
+                        }
+                    }
+                });
+            }
+        });
+
         // Xử lý khi người dùng nhấn nút back/forward của trình duyệt
         window.addEventListener('popstate', function() {
-            initFiltersFromUrl();
+            initFiltersFromStorageOrUrl();
             loadRoles(currentPage, itemPerPage);
         });
     });
@@ -262,6 +290,7 @@
         sortOrder = 'asc';
         // Xóa URL params
         window.history.pushState({}, '', window.location.pathname);
+        localStorage.removeItem(FILTERS_STORAGE_KEY);
         loadRoles(1, itemPerPage);
     }
 
@@ -341,7 +370,7 @@
         const filters = getFilterParams();
 
         // Cập nhật URL parameters
-        updateUrlParams({
+        updateUrlParamsAndStorage({
             page: currentPage,
             per_page: itemPerPage,
             search: filters.name,
@@ -432,7 +461,9 @@
             <thead class="custom-thead">
                 <tr>
                     <th class="${PIN_COLS_STYLES['checkbox'].sticky} text-center">
-                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" >
+                        <div class="flex items-center justify-center">
+                            <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" >
+                        </div>
                     </th>
                     <th class="HAS_SORT ${sortBy === 'id' ? 'ACTIVE' : ''}" onclick="handleSort('id')">
                         <span>
@@ -495,7 +526,9 @@
                         return `
                             <tr>
                                 <td class="${PIN_COLS_STYLES['checkbox'].sticky} text-center">
-                                    <input type="checkbox" class="role-checkbox" value="${role.id}" ${isChecked ? 'checked' : ''} onchange="toggleRoleSelection(${role.id}, this.checked)">
+                                    <div class="flex items-center justify-center">
+                                        <input type="checkbox" class="role-checkbox" value="${role.id}" ${isChecked ? 'checked' : ''} onchange="toggleRoleSelection(${role.id}, this.checked)">
+                                    </div>
                                 </td>
                                 <td class="${sortBy === 'id' ? 'ACTIVE' : ''} text-center">
                                     <span>${role.id}</span>

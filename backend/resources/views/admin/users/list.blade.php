@@ -8,7 +8,7 @@
 <div class="h-full flex flex-col items-stretch justify-start gap-2.5 3xl:gap-4">
 
     {{-- Header Bar --}}
-    <div class="max-w-1/2 p-3 3xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-row justify-between gap-4">
+    <div class="w-full p-3 3xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-row justify-between gap-4">
 
         <div class="flex items-center justify-start gap-3">
             <div class="flex flex-col gap-0 min-w-0 flex-1">
@@ -156,30 +156,14 @@
     let sortOrder = 'desc';
     let selectedUserIds = new Set();
 
+    const FILTERS_STORAGE_KEY = `FILTERS_${window.location.pathname}`;
+
     const createUserRouteSystemName = '{{ route('admin.users.create') }}';
     const detailUserRouteSystemName = '{{ route('admin.users.show', ['id' => ':id']) }}';
     const editUserRouteSystemName = '{{ route('admin.users.edit', ['id' => ':id']) }}';
 
-    // Hàm đọc URL parameters
-    function getUrlParams() {
-        const params = new URLSearchParams(window.location.search);
-        return {
-            page: params.get('page') || 1,
-            role_id: params.get('role_id') || '',
-            search_fullname: decodeURIComponent(params.get('search_fullname') ?? ''),
-            search_email: decodeURIComponent(params.get('search_email') ?? ''),
-            created_from: params.get('created_from') || '',
-            created_to: params.get('created_to') || '',
-            per_page: params.get('per_page') || 50,
-            sort_by: params.get('sort_by') || 'created_at',
-            order_by: params.get('order_by') || 'desc',
-            next_page_url: params.get('next_page_url') || '',
-            prev_page_url: params.get('prev_page_url') || '',
-        };
-    }
-
     // Hàm cập nhật URL parameters
-    function updateUrlParams(params) {
+    function updateUrlParamsAndStorage(params) {
         const url = new URL(window.location.href);
         // Xóa tất cả params cũ
         url.search = '';
@@ -196,24 +180,47 @@
 
         // Cập nhật URL mà không reload trang
         window.history.pushState({}, '', url.toString());
+        localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(params));
     }
 
     // Hàm khởi tạo filters từ URL
-    function initFiltersFromUrl() {
-        const params = getUrlParams();
+    function initFiltersFromStorageOrUrl() {
+        const pathName = window.location.pathname;
+        const search = window.location.search;
+        let params = null;
+
+        if (search) {
+            const searchParams = new URLSearchParams(window.location.search);
+            params = {
+                page: searchParams.get('page') || 1,
+                role_id: searchParams.get('role_id') || '',
+                search_fullname: searchParams.get('search_fullname') ?? '',
+                search_email: searchParams.get('search_email') ?? '',
+                created_from: searchParams.get('created_from') || '',
+                created_to: searchParams.get('created_to') || '',
+                per_page: searchParams.get('per_page') || 50,
+                sort_by: searchParams.get('sort_by') || 'created_at',
+                order_by: searchParams.get('order_by') || 'desc',
+                next_page_url: searchParams.get('next_page_url') || '',
+                prev_page_url: searchParams.get('prev_page_url') || '',
+            };
+        } else {
+            const filters = localStorage.getItem(FILTERS_STORAGE_KEY);
+            params = JSON.parse(filters) || null;
+        }
 
         // Set giá trị cho các input filter
-        Select.setValue('roleFilter', parseInt(params.role_id) || '');
-        document.getElementById('searchFullNameFilter').value = decodeURIComponent(params.search_fullname) || '';
-        document.getElementById('searchEmailFilter').value = decodeURIComponent(params.search_email) || '';
-        DatePicker.setValue('createdFromFilter', params.created_from);
-        DatePicker.setValue('createdToFilter', params.created_to);
+        Select.setValue('roleFilter', parseInt(params?.role_id) || '');
+        document.getElementById('searchFullNameFilter').value = decodeURIComponent(params?.search_fullname ?? '') || '';
+        document.getElementById('searchEmailFilter').value = decodeURIComponent(params?.search_email ?? '') || '';
+        DatePicker.setValue('createdFromFilter', params?.created_from);
+        DatePicker.setValue('createdToFilter', params?.created_to);
 
         // Set giá trị sort
-        sortBy = params.sort_by || sortBy;
-        sortOrder = params.order_by || sortOrder;
-        currentPage = parseInt(params.page) || currentPage;
-        itemPerPage = parseInt(params.per_page) || itemPerPage;
+        sortBy = params?.sort_by || sortBy;
+        sortOrder = params?.order_by || sortOrder;
+        currentPage = parseInt(params?.page) || currentPage;
+        itemPerPage = parseInt(params?.per_page) || itemPerPage;
     }
 
     document.addEventListener('DOMContentLoaded', async function() {
@@ -239,7 +246,7 @@
         });
 
         // Khởi tạo filters từ URL trước
-        initFiltersFromUrl();
+        initFiltersFromStorageOrUrl();
 
         // Load roles và users
         await loadUsers(currentPage, itemPerPage);
@@ -263,7 +270,7 @@
 
         // Xử lý khi người dùng nhấn nút back/forward của trình duyệt
         window.addEventListener('popstate', function() {
-            initFiltersFromUrl();
+            initFiltersFromStorageOrUrl();
             loadUsers(currentPage);
         });
     });
@@ -287,7 +294,8 @@
         sortOrder = 'desc';
         // Xóa URL params
         window.history.pushState({}, '', window.location.pathname);
-        loadUsers(1);
+        localStorage.removeItem(FILTERS_STORAGE_KEY);
+        loadUsers(1, itemPerPage);
     }
 
     function handleSubmitFilter(event) {
@@ -380,7 +388,7 @@
         const createdToFilter = DatePicker.getValue('createdToFilter');
 
         // Cập nhật URL parameters
-        updateUrlParams({
+        updateUrlParamsAndStorage({
             page: currentPage,
             role_id: roleId,
             search_fullname: name,
@@ -475,26 +483,28 @@
             <thead class="custom-thead">
                 <tr>
                     <th class="${PIN_COLS_STYLES['checkbox'].sticky} align-center">
-                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" >
+                        <div class="flex items-center justify-center">
+                            <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" >
+                        </div>
                     </th>
-                    <th class="${sortBy === 'id' ? 'ACTIVE' : ''} HAS_SORT" onclick="handleSortWhenClickTableHead('id')">
+                    <th class="${PIN_COLS_STYLES['id'].sticky} ${sortBy === 'id' ? 'ACTIVE' : ''} HAS_SORT" onclick="handleSortWhenClickTableHead('id')">
                         <span>
                             ID${getSortIcon('id')}
                         </span>
                     </th>
                     <th class="${PIN_COLS_STYLES['avatar'].sticky}">Avatar</th>
-                    <th class="HAS_SORT ${sortBy === 'fullname' ? 'ACTIVE' : ''} ${PIN_COLS_STYLES['fullname'].sticky}" onclick="handleSortWhenClickTableHead('fullname')">
+                    <th class="${PIN_COLS_STYLES['fullname'].sticky} HAS_SORT ${sortBy === 'fullname' ? 'ACTIVE' : ''}" onclick="handleSortWhenClickTableHead('fullname')">
                         <span>
                             Tên${getSortIcon('fullname')}
                         </span>
                     </th>
-                    <th class="HAS_SORT ${sortBy === 'email' ? 'ACTIVE' : ''}" onclick="handleSortWhenClickTableHead('email')">
+                    <th class="${PIN_COLS_STYLES['email'].sticky} HAS_SORT ${sortBy === 'email' ? 'ACTIVE' : ''}" onclick="handleSortWhenClickTableHead('email')">
                         <span>
                             Email${getSortIcon('email')}
                         </span>
                     </th>
-                    <th>Vai trò</th>
-                    <th onclick="handleSortWhenClickTableHead('created_at')" class="HAS_SORT ${sortBy === 'created_at' ? 'ACTIVE' : ''}">
+                    <th class="${PIN_COLS_STYLES['roles'].sticky}">Vai trò</th>
+                    <th onclick="handleSortWhenClickTableHead('created_at')" class="${PIN_COLS_STYLES['created_at'].sticky} HAS_SORT ${sortBy === 'created_at' ? 'ACTIVE' : ''}">
                         <span>
                             Ngày tạo${getSortIcon('created_at')}
                         </span>
@@ -554,24 +564,26 @@
                             return `
                                 <tr class="${isChecked ? '!bg-red-500' : ''}">
                                     <td class="${PIN_COLS_STYLES['checkbox'].sticky} align-center">
-                                        <input type="checkbox" class="user-checkbox" value="${user.id}" ${isChecked ? 'checked' : ''} onchange="toggleUserSelection(${user.id}, this.checked)">
+                                        <div class="flex items-center justify-center">
+                                            <input type="checkbox" class="user-checkbox" value="${user.id}" ${isChecked ? 'checked' : ''} onchange="toggleUserSelection(${user.id}, this.checked)">
+                                        </div>
                                     </td>
-                                    <td class="${sortBy === 'id' ? 'ACTIVE' : ''} text-center">
+                                    <td class="${PIN_COLS_STYLES['id'].sticky} ${sortBy === 'id' ? 'ACTIVE' : ''} text-center">
                                         <span class="text-gray-600 dark:text-gray-300">${user.id}</span>
                                     </td>
                                     <td class="${PIN_COLS_STYLES['avatar'].sticky} align-center">
                                         <img src="${user.avatar_path ?? ''}" alt="" class="m-auto w-10 aspect-square object-cover rounded-full bg-gray-200 dark:bg-gray-700">
                                     </td>
-                                    <td class="${sortBy === 'fullname' ? 'ACTIVE' : ''} ${PIN_COLS_STYLES['fullname'].sticky}">
+                                    <td class="${PIN_COLS_STYLES['fullname'].sticky} ${sortBy === 'fullname' ? 'ACTIVE' : ''} ">
                                         <span>${user.fullname || '-'}</span>
                                     </td>
-                                    <td class="${sortBy === 'email' ? 'ACTIVE' : ''} text-gray-600 dark:text-gray-300 break-all [overflow-wrap:anywhere]">
+                                    <td class="${PIN_COLS_STYLES['email'].sticky} ${sortBy === 'email' ? 'ACTIVE' : ''} text-gray-600 dark:text-gray-300 break-all [overflow-wrap:anywhere]">
                                         <span>${user.email}</span>
                                     </td>
-                                    <td class="px-4 py-3 align-center whitespace-normal break-words">
+                                    <td class="${PIN_COLS_STYLES['roles'].sticky} px-4 py-3 align-center whitespace-normal break-words">
                                         ${roleBadge}
                                     </td>
-                                    <td class="${sortBy === 'created_at' ? 'ACTIVE' : ''} text-gray-600 dark:text-gray-300">
+                                    <td class="${PIN_COLS_STYLES['created_at'].sticky} ${sortBy === 'created_at' ? 'ACTIVE' : ''} text-gray-600 dark:text-gray-300">
                                         ${formatDate_Global(user.created_at)}
                                     </td>
                                     <td class="${PIN_COLS_STYLES['actions'].sticky}">

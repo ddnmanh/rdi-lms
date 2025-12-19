@@ -4,52 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Đăng nhập - Admin</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
+    <link rel="stylesheet" href="{{ mix('css/app.css') }}" />
+    <link rel="stylesheet" href="{{ mix('css/layout.css') }}" />
+    <link rel="stylesheet" href="{{ mix('css/loading.css') }}" />
+    <link rel="stylesheet" href="{{ mix('css/loading-in-btn.css') }}" />
+    <link rel="stylesheet" href="{{ mix('css/table.css') }}" />
+    <script src="{{ mix('js/app.js') }}"></script>
 
-    <style>
-        html,
-        body,
-        main {
-            overflow-x: hidden;
-            max-width: 100%;
-            font-size: 16px;
-            color: #314158;
-            font-family: 'UTM Avo', sans-serif;
-        }
-
-        @media (min-width: 1536px) {
-            html,
-            body,
-            main {
-                font-size: 18px;
-            }
-        }
-    </style>
-
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brandBlue: '#2563eb',
-                        brandGreen: '#10b981'
-                    },
-                    keyframes: {
-                        spinfast: {
-                            to: { transform: "rotate(360deg)" }
-                        }
-                    },
-                    animation: {
-                        spinfast: "spinfast .8s linear infinite"
-                    }
-                }
-            }
-        };
-    </script>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 </head>
 
 <body class="min-h-screen flex items-center justify-center p-8
@@ -57,7 +22,7 @@
     dark:bg-[#0f172a]
 ">
 
-    <div class="w-full max-w-[450px] relative flex flex-col items-stretch justify-center gap-4"> 
+    <div class="w-full max-w-[450px] relative flex flex-col items-stretch justify-center gap-4">
 
         <!-- Login Card -->
         <div class="bg-white dark:bg-gray-800 border border-blue-500/30 dark:border-blue-500/40
@@ -182,7 +147,7 @@
                 const data = await res.json();
 
                 if (res.ok && data.success) {
-                    showAlert("Đăng nhập thành công! Đang chuyển hướng...", "success"); 
+                    showAlert("Đăng nhập thành công! Đang chuyển hướng...", "success");
                     setTimeout(() => {
                         window.location.href = "/admin/";
                     }, 600);

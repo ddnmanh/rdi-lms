@@ -7,7 +7,7 @@
 <div class="w-full h-full flex flex-col overflow-hidden gap-2.5 3xl:gap-4"> {{-- khung ngoài chiếm toàn bộ viewport, chặn tràn --}}
 
     {{-- Header Bar --}}
-    <div class="max-w-1/2 p-3 3xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-row justify-between gap-4">
+    <div class="w-full max-w-[1600px] mx-auto p-3 3xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-row justify-between gap-4">
 
         <div class="flex items-center justify-start gap-3">
             <button onclick="handleGotoBackPage_Global()"

@@ -8,7 +8,7 @@
 <div class="h-full flex flex-col items-stretch justify-start gap-2.5 3xl:gap-4">
 
     {{-- Header Bar --}}
-    <div class="max-w-1/2 p-3 3xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-row justify-between gap-4">
+    <div class="w-full mx-auto p-3 3xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-row justify-between gap-4">
 
         <div class="flex items-center justify-start gap-3">
             <div class="flex flex-col gap-0 min-w-0 flex-1">
@@ -132,6 +132,8 @@
     let sortOrder = 'asc';
     let selectedLessonIds = new Set();
 
+    const FILTERS_STORAGE_KEY = `FILTERS_${window.location.pathname}`;
+
     const detailLessonRouteSystemName = '{{ route('admin.lessons.show', ['id' => ':id']) }}';
     const editLessonRouteSystemName = '{{ route('admin.lessons.edit', ['id' => ':id']) }}';
     const createLessonRouteSystemName = '{{ route('admin.lessons.create') }}';
@@ -148,7 +150,7 @@
         });
 
         // Sau đó khởi tạo filters từ URL (cần courses đã load xong)
-        initFiltersFromUrl();
+        initFiltersFromStorageOrUrl();
 
         // Cuối cùng load lessons với giá trị từ URL
         await loadLessons(currentPage, itemPerPage);
@@ -175,29 +177,13 @@
 
         // Xử lý khi người dùng nhấn nút back/forward của trình duyệt
         window.addEventListener('popstate', function() {
-            initFiltersFromUrl();
+            initFiltersFromStorageOrUrl();
             loadLessons(currentPage, itemPerPage);
         });
     });
 
-    // Hàm đọc URL parameters
-    // Lưu ý: URLSearchParams.get() tự động decode, không cần decodeURIComponent()
-    function getUrlParams() {
-        const params = new URLSearchParams(window.location.search);
-        return {
-            page: params.get('page') || 1,
-            per_page: params.get('per_page') || 50,
-            search: params.get('search') || '',
-            course_id: params.get('course_id') || '',
-            duration_min: params.get('duration_min') || '',
-            duration_max: params.get('duration_max') || '',
-            sort_by: params.get('sort_by') || 'course_id',
-            order_by: params.get('order_by') || 'asc'
-        };
-    }
-
     // Hàm cập nhật URL parameters
-    function updateUrlParams(params) {
+    function updateUrlParamsAndStorage(params) {
         const url = new URL(window.location.href);
         // Xóa tất cả params cũ
         url.search = '';
@@ -212,18 +198,39 @@
 
         // Cập nhật URL mà không reload trang
         window.history.pushState({}, '', url.toString());
+
+        // Cập nhật storage
+        localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(params));
     }
 
-    // Hàm khởi tạo filters từ URL
-    function initFiltersFromUrl() {
-        const params = getUrlParams();
+    // Hàm khởi tạo filters từ URL hoặc storage
+    // Nếu có url có thông tin filters thì lấy từ URL, nếu không thì lấy từ storage
+    function initFiltersFromStorageOrUrl() {
+        const pathName = window.location.pathname;
+        const search = window.location.search;
+        let params = null;
 
+        if (search) {
+            const searchParams = new URLSearchParams(window.location.search);
+            params = {
+                page: searchParams.get('page') || 1,
+                per_page: searchParams.get('per_page') || 50,
+                search: searchParams.get('search') || '',
+                course_id: searchParams.get('course_id') || '',
+                duration_min: searchParams.get('duration_min') || '',
+                duration_max: searchParams.get('duration_max') || '',
+                sort_by: searchParams.get('sort_by') || 'course_id',
+                order_by: searchParams.get('order_by') || 'asc'
+            };
+        } else {
+            const filters = localStorage.getItem(FILTERS_STORAGE_KEY);
+            params = JSON.parse(filters) || null;
+        }
         // Set giá trị cho các input filter
-        document.getElementById('courseFilter').value = params.course_id || '';
-        document.getElementById('searchFilter').value = decodeURIComponent(params.search) || '';
-        document.getElementById('durationMin').value = params.duration_min;
-        document.getElementById('durationMax').value = params.duration_max;
-
+        document.getElementById('courseFilter').value = params?.course_id || '';
+        document.getElementById('searchFilter').value = decodeURIComponent(params?.search ?? '') || '';
+        document.getElementById('durationMin').value = params?.duration_min || '';
+        document.getElementById('durationMax').value = params?.duration_max || '';
         // Set giá trị sort
         sortBy = params.sort_by || sortBy;
         sortOrder = params.order_by || sortOrder;
@@ -243,6 +250,7 @@
         sortOrder = 'asc';
         // Xóa URL params
         window.history.pushState({}, '', window.location.pathname);
+        localStorage.removeItem(FILTERS_STORAGE_KEY);
         loadLessons(1, itemPerPage);
     }
 
@@ -331,8 +339,8 @@
                     </div>
                     <div id="SPINNER_LOADING_ICON">
                         <svg class="w-6 h-6" viewBox="0 0 640 640" fill="currentColor">
-                        <path d="M80 259.8L289.2 345.9C299 349.9 309.4 352 320 352C330.6 352 341 349.9 350.8 345.9L593.2 246.1C602.2 242.4 608 233.7 608 224C608 214.3 602.2 205.6 593.2 201.9L350.8 102.1C341 98.1 330.6 96 320 96C309.4 96 299 98.1 289.2 102.1L46.8 201.9C37.8 205.6 32 214.3 32 224L32 520C32 533.3 42.7 544 56 544C69.3 544 80 533.3 80 520L80 259.8zM128 331.5L128 448C128 501 214 544 320 544C426 544 512 501 512 448L512 331.4L369.1 390.3C353.5 396.7 336.9 400 320 400C303.1 400 286.5 396.7 270.9 390.3L128 331.4z"/>
-                    </svg>
+                            <path d="M80 259.8L289.2 345.9C299 349.9 309.4 352 320 352C330.6 352 341 349.9 350.8 345.9L593.2 246.1C602.2 242.4 608 233.7 608 224C608 214.3 602.2 205.6 593.2 201.9L350.8 102.1C341 98.1 330.6 96 320 96C309.4 96 299 98.1 289.2 102.1L46.8 201.9C37.8 205.6 32 214.3 32 224L32 520C32 533.3 42.7 544 56 544C69.3 544 80 533.3 80 520L80 259.8zM128 331.5L128 448C128 501 214 544 320 544C426 544 512 501 512 448L512 331.4L369.1 390.3C353.5 396.7 336.9 400 320 400C303.1 400 286.5 396.7 270.9 390.3L128 331.4z"/>
+                        </svg>
                     </div>
                 </div>
             </div>
@@ -346,7 +354,7 @@
         const durationMax = document.getElementById('durationMax').value;
 
         // Cập nhật URL parameters
-        updateUrlParams({
+        updateUrlParamsAndStorage({
             page: currentPage,
             per_page: itemPerPage,
             search: search,
@@ -414,12 +422,12 @@
                 width: 'w-[400px] 3xl:w-[550px]'
             },
             duration: {
-                sticky: 'PIN right-[120px] 3xl:right-[140px] sticky-shadow-right border-l',
+                sticky: 'PIN right-[120px] 3xl:right-[150px] sticky-shadow-right border-l',
                 width: 'w-[120px] 3xl:w-[150px]'
             },
             actions: {
                 sticky: 'PIN right-[0px] 3xl:right-[0px]',
-                width: 'w-[120px] 3xl:w-[140px]'
+                width: 'w-[120px] 3xl:w-[150px]'
             }
         }
 
@@ -437,7 +445,9 @@
             <thead class="custom-thead">
                 <tr>
                     <th class="${PIN_COLS_STYLES['checkbox'].sticky} text-center">
-                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" class="">
+                        <div class="flex items-center justify-center">
+                            <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" class="">
+                        </div>
                     </th>
                     <th onclick="handleSort('id')" class="HAS_SORT ${sortBy === 'id' ? 'ACTIVE' : ''} ${PIN_COLS_STYLES['id'].sticky}">
                         <span>
@@ -502,11 +512,13 @@
                             return `
                                 <tr>
                                     <td class="${PIN_COLS_STYLES['checkbox'].sticky} align-center">
-                                        <input type="checkbox"
-                                            class="lesson-checkbox"
-                                            value="${lesson.id}"
-                                            ${isChecked ? 'checked' : ''}
-                                            onchange="toggleLessonSelection(${lesson.id}, this.checked)">
+                                        <div class="flex items-center justify-center">
+                                            <input type="checkbox"
+                                                class="lesson-checkbox"
+                                                value="${lesson.id}"
+                                                ${isChecked ? 'checked' : ''}
+                                                onchange="toggleLessonSelection(${lesson.id}, this.checked)">
+                                        </div>
                                     </td>
                                     <td class="${sortBy === 'id' ? 'ACTIVE' : ''} text-center">
                                         <span class="text-gray-600 dark:text-gray-300">${lesson.id}</span>

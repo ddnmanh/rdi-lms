@@ -8,7 +8,7 @@
     <div class="h-full flex flex-col items-stretch justify-start gap-2.5 3xl:gap-4">
 
         {{-- Header Bar --}}
-        <div class="max-w-1/2 p-3 3xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-row justify-between gap-4">
+        <div class="w-full mx-auto p-3 3xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-row justify-between gap-4">
 
             <div class="flex items-center justify-start gap-3">
 
@@ -163,6 +163,8 @@
         let deleteCourseId = null;
         let isBulkDelete = false;
 
+        const FILTERS_STORAGE_KEY = `FILTERS_${window.location.pathname}`;
+
         const detailCourseRouteSystemName = '{{ route('admin.courses.show', ['id' => ':id']) }}';
         const editCourseRouteSystemName = '{{ route('admin.courses.edit', ['id' => ':id']) }}';
         const createCourseRouteSystemName = '{{ route('admin.courses.create') }}';
@@ -197,8 +199,8 @@
                 maxDate: DatePicker.today()
             });
 
-            // Khởi tạo filters từ URL trước
-            initFiltersFromUrl();
+            // Khởi tạo filters từ URL hoặc storage
+            initFiltersFromStorageOrUrl();
 
             await loadCourses(currentPage, itemPerPage);
 
@@ -224,30 +226,13 @@
 
             // Xử lý khi người dùng nhấn nút back/forward của trình duyệt
             window.addEventListener('popstate', function() {
-                initFiltersFromUrl();
+                initFiltersFromStorageOrUrl();
                 loadCourses(currentPage, itemPerPage);
             });
         });
 
-        // Hàm đọc URL parameters
-        function getUrlParams() {
-            const params = new URLSearchParams(window.location.search);
-            return {
-                page: params.get('page') || 1,
-                per_page: params.get('per_page') || 50,
-                title: decodeURIComponent(params.get('title') ?? ''),
-                course_state: params.get('course_state') || '',
-                start_date_from: params.get('start_date_from') || '',
-                start_date_to: params.get('start_date_to') || '',
-                end_date_from: params.get('end_date_from') || '',
-                end_date_to: params.get('end_date_to') || '',
-                sort_by: params.get('sort_by') || 'created_at',
-                order_by: params.get('order_by') || 'desc'
-            };
-        }
-
         // Hàm cập nhật URL parameters
-        function updateUrlParams(params) {
+        function updateUrlParamsAndStorage(params) {
             const url = new URL(window.location.href);
             // Xóa tất cả params cũ
             url.search = '';
@@ -263,25 +248,47 @@
 
             // Cập nhật URL mà không reload trang
             window.history.pushState({}, '', url.toString());
+            localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(params));
         }
 
         // Hàm khởi tạo filters từ URL
-        function initFiltersFromUrl() {
-            const params = getUrlParams();
+        function initFiltersFromStorageOrUrl() {
+            const pathName = window.location.pathname;
+            const search = window.location.search;
+            let params = null;
+
+            if (search) {
+                const searchParams = new URLSearchParams(window.location.search);
+                params = {
+                    page: searchParams.get('page') || 1,
+                    per_page: searchParams.get('per_page') || 50,
+                    title: searchParams.get('title') ?? '',
+                    course_state: searchParams.get('course_state') || '',
+                    start_date_from: searchParams.get('start_date_from') || '',
+                    start_date_to: searchParams.get('start_date_to') || '',
+                    end_date_from: searchParams.get('end_date_from') || '',
+                    end_date_to: searchParams.get('end_date_to') || '',
+                    sort_by: searchParams.get('sort_by') || 'created_at',
+                    order_by: searchParams.get('order_by') || 'desc'
+                };
+            } else {
+                const filters = localStorage.getItem(FILTERS_STORAGE_KEY);
+                params = JSON.parse(filters) || null;
+            }
 
             // Set giá trị cho các input filter
-            document.getElementById('titleFilter').value = params.title;
-            Select.setValue('courseStateFilter', params.course_state);
-            DatePicker.setValue('startDateFromFilter', params.start_date_from);
-            DatePicker.setValue('startDateToFilter', params.start_date_to);
-            DatePicker.setValue('endDateFromFilter', params.end_date_from);
-            DatePicker.setValue('endDateToFilter', params.end_date_to);
+            document.getElementById('titleFilter').value = decodeURIComponent(params?.title ?? '') || '';
+            Select.setValue('courseStateFilter', params?.course_state);
+            DatePicker.setValue('startDateFromFilter', params?.start_date_from);
+            DatePicker.setValue('startDateToFilter', params?.start_date_to);
+            DatePicker.setValue('endDateFromFilter', params?.end_date_from);
+            DatePicker.setValue('endDateToFilter', params?.end_date_to);
 
             // Set giá trị sort
-            sortBy = params.sort_by || sortBy;
-            sortOrder = params.order_by || sortOrder;
-            currentPage = parseInt(params.page) || currentPage;
-            itemPerPage = parseInt(params.per_page) || itemPerPage;
+            sortBy = params?.sort_by || sortBy;
+            sortOrder = params?.order_by || sortOrder;
+            currentPage = parseInt(params?.page) || currentPage;
+            itemPerPage = parseInt(params?.per_page) || itemPerPage;
         }
 
         function resetFilters() {
@@ -299,7 +306,8 @@
             sortOrder = 'desc';
             // Xóa URL params
             window.history.pushState({}, '', window.location.pathname);
-            loadCourses(1);
+            localStorage.removeItem(FILTERS_STORAGE_KEY);
+            loadCourses(1, itemPerPage);
         }
 
         function handleSubmitFilter(event) {
@@ -385,7 +393,7 @@
             const endDateToFilter = DatePicker.getValue('endDateToFilter');
 
             // Cập nhật URL parameters
-            updateUrlParams({
+            updateUrlParamsAndStorage({
                 page: currentPage,
                 title: title,
                 course_state: dateRange,
@@ -461,20 +469,20 @@
                     width: 'w-[95px] 3xl:w-[110px]'
                 },
                 start_date: {
-                    sticky: 'PIN right-[340px] 3xl:right-[450px] sticky-shadow-right border-l',
+                    sticky: 'PIN right-[340px] 3xl:right-[460px] sticky-shadow-right border-l',
                     width: 'w-[100px] 3xl:w-[160px]'
                 },
                 end_date: {
-                    sticky: 'PIN right-[240px] 3xl:right-[290px]',
+                    sticky: 'PIN right-[240px] 3xl:right-[300px]',
                     width: 'w-[100px] 3xl:w-[160px]'
                 },
                 status: {
-                    sticky: 'PIN right-[120px] 3xl:right-[140px]',
+                    sticky: 'PIN right-[120px] 3xl:right-[150px]',
                     width: 'w-[120px] 3xl:w-[150px]'
                 },
                 actions: {
                     sticky: 'PIN right-[0px] 3xl:right-[0px]',
-                    width: 'w-[120px] 3xl:w-[140px]'
+                    width: 'w-[120px] 3xl:w-[150px]'
                 }
             }
 
@@ -495,7 +503,9 @@
                 <thead class="custom-thead">
                     <tr>
                         <th class="${PIN_COLS_STYLES['checkbox'].sticky} text-center">
-                            <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" class="">
+                            <div class="flex items-center justify-center">
+                                <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this.checked)" class="">
+                            </div>
                         </th>
                         <th onclick="handleSort('id')" class="HAS_SORT ${sortBy === 'id' ? 'ACTIVE' : ''} ${PIN_COLS_STYLES['id'].sticky}">
                             <span>
@@ -603,11 +613,13 @@
                                 return `
                                     <tr>
                                         <td class="${PIN_COLS_STYLES['checkbox'].sticky} align-center">
-                                            <input type="checkbox"
-                                                class="course-checkbox"
-                                                value="${course.id}"
-                                                ${isChecked ? 'checked' : ''}
-                                                onchange="toggleCourseSelection(${course.id}, this.checked)">
+                                            <div class="flex items-center justify-center">
+                                                <input type="checkbox"
+                                                    class="course-checkbox"
+                                                    value="${course.id}"
+                                                    ${isChecked ? 'checked' : ''}
+                                                    onchange="toggleCourseSelection(${course.id}, this.checked)">
+                                            </div>
                                         </td>
                                         <td class="${sortBy === 'id' ? 'ACTIVE' : ''} text-center">
                                             <span class="text-gray-600 dark:text-gray-300">${course.id}</span>
@@ -635,7 +647,7 @@
                                         <td class="${sortBy === 'end_date' ? 'ACTIVE' : ''} ${PIN_COLS_STYLES['end_date'].sticky}">
                                             <span>${formatDate_Global(course.end_date)}</span>
                                         </td>
-                                        <td class="${sortBy === 'status' ? 'ACTIVE' : ''} ${PIN_COLS_STYLES['status'].sticky}r">
+                                        <td class="${sortBy === 'status' ? 'ACTIVE' : ''} ${PIN_COLS_STYLES['status'].sticky}">
                                             <span class="inline-flex items-center px-2.5 py-1 rounded-full font-medium ${statusClass}">
                                                 ${statusText}
                                             </span>

@@ -15,6 +15,7 @@
 
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 
+
     <script>
         // ===== Theme (Light/Dark) =====
         const THEME_KEY = 'lms-theme';
@@ -295,6 +296,16 @@
                     </svg>
                 </div>
                 <span class="sidebar-text">Bài học</span>
+            </a>
+            <a href="{{ route('admin.quizzes.list') }}"
+                class="sidebar-item group px-3 py-2.5 flex items-center gap-3 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.quizzes.*') ? 'active bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20' }}">
+                <div
+                    class="h-7 w-7 rounded-lg {{ request()->routeIs('admin.quizzes.*') ? 'text-white bg-white/20' : 'text-gray-600 dark:text-gray-400 bg-slate-100 dark:bg-slate-900/30' }} flex items-center justify-center transition-all duration-300">
+                    <svg class="w-4 h-4" viewBox="0 0 448 512" fill="currentColor">
+                        <path d="M384 32c35.3 0 64 28.7 64 64l0 320c0 35.3-28.7 64-64 64L64 480c-35.3 0-64-28.7-64-64L0 96C0 60.7 28.7 32 64 32l320 0zM342 145.7c-10.7-7.8-25.7-5.4-33.5 5.3L189.1 315.2 137 263.1c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l72 72c5 5 11.9 7.5 18.8 7s13.4-4.1 17.5-9.8L347.3 179.2c7.8-10.7 5.4-25.7-5.3-33.5z"/>
+                    </svg>
+                </div>
+                <span class="sidebar-text">Quiz</span>
             </a>
 
             @php $reportsOpen = request()->routeIs('admin.reports.*'); @endphp

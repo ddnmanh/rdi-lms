@@ -1,13 +1,13 @@
 {{-- Lessons Tab --}}
 <div class="tab-panel h-full flex flex-col overflow-hidden hidden" data-tab-content="tab-lessons">
     <div class="flex-1 min-h-0 overflow-hidden">
-        <form id="lessonsForm" onsubmit="saveLessons(event)" class="h-full flex flex-col">
+        <form id="lessonsForm" onsubmit="saveLessons(event)" class="h-full p-6 flex flex-col">
             {{-- <div class="p-6 pb-4">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">Quản lý bài học</h3>
                 <p class="text-sm text-gray-500 dark:text-gray-400">Kéo thả để sắp xếp thứ tự bài học trong khóa học</p>
             </div> --}}
 
-            <div class="flex-1 min-h-0 p-6 pt-0">
+            <div class="flex-1 min-h-0">
                 <div class="h-full rounded-lg relative table-scroll-container flex flex-row items-stretch gap-4">
                     <div class="flex-1 min-h-0 flex flex-col items-stretch justify-start">
                         <label class="ml-4 block font-semibold text-blue-700 dark:text-gray-300 mb-2">Bài học tự do</label>
@@ -56,7 +56,7 @@
                 </div>
             </div>
 
-            <div class="p-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div class="mt-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <div class="flex items-center justify-between">
                     <div class="text-sm text-gray-500 dark:text-gray-400">
                         <span id="lessonsCount">0</span> bài học được chọn
@@ -64,9 +64,9 @@
                     <button
                         type="submit"
                         id="saveLessonsBtn"
-                        class="px-4 py-2 rounded-md text-white bg-green-600 hover:bg-green-700"
+                        class="px-4 py-2 rounded-md text-white bg-blue-600 hover:bg-blue-500"
                     >
-                        Lưu bài học
+                        Lưu danh sách bài học
                     </button>
                 </div>
             </div>

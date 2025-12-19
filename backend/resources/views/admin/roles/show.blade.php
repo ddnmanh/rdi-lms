@@ -9,7 +9,7 @@
     <input type="hidden" id="roleId" value="{{ $roleId ?? '' }}">
 
     {{-- Header Bar --}}
-    <div class="max-w-1/2 p-3 3xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-row justify-between gap-4">
+    <div class="w-full max-w-[1800px] mx-auto p-3 3xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-row justify-between gap-4">
 
         <div class="flex items-center justify-start gap-3">
             <button onclick="handleGotoBackPage_Global()"

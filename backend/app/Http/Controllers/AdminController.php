@@ -150,6 +150,38 @@ class AdminController extends Controller
     }
 
     /**
+     * Trang quản lý quizzes
+     */
+    public function quizzes()
+    {
+        return view('admin.quizzes.list');
+    }
+
+    /**
+     * Trang tạo mới quiz
+     */
+    public function createQuiz()
+    {
+        return view('admin.quizzes.form', ['mode' => 'CREATE_QUIZ']);
+    }
+
+    /**
+     * Trang chỉnh sửa quiz
+     */
+    public function editQuiz($id)
+    {
+        return view('admin.quizzes.form', ['mode' => 'EDIT_QUIZ', 'quizId' => $id]);
+    }
+
+    /**
+     * Trang xem trước quiz của lesson (như sinh viên)
+     */
+    public function previewLessonQuiz($id)
+    {
+        return view('admin.lessons.quiz-preview', ['lessonId' => $id]);
+    }
+
+    /**
      * Trang báo cáo
      */
     public function reports()

@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../../../data/models/lesson_model.dart';
+import '../../../../data/models/quiz_model.dart';
 
 class VideoPlayerControls extends StatelessWidget {
   final Animation<double> controlsFadeAnimation;
@@ -13,6 +14,7 @@ class VideoPlayerControls extends StatelessWidget {
   final Duration seekPosition;
   final Duration duration;
   final Lesson? lesson;
+  final List<Quiz> quizzes;
   final VoidCallback onToggleLock;
   final VoidCallback onToggleFullscreen;
   final VoidCallback onPlayPause;
@@ -43,10 +45,13 @@ class VideoPlayerControls extends StatelessWidget {
     required this.onSeekEnd,
     required this.onTap,
     required this.onDoubleTapDown,
+    this.quizzes = const [],
   });
 
   // Colors
   static const Color _accentBlue = Color(0xFF0A84FF);
+  // static const Color _accentOrange = Color(0xFFFF9F0A); // iOS Orange
+  static const Color _quizMarkerColor = Color(0xFFFFD60A); // iOS Yellow
   static const Color _white = Color(0xFFFFFFFF);
   static const Color _white20 = Color(0x33FFFFFF);
   static const Color _white10 = Color(0x1AFFFFFF);
@@ -134,28 +139,38 @@ class VideoPlayerControls extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
-          CupertinoButton(
-            padding: EdgeInsets.zero,
-            onPressed: onToggleFullscreen,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: Colors.black26,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                CupertinoIcons.fullscreen_exit,
-                color: _white,
-                size: 22,
-                shadows: [
-                  Shadow(
-                    color: Colors.black54,
-                    blurRadius: 4,
-                    offset: Offset(0, 2),
+          Builder(
+            builder: (context) {
+              final isDark = Theme.of(context).brightness == Brightness.dark;
+              final bgColor = isDark
+                  ? Colors.black.withOpacity(0.6)
+                  : Colors.black.withOpacity(0.3);
+              const iconColor = _white;
+
+              return CupertinoButton(
+                padding: EdgeInsets.zero,
+                onPressed: onToggleFullscreen,
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: bgColor,
+                    shape: BoxShape.circle,
                   ),
-                ],
-              ),
-            ),
+                  child: const Icon(
+                    CupertinoIcons.fullscreen_exit,
+                    color: iconColor,
+                    size: 22,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black54,
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
           const Spacer(),
         ],
@@ -187,35 +202,48 @@ class VideoPlayerControls extends StatelessWidget {
   }
 
   Widget _buildPlayButton() {
-    return GestureDetector(
-      onTap: onPlayPause,
-      child: Container(
-        width: 64,
-        height: 64,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: _white.withOpacity(0.15),
-          border: Border.all(color: _white20, width: 1.5),
-        ),
-        child: Center(
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 150),
-            child: Icon(
-              isPlaying ? CupertinoIcons.pause_fill : CupertinoIcons.play_fill,
-              key: ValueKey(isPlaying),
-              color: _white,
-              size: 32,
-              shadows: const [
-                Shadow(
-                  color: Colors.black54,
-                  blurRadius: 4,
-                  offset: Offset(0, 2),
+    return Builder(
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final bgColor = isDark
+            ? Colors.black.withOpacity(0.6)
+            : Colors.black.withOpacity(0.3);
+        const iconColor = _white;
+        const borderColor = _white20;
+
+        return GestureDetector(
+          onTap: onPlayPause,
+          child: Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: bgColor,
+              border: Border.all(color: borderColor, width: 1.5),
+            ),
+            child: Center(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 150),
+                child: Icon(
+                  isPlaying
+                      ? CupertinoIcons.pause_fill
+                      : CupertinoIcons.play_fill,
+                  key: ValueKey(isPlaying),
+                  color: iconColor,
+                  size: 32,
+                  shadows: const [
+                    Shadow(
+                      color: Colors.black54,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -225,24 +253,35 @@ class VideoPlayerControls extends StatelessWidget {
     required double buttonSize,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: buttonSize,
-        height: buttonSize,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.black.withOpacity(0.3),
-        ),
-        child: Icon(
-          icon,
-          color: _white,
-          size: size,
-          shadows: const [
-            Shadow(color: Colors.black54, blurRadius: 4, offset: Offset(0, 2)),
-          ],
-        ),
-      ),
+    return Builder(
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final bgColor = isDark
+            ? Colors.black.withOpacity(0.6)
+            : Colors.black.withOpacity(0.3);
+        const iconColor = _white;
+
+        return GestureDetector(
+          onTap: onTap,
+          child: Container(
+            width: buttonSize,
+            height: buttonSize,
+            decoration: BoxDecoration(shape: BoxShape.circle, color: bgColor),
+            child: Icon(
+              icon,
+              color: iconColor,
+              size: size,
+              shadows: const [
+                Shadow(
+                  color: Colors.black54,
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -261,19 +300,35 @@ class VideoPlayerControls extends StatelessWidget {
           CupertinoButton(
             padding: const EdgeInsets.all(8),
             onPressed: onToggleFullscreen,
-            child: Icon(
-              isFullscreen
-                  ? CupertinoIcons.fullscreen_exit
-                  : CupertinoIcons.fullscreen,
-              color: _white,
-              size: 22,
-              shadows: const [
-                Shadow(
-                  color: Colors.black54,
-                  blurRadius: 4,
-                  offset: Offset(0, 1),
-                ),
-              ],
+            child: Builder(
+              builder: (context) {
+                final isDark = Theme.of(context).brightness == Brightness.dark;
+                final bgColor = isDark
+                    ? Colors.black.withOpacity(0.6)
+                    : Colors.black.withOpacity(0.3);
+                const iconColor = _white;
+                return Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: bgColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    isFullscreen
+                        ? CupertinoIcons.fullscreen_exit
+                        : CupertinoIcons.fullscreen,
+                    color: iconColor,
+                    size: 22,
+                    shadows: const [
+                      Shadow(
+                        color: Colors.black54,
+                        blurRadius: 4,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -282,69 +337,151 @@ class VideoPlayerControls extends StatelessWidget {
   }
 
   Widget _buildProgressBar(Duration position, Duration duration) {
-    final maxMs = duration.inMilliseconds.toDouble();
+    return Builder(
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final bgColor = isDark
+            ? Colors.black.withOpacity(0.6)
+            : Colors.black.withOpacity(0.3);
+        const textColor = _white;
+        // Keep blue active track for both, adjust inactive
+        final sliderActiveColor = _accentBlue;
+        final sliderInactiveColor = isDark ? _white20 : Colors.white24;
+        final thumbColor = _accentBlue;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              _formatDuration(position),
-              style: const TextStyle(
-                color: _white,
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                fontFeatures: [FontFeature.tabularFigures()],
-                shadows: [
-                  Shadow(
-                    color: Colors.black87,
-                    blurRadius: 2,
-                    offset: Offset(0, 1),
+        final maxMs = duration.inMilliseconds.toDouble();
+        final totalMs = maxMs > 0 ? maxMs : 1.0;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    _formatDuration(position),
+                    style: const TextStyle(
+                      color: textColor,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      fontFeatures: [FontFeature.tabularFigures()],
+                      shadows: [
+                        Shadow(
+                          color: Colors.black54,
+                          blurRadius: 2,
+                          offset: Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    _formatDuration(duration),
+                    style: const TextStyle(
+                      color: textColor,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      fontFeatures: [FontFeature.tabularFigures()],
+                      shadows: [
+                        Shadow(
+                          color: Colors.black54,
+                          blurRadius: 2,
+                          offset: Offset(0, 1),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
-            ),
-            Text(
-              _formatDuration(duration),
-              style: const TextStyle(
-                color: _white,
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-                fontFeatures: [FontFeature.tabularFigures()],
-                shadows: [
-                  Shadow(
-                    color: Colors.black87,
-                    blurRadius: 2,
-                    offset: Offset(0, 1),
-                  ),
-                ],
+              const SizedBox(height: 4),
+              SizedBox(
+                height: 20, // Specific height for stack
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Quiz Markers
+                    if (maxMs > 0)
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final width = constraints.maxWidth;
+                          // Standard slider padding assumption
+                          const padding = 12.0;
+                          final availableWidth = width - (padding * 2);
+
+                          return Stack(
+                            children: quizzes.map((quiz) {
+                              final quizTimeMs = quiz.startAtSeconds * 1000;
+                              if (quizTimeMs > maxMs) return const SizedBox();
+
+                              final percent = quizTimeMs / maxMs;
+                              final left = padding + (availableWidth * percent);
+
+                              return Positioned(
+                                left: left - 2,
+                                child: Container(
+                                  width: 4,
+                                  height: 4,
+                                  decoration: BoxDecoration(
+                                    color: _quizMarkerColor,
+                                    shape: BoxShape.circle,
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.black54,
+                                        blurRadius: 2,
+                                        offset: Offset(0, 1),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          );
+                        },
+                      ),
+                    // Slider
+                    SliderTheme(
+                      data: SliderThemeData(
+                        trackHeight: 3,
+                        activeTrackColor: sliderActiveColor,
+                        inactiveTrackColor: sliderInactiveColor,
+                        thumbColor: thumbColor,
+                        thumbShape: const RoundSliderThumbShape(
+                          enabledThumbRadius: 6,
+                        ),
+                        overlayColor: sliderActiveColor.withOpacity(0.2),
+                        overlayShape: const RoundSliderOverlayShape(
+                          overlayRadius: 12,
+                        ),
+                      ),
+                      child: Slider(
+                        value: position.inMilliseconds.toDouble().clamp(
+                          0,
+                          maxMs,
+                        ),
+                        min: 0,
+                        max: totalMs,
+                        onChangeStart: (v) => onSeekStart(
+                          true,
+                          Duration(milliseconds: v.toInt()),
+                        ),
+                        onChanged: (v) =>
+                            onSeekUpdate(Duration(milliseconds: v.toInt())),
+                        onChangeEnd: (v) =>
+                            onSeekEnd(Duration(milliseconds: v.toInt())),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-        SliderTheme(
-          data: SliderThemeData(
-            trackHeight: 3,
-            activeTrackColor: _accentBlue,
-            inactiveTrackColor: _white20,
-            thumbColor: _white,
-            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
-            overlayColor: _accentBlue.withOpacity(0.2),
-            overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
+            ],
           ),
-          child: Slider(
-            value: position.inMilliseconds.toDouble().clamp(0, maxMs),
-            min: 0,
-            max: maxMs > 0 ? maxMs : 1,
-            onChangeStart: (v) =>
-                onSeekStart(true, Duration(milliseconds: v.toInt())),
-            onChanged: (v) => onSeekUpdate(Duration(milliseconds: v.toInt())),
-            onChangeEnd: (v) => onSeekEnd(Duration(milliseconds: v.toInt())),
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 

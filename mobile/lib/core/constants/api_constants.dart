@@ -42,4 +42,16 @@ class ApiConstants {
   /// Lấy danh sách ghi chú của lesson
   static String getLessonNotes(int lessonId) =>
       '/api/student/lessons/$lessonId/notes?sort_by=duration_at&order_by=asc';
+
+  // Quizzes
+  /// Lấy danh sách quiz trong video
+  static String getLessonQuizzes(int lessonId) =>
+      '/api/student/lessons/$lessonId/quiz';
+
+  /// Lấy thông tin về kết quả làm quiz của sinh viên
+  static String getQuizStatus(int lessonId) =>
+      '/api/student/lessons/$lessonId/quiz-status';
+
+  /// Nộp bài quiz
+  static String submitQuiz(int quizId) => '/api/student/quizzes/$quizId/submit';
 }

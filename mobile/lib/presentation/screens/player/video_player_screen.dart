@@ -20,6 +20,10 @@ import 'widgets/video_player_view.dart';
 import 'widgets/video_player_controls.dart';
 import 'widgets/video_notes_section.dart';
 import 'widgets/player_overlays.dart';
+import 'widgets/quiz_overlay.dart';
+import '../../../data/models/quiz_model.dart';
+import '../../../data/repositories/quiz_repository.dart';
+import '../../../data/services/api_service.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final int lessonId;
@@ -73,6 +77,18 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   List<LessonNote> _notes = [];
   bool _isLoadingNotes = false;
 
+  // Quiz state
+  List<Quiz> _quizzes = [];
+  QuizStatus? _quizStatus;
+  Quiz? _activeQuiz;
+  late final QuizRepository _quizRepository;
+  bool _isSubmittingQuiz = false;
+  String? _quizError;
+  bool? _isQuizPassed;
+  final Set<int> _passedQuizIds = {};
+  final Map<int, Map<int, List<int>>> _quizDrafts =
+      {}; // QuizID -> {QuestionID -> Options}
+
   // Animation controllers
   late AnimationController _controlsAnimController;
   late Animation<double> _controlsFadeAnimation;
@@ -118,10 +134,20 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     _player = Player();
     _videoController = VideoController(_player);
 
+    // Initialize repository
+    _quizRepository = QuizRepository(
+      ApiService(Dio(), const FlutterSecureStorage()),
+    );
+    // In strict architecture, use Provider/GetIt. Here I instantiate locally as per existing pattern or reuse _apiService logic if possible.
+    // However, _initializePlayer creates a local Dio. I should probably create a stored one or use a singleton if available.
+    // Existing code uses `_apiService` in repository but here `fetchLessonDetail` uses new Dio().
+    // I will use a helper to get dio with token later, or just init here.
+
     _setupOrientations();
     _setupListeners();
     _initializePlayer();
     _fetchNotes();
+    _fetchQuizzes();
   }
 
   void _setupOrientations() {
@@ -133,39 +159,75 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   }
 
+  final List<StreamSubscription> _subscriptions = [];
+
+  // ... (previous code)
+
+  @override
+  void dispose() {
+    _saveProgress();
+
+    for (final s in _subscriptions) {
+      s.cancel();
+    }
+
+    WidgetsBinding.instance.removeObserver(this);
+    _controlsAnimController.dispose();
+    _seekAnimController.dispose();
+    _hideControlsTimer?.cancel();
+    _doubleTapTimer?.cancel();
+
+    _player.dispose();
+
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    super.dispose();
+  }
+
   void _setupListeners() {
-    _player.stream.playing.listen((playing) {
-      if (mounted) setState(() => _isPlaying = playing);
-    });
+    _subscriptions.add(
+      _player.stream.playing.listen((playing) {
+        if (mounted) setState(() => _isPlaying = playing);
+      }),
+    );
 
-    _player.stream.position.listen((position) {
-      if (mounted && !_isSeeking) {
-        setState(() {
-          _position = position;
-          // Track maximum watched position
-          if (position > _maxWatchedPosition) {
-            _maxWatchedPosition = position;
-          }
-        });
-      }
-    });
+    _subscriptions.add(
+      _player.stream.position.listen((position) {
+        if (mounted && !_isSeeking) {
+          setState(() {
+            _position = position;
+            // Track maximum watched position
+            if (position > _maxWatchedPosition) {
+              _maxWatchedPosition = position;
+            }
+          });
+          _checkQuizTrigger(_position);
+        }
+      }),
+    );
 
-    _player.stream.duration.listen((duration) {
-      if (mounted) setState(() => _duration = duration);
-    });
+    _subscriptions.add(
+      _player.stream.duration.listen((duration) {
+        if (mounted) setState(() => _duration = duration);
+      }),
+    );
 
-    _player.stream.buffering.listen((buffering) {
-      if (mounted) setState(() => _isBuffering = buffering);
-    });
+    _subscriptions.add(
+      _player.stream.buffering.listen((buffering) {
+        if (mounted) setState(() => _isBuffering = buffering);
+      }),
+    );
 
-    _player.stream.error.listen((error) {
-      if (mounted && error.isNotEmpty) {
-        setState(() {
-          _error = error;
-          _isLoading = false;
-        });
-      }
-    });
+    _subscriptions.add(
+      _player.stream.error.listen((error) {
+        if (mounted && error.isNotEmpty) {
+          setState(() {
+            _error = error;
+            _isLoading = false;
+          });
+        }
+      }),
+    );
   }
 
   @override
@@ -352,6 +414,173 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     }
   }
 
+  // ===== QUIZ LOGIC =====
+
+  Future<void> _fetchQuizzes() async {
+    try {
+      final quizzes = await _quizRepository.getLessonQuizzes(widget.lessonId);
+      final status = await _quizRepository.getQuizStatus(widget.lessonId);
+
+      if (mounted) {
+        setState(() {
+          _quizzes = quizzes;
+          _quizStatus = status;
+          if (status != null) {
+            for (var q in status.quizzes) {
+              if (q.passed) _passedQuizIds.add(q.quizId);
+            }
+          }
+        });
+        _checkQuizTrigger(_position);
+      }
+    } catch (e) {
+      debugPrint('Error fetching quizzes: $e');
+    }
+  }
+
+  void _checkQuizTrigger(Duration position) {
+    if (_activeQuiz != null) return; // Already showing a quiz
+    if (_isLoading) return;
+
+    final currentSeconds = position.inSeconds;
+
+    for (var quiz in _quizzes) {
+      // Trigger if we are at or past the start time
+      // AND we haven't passed it yet
+      // AND it's required (or we just want to show all quizzes?)
+      // Requirement: "appear at specific timestamps... must pass ... to continue"
+      // So checks:
+      // 1. Time logic: strict equality might miss if we skip frames, so use range or "crossed boundary" logic?
+      //    "Crossed boundary" is hard without storing last checks.
+      //    Simple approach: `currentSeconds == quiz.startAtSeconds`.
+      //    But players might jump from 299 to 301.
+      //    Better: `currentSeconds >= quiz.startAtSeconds` AND `!_passedQuizIds.contains(quiz.id)`.
+      //    But if I rewind, it triggers again? "already passed" check handles that.
+      //    But if I haven't passed, and I'm at 400s (quiz at 300s), should it trigger? Yes, I shouldn't have been able to get there.
+      //    Wait, if I seek past it?
+      //    "Block seeking past" is in requirements "must pass ... to continue viewing content BEHIND that exercise".
+      //    So if I seek to 500s and quiz is at 300s and not passed, I should be blocked.
+
+      if (_passedQuizIds.contains(quiz.id)) continue;
+
+      if (currentSeconds >= quiz.startAtSeconds) {
+        // Trigger!
+        _player.pause();
+
+        // Seek back to exactly the start time if we overshot significantly?
+        // Maybe just pause is enough. But if they seeked way past, maybe move them back?
+        // Let's just prompt quiz.
+        setState(() {
+          _activeQuiz = quiz;
+        });
+        break; // Only trigger one at a time
+      }
+    }
+  }
+
+  Future<void> _submitQuiz(
+    int quizId,
+    List<Map<String, dynamic>> answers,
+  ) async {
+    setState(() {
+      _isSubmittingQuiz = true;
+      _quizError = null;
+    });
+
+    try {
+      final success = await _quizRepository.submitQuiz(quizId, answers);
+      if (success) {
+        // Re-fetch status to get score/pass result?
+        // Or assume success means passed?
+        // The API returns void/bool in my repo, but real backend might return score.
+        // Step 1: fetch status again to confirm pass/result detail.
+        final status = await _quizRepository.getQuizStatus(widget.lessonId);
+
+        bool passed = false;
+        if (status != null) {
+          final quizResult = status.quizzes.firstWhere(
+            (q) => q.quizId == quizId,
+            orElse: () => QuizResultStatus(
+              quizId: quizId,
+              title: '',
+              startAtSeconds: 0,
+              passingPercentScore: 0,
+              passed: false,
+            ),
+          );
+          passed = quizResult.passed;
+        }
+
+        if (mounted) {
+          setState(() {
+            _isSubmittingQuiz = false;
+            _isQuizPassed = passed;
+            if (passed) {
+              _passedQuizIds.add(quizId);
+              _quizStatus = status;
+            }
+            _quizDrafts.remove(
+              quizId,
+            ); // Clear draft on ANY submission (pass or fail)
+          });
+        }
+      } else {
+        setState(() {
+          _isSubmittingQuiz = false;
+          _quizError = 'Có lỗi khi nộp bài. Vui lòng thử lại.';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isSubmittingQuiz = false;
+        _quizError = 'Lỗi kết nối: ${e.toString()}';
+      });
+    }
+  }
+
+  void _handleRetry() {
+    setState(() {
+      _isQuizPassed = null;
+      _quizError = null;
+    });
+  }
+
+  Future<void> _handleQuizClose(Map<int, List<int>> currentAnswers) async {
+    final quiz = _activeQuiz;
+    final wasRequired = quiz?.isRequired ?? false;
+    final quizId = quiz?.id;
+    final startAt = quiz?.startAtSeconds;
+
+    // Only save draft if we haven't submitted (isPassed is null)
+    // If _isQuizPassed != null, we are in result view, so don't overwrite draft.
+    if (quizId != null && _isQuizPassed == null) {
+      _quizDrafts[quizId] = currentAnswers;
+    }
+
+    setState(() {
+      _activeQuiz = null;
+      _isQuizPassed = null;
+      _quizError = null;
+    });
+
+    if (!_isPlaying && (_lesson?.progress.isCompleted == false)) {
+      bool passed = quizId != null && _passedQuizIds.contains(quizId);
+      if (!wasRequired || passed) {
+        await _player.play();
+      } else {
+        // "Xem lại kiến thức": Seek back 10 seconds from QUIZ START to allow review
+        final anchor = startAt ?? _position.inSeconds;
+        final backSeconds = anchor - 10;
+        final backPosition = Duration(
+          seconds: backSeconds < 0 ? 0 : backSeconds,
+        );
+
+        await _player.seek(backPosition);
+        await _player.play();
+      }
+    }
+  }
+
   /// Lưu tiến độ xem video lên server
   Future<void> _saveProgress() async {
     // Prevent duplicate saves
@@ -425,7 +654,30 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     } else if (newPosition > duration) {
       newPosition = duration;
     }
+    newPosition = _getSafeSeekPosition(newPosition);
     _player.seek(newPosition);
+  }
+
+  Duration _getSafeSeekPosition(Duration target) {
+    // Filter only unpassed & required quizzes
+    final blockingQuizzes = _quizzes
+        .where((q) => q.isRequired && !_passedQuizIds.contains(q.id))
+        .toList();
+
+    if (blockingQuizzes.isEmpty) return target;
+
+    // Sort by time
+    blockingQuizzes.sort(
+      (a, b) => a.startAtSeconds.compareTo(b.startAtSeconds),
+    );
+
+    for (var quiz in blockingQuizzes) {
+      // If target is past the quiz, restrict to the quiz start
+      if (target.inSeconds >= quiz.startAtSeconds) {
+        return Duration(seconds: quiz.startAtSeconds);
+      }
+    }
+    return target;
   }
 
   void _handleDoubleTap(TapDownDetails details, double screenWidth) {
@@ -529,26 +781,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   }
 
   void _onSeekEnd(Duration position) {
-    _player.seek(position);
+    final safePos = _getSafeSeekPosition(position);
+    _player.seek(safePos);
     setState(() => _isSeeking = false);
     _resetHideTimer();
-  }
-
-  @override
-  void dispose() {
-    // Save progress before disposing
-    _saveProgress();
-
-    WidgetsBinding.instance.removeObserver(this);
-    _controlsAnimController.dispose();
-    _seekAnimController.dispose();
-    _hideControlsTimer?.cancel();
-    _doubleTapTimer?.cancel();
-    _player.dispose();
-
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    super.dispose();
   }
 
   @override
@@ -608,6 +844,21 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
                           ),
                     );
                   },
+                ),
+
+              if (_activeQuiz != null)
+                Positioned.fill(
+                  child: QuizOverlay(
+                    quiz: _activeQuiz!,
+                    isSubmitting: _isSubmittingQuiz,
+                    error: _quizError,
+                    isPassed: _isQuizPassed,
+                    initialAnswers: _quizDrafts[_activeQuiz!.id],
+                    onClose: _handleQuizClose,
+                    onRetry: _handleRetry,
+                    onSubmit: (answers) =>
+                        _submitQuiz(_activeQuiz!.id, answers),
+                  ),
                 ),
             ],
           ),
@@ -701,6 +952,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       onSeekEnd: _onSeekEnd,
       onTap: _onVideoTap,
       onDoubleTapDown: _handleDoubleTap,
+      quizzes: _quizzes,
     );
   }
 

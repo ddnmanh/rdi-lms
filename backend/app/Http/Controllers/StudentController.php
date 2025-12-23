@@ -614,17 +614,6 @@ class StudentController extends Controller
             $body = $request->validated();
             $user = $request->user();
 
-            // Kiểm tra quiz có thuộc về lesson của user không
-            $lesson = Lesson::find($quizId);
-            if (!$user->courses->contains($lesson->course_id)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Bài học này không thuộc về khóa học của bạn'
-                ], 403);
-            }
-
-
-
             $quiz = LessonQuiz::with(['questions.options'])->find($quizId);
 
             // Kiểm tra quiz có tồn tại không
@@ -649,6 +638,15 @@ class StudentController extends Controller
                     'success' => false,
                     'message' => 'Quiz này chưa có câu hỏi'
                 ], 400);
+            }
+
+            // Kiểm tra quiz có thuộc về lesson của user không
+            $lesson = Lesson::find($quiz->lesson_id);
+            if (!$user->courses->contains($lesson->course_id)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Bài học này không thuộc về khóa học của bạn'
+                ], 403);
             }
 
             // Kiểm tra user đã pass quiz này chưa

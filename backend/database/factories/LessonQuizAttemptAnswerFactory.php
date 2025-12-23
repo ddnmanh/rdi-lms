@@ -28,7 +28,7 @@ class LessonQuizAttemptAnswerFactory extends Factory
             'question_id' => LessonQuizQuestion::factory(),
             'selected_option_ids' => [], // To be populated
             'is_correct' => $this->faker->boolean(),
-            'points_earned' => $this->faker->numberBetween(0, 10),
+            'score_earned' => $this->faker->numberBetween(0, 10),
         ];
     }
 }

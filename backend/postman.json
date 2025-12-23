@@ -2022,6 +2022,42 @@
 					"response": []
 				},
 				{
+					"name": "Get Lesson Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{domain_server}}/api/lessons/:id/statistics",
+							"host": [
+								"{{domain_server}}"
+							],
+							"path": [
+								"api",
+								"lessons",
+								":id",
+								"statistics"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Xem thống kê chi tiết của một bài học (Quiz, câu hỏi, điểm số)."
+					},
+					"response": []
+				},
+				{
 					"name": "Update Lesson",
 					"request": {
 						"method": "PUT",
@@ -2325,6 +2361,34 @@
 							]
 						},
 						"description": "Xem danh sách tất cả quiz của một bài học."
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Quizzes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{domain_server}}/api/lesson-quizzes",
+							"host": [
+								"{{domain_server}}"
+							],
+							"path": [
+								"api",
+								"lesson-quizzes"
+							]
+						},
+						"description": "Xem danh sách tất cả quiz trong hệ thống."
 					},
 					"response": []
 				},

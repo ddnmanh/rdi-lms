@@ -258,6 +258,12 @@ Route::middleware('auth:api')->group(function () {
             'description' => 'Cho phép xóa bài học, không thể xóa bài học đang thuộc về một khóa học'
         ]);
 
+        routeWithPermission('get', '/{id}/statistics', [LessonController::class, 'getStatistics'], [
+            'group' => 'Bài học',
+            'name' => 'Xem thống kê Bài học',
+            'description' => 'Cho phép xem thống kê chi tiết của một bài học (Quiz, câu hỏi, điểm số)'
+        ]);
+
         routeWithPermission('get', '/{lesson}/auto-signature', [LessonVideoStreamController::class, 'getUriWithSignatureForVideo'], [
             'group' => 'Bài học',
             'name' => 'Lấy chữ ký cho video (tự chọn HLS hoặc mp4)',
@@ -412,22 +418,22 @@ Route::middleware('auth:api')->group(function () {
         ]);
 
         // Quiz routes (Sinh viên làm bài)
-        routeWithPermission('get', '/lessons/{lessonId}/quiz-status', [LessonQuizController::class, 'checkQuizStatus'], [
+        routeWithPermission('get', '/lessons/{lessonId}/quiz', [StudentController::class, 'getQuizzesByLesson'], [
+            'group' => 'Quiz bài học (Sinh viên)',
+            'name' => 'Lấy danh sách Quiz của bài học',
+            'description' => 'Cho phép học viên lấy danh sách quiz của một bài học'
+        ]);
+        routeWithPermission('get', '/lessons/{lessonId}/quiz-status', [StudentController::class, 'checkQuizStatus'], [
             'group' => 'Quiz bài học (Sinh viên)',
             'name' => 'Kiểm tra trạng thái Quiz',
             'description' => 'Kiểm tra sinh viên đã pass các quiz của bài học chưa (để cho phép xem tiếp video)'
         ]);
-        routeWithPermission('get', '/quizzes/{quizId}', [LessonQuizController::class, 'show'], [
-            'group' => 'Quiz bài học (Sinh viên)',
-            'name' => 'Xem chi tiết Quiz (Sinh viên)',
-            'description' => 'Cho phép sinh viên xem thông tin quiz để làm bài'
-        ]);
-        routeWithPermission('post', '/quizzes/{quizId}/submit', [LessonQuizController::class, 'submitAttempt'], [
+        routeWithPermission('post', '/quizzes/{quizId}/submit', [StudentController::class, 'submitAttempt'], [
             'group' => 'Quiz bài học (Sinh viên)',
             'name' => 'Nộp bài Quiz',
             'description' => 'Cho phép sinh viên nộp bài làm quiz và nhận điểm'
         ]);
-        routeWithPermission('get', '/quizzes/{quizId}/attempts', [LessonQuizController::class, 'getAttempts'], [
+        routeWithPermission('get', '/quizzes/{quizId}/attempts', [StudentController::class, 'getAttempts'], [
             'group' => 'Quiz bài học (Sinh viên)',
             'name' => 'Xem lịch sử làm bài Quiz',
             'description' => 'Cho phép sinh viên xem lịch sử các lần làm quiz của mình'

@@ -103,6 +103,14 @@
                     <span>Bài tập trắc nghiệm</span>
                     <span id="quizTabCount" class="rounded-full bg-gray-200 dark:bg-gray-700 px-2 py-0.5 font-semibold text-gray-600 dark:text-gray-300 text-xs">0</span>
                 </button>
+                <button type="button"
+                    class="tab-trigger inline-flex items-center gap-2 rounded-t-xl px-5 py-2.5 font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/70 dark:hover:bg-gray-800/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                    data-tab-target="TAB_STATISTICS">
+                    <svg class="w-4 h-4" viewBox="0 0 512 512" fill="currentColor">
+                        <path d="M64 64c0-17.7-14.3-32-32-32S0 46.3 0 64L0 400c0 44.2 35.8 80 80 80l400 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 416c-8.8 0-16-7.2-16-16L64 64zm406.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L320 210.7 262.6 153.4c-12.5-12.5-32.8-12.5-45.3 0l-96 96c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l73.4-73.4 57.4 57.4c12.5 12.5 32.8 12.5 45.3 0l128-128z"/>
+                    </svg>
+                    <span>Thống kê</span>
+                </button>
             </div>
 
             {{-- Content area --}}
@@ -116,6 +124,9 @@
                 <div class="tab-panel hidden h-full max-h-full overflow-y-auto" data-tab-content="TAB_QUIZ">
                     @include('admin.lessons.show.tab-quiz')
                 </div>
+
+                {{-- Statistics Tab --}}
+                @include('admin.lessons.show.tab-statistics')
             </div>
         </div>
     </div>
@@ -204,6 +215,13 @@
                 }
             }
         });
+
+        // Load statistics when tab is active
+        if (target === 'TAB_STATISTICS') {
+            if (typeof loadLessonStatistics === 'function') {
+                loadLessonStatistics();
+            }
+        }
 
         // Cập nhật URL hash nếu cần
         if (updateUrl) {

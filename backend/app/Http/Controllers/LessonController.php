@@ -141,6 +141,221 @@ class LessonController extends Controller
     }
 
     /**
+     * Lấy thống kê bài học (Quiz, Questions, Users Attempts)
+     */
+    public function getStatistics($id): JsonResponse
+    {
+        try {
+            $lesson = Lesson::find($id);
+
+            if (!$lesson) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Không tìm thấy bài học'
+                ], 404);
+            }
+
+            // Lấy danh sách quiz thuộc bài học này
+            // Sử dụng quan hệ quizzes() nếu đã định nghĩa trong model Lesson
+            // Hoặc query trực tiếp nếu chưa định nghĩa: LessonQuiz::where('lesson_id', $id)->get()
+            // Giả sử có model LessonQuiz và quan hệ quizzes
+            $quizzes = \App\Models\LessonQuiz::where('lesson_id', $id)->get();
+            $quizIds = $quizzes->pluck('id');
+
+            // Tổng số câu hỏi
+            // Giả sử LessonQuiz có quan hệ questions() hoặc đếm từ bảng questions
+            $totalQuestions = \App\Models\LessonQuizQuestion::whereIn('quiz_id', $quizIds)->count();
+
+            // Lấy tất cả lượt làm bài (attempts) của các quiz này
+            $attempts = \App\Models\LessonQuizAttempt::whereIn('quiz_id', $quizIds)
+                ->whereNotNull('completed_at') // Chỉ lấy bài đã nộp (hoàn thành)
+                ->with(['user', 'quiz']) // Eager load relations
+                ->get();
+
+            $totalAttempts = $attempts->count();
+            $avgScore = $totalAttempts > 0 ? $attempts->avg('score_earned') : 0;
+
+            // --- 1. Phân bổ điểm số (0-4, 5-7, 8-9, 10) ---
+            $scoreDistribution = [
+                '0-4' => 0,
+                '5-7' => 0,
+                '8-9' => 0,
+                '10' => 0
+            ];
+
+            // --- 2. Thống kê Pass/Fail ---
+            $passFailRatio = [
+                'passed' => 0,
+                'failed' => 0
+            ];
+
+            // --- 3. Top học viên (Điểm cao nhất) ---
+            // Group by user_id -> lấy attempt có điểm cao nhất của mỗi user
+            $userBestAttempts = [];
+            // Lưu tổng điểm và tổng điểm tối đa của từng user để tính % tổng
+            $userAccumulatedScores = [];
+
+            // --- 4. Thời gian làm bài trung bình ---
+            $totalDurationSeconds = 0;
+
+            foreach ($attempts as $attempt) {
+
+                // Score dist
+                $score = $attempt->score_earned;
+                if ($score < 5) {
+                    $scoreDistribution['0-4']++;
+                } else if ($score < 8) {
+                    $scoreDistribution['5-7']++;
+                } else if ($score < 10) {
+                    $scoreDistribution['8-9']++;
+                } else {
+                    $scoreDistribution['10']++;
+                }
+
+                // Pass/Fail
+                if ($attempt->passed) {
+                    $passFailRatio['passed']++;
+                } else {
+                    $passFailRatio['failed']++;
+                }
+
+                // Top students processing
+                $uid = $attempt->user_id;
+                // Tích lũy điểm cho tất cả attempt của user
+                if (!isset($userAccumulatedScores[$uid])) {
+                    $userAccumulatedScores[$uid] = [
+                        'score_earned' => 0,
+                        'max_possible_score' => 0
+                    ];
+                }
+                $userAccumulatedScores[$uid]['score_earned'] += (float) $attempt->score_earned;
+                $userAccumulatedScores[$uid]['max_possible_score'] += (float) $attempt->max_possible_score;
+
+                if (!isset($userBestAttempts[$uid]) || $score > $userBestAttempts[$uid]['score_earned']) {
+                    $userBestAttempts[$uid] = [
+                        'user' => $attempt->user,
+                        'score_earned' => $score,
+                        'percent_score_earned' => round($attempt->percent_score_earned, 2),
+                        'quiz_title' => $attempt->quiz->title ?? '-',
+                        'completed_at' => $attempt->completed_at
+                    ];
+                }
+
+                // Avg Duration
+                if ($attempt->started_at && $attempt->completed_at) {
+                    $totalDurationSeconds += $attempt->completed_at->diffInSeconds($attempt->started_at);
+                }
+            }
+
+            $avgDuration = $totalAttempts > 0 ? round($totalDurationSeconds / $totalAttempts) : 0;
+
+            // Format Top Students (Top 5)
+            // Bổ sung total_percent_score = (tổng score_earned / tổng max_possible_score) * 100
+            foreach ($userBestAttempts as $uid => &$bestAttempt) {
+                $totalEarned = $userAccumulatedScores[$uid]['score_earned'] ?? 0;
+                $totalMax = $userAccumulatedScores[$uid]['max_possible_score'] ?? 0;
+                $bestAttempt['total_percent_score'] = $totalMax > 0 ? round(($totalEarned / $totalMax) * 100, 2) : 0;
+            }
+            unset($bestAttempt);
+
+            $topStudents = collect($userBestAttempts)->sortByDesc('score_earned')->take(5)->values();
+
+
+            // --- 5. Thống kê theo từng Quiz (Thêm số lượng câu hỏi) ---
+            // Eager load question count
+            $quizzes->loadCount('questions');
+
+            $quizStats = $quizzes->map(function ($quiz) use ($attempts) {
+                $quizAttempts = $attempts->where('quiz_id', $quiz->id);
+                return [
+                    'id' => $quiz->id,
+                    'title' => $quiz->title,
+                    'total_attempts' => $quizAttempts->count(),
+                    'avg_score' => $quizAttempts->count() > 0 ? round($quizAttempts->avg('percent_score_earned'), 2) : 0,
+                    'passed_count' => $quizAttempts->where('passed', true)->count(),
+                    'question_count' => $quiz->questions_count
+                ];
+            });
+
+            // --- 6. Thống kê chi tiết câu hỏi (Tất cả câu hỏi để vẽ biểu đồ) ---
+            $allQuestionIds = \App\Models\LessonQuizQuestion::whereIn('quiz_id', $quizIds)->pluck('id');
+            // Aggregate answers
+            $rawAnswers = \App\Models\LessonQuizAttemptAnswer::whereIn('question_id', $allQuestionIds)
+                ->selectRaw('question_id, count(*) as total, sum(case when is_correct = 1 then 1 else 0 end) as correct')
+                ->groupBy('question_id')
+                ->get();
+
+            $questionStats = [];
+            foreach($rawAnswers as $ans) {
+                $ratio = $ans->total > 0 ? ($ans->correct / $ans->total) * 100 : 0;
+                $questionStats[$ans->question_id] = [
+                    'question_id' => $ans->question_id,
+                    'total' => $ans->total,
+                    'correct' => $ans->correct,
+                    'ratio' => $ratio
+                ];
+            }
+
+            // Lấy nội dung tất cả câu hỏi để vẽ biểu đồ
+            $allQuestionsDetails = \App\Models\LessonQuizQuestion::whereIn('id', $allQuestionIds)
+                ->get()
+                ->map(function($q) use ($questionStats) {
+                    $stat = $questionStats[$q->id] ?? ['total' => 0, 'correct' => 0, 'ratio' => 0];
+                    return [
+                        'id' => $q->id,
+                        'question' => $q->question_text,
+                        'short_question' => \Illuminate\Support\Str::limit($q->question_text, 20),
+                        'total_answers' => $stat['total'],
+                        'correct_count' => (int)$stat['correct'],
+                        'correct_ratio' => round($stat['ratio'], 2)
+                    ];
+                })
+                ->values();
+
+             // Top 5 hardest for table (subset of above)
+            $hardestQuestions = $allQuestionsDetails->sortBy('correct_ratio')->take(5)->values();
+
+
+            // Thống kê lượt làm bài theo thời gian (theo ngày)
+            $attemptsOverTime = $attempts->groupBy(function ($item) {
+                return $item->created_at->format('Y-m-d');
+            })->map(function ($group) {
+                return $group->count();
+            })->sortKeys();
+
+            $chartAttemptsOverTime = [];
+            foreach ($attemptsOverTime as $date => $count) {
+                $chartAttemptsOverTime[] = ['date' => $date, 'count' => $count];
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'total_quizzes' => $quizzes->count(),
+                    'total_questions' => $totalQuestions,
+                    'total_attempts' => $totalAttempts,
+                    'avg_score' => round($avgScore, 2),
+                    'avg_duration_seconds' => $avgDuration,
+                    'score_distribution' => $scoreDistribution,
+                    'pass_fail_ratio' => $passFailRatio,
+                    'attempts_over_time' => $chartAttemptsOverTime,
+                    'top_students' => $topStudents,
+                    'quiz_stats' => $quizStats,
+                    'all_questions_stats' => $allQuestionsDetails, // New full dataset
+                    'hardest_questions' => $hardestQuestions
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            report($e);
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi khi lấy thống kê bài học: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Tạo bài học mới
      */
     public function store(StoreRequest $request): JsonResponse

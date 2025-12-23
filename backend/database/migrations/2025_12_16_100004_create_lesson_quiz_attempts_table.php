@@ -17,9 +17,9 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('quiz_id');
             $table->unsignedBigInteger('user_id');
-            $table->decimal('score', 5, 2)->default(0); // Điểm đạt được (%)
-            $table->unsignedInteger('points_earned')->default(0); // Tổng điểm đạt được
-            $table->unsignedInteger('max_points')->default(0); // Điểm tối đa có thể đạt
+            $table->decimal('percent_score_earned', 5, 2)->default(0); // Điểm đạt được (%)
+            $table->unsignedInteger('score_earned')->default(0); // Tổng điểm đạt được
+            $table->unsignedInteger('max_possible_score')->default(0); // Điểm tối đa có thể đạt
             $table->boolean('passed')->default(false); // Đã pass chưa
             $table->timestamp('started_at')->nullable(); // Thời gian bắt đầu làm bài
             $table->timestamp('completed_at')->nullable(); // Thời gian hoàn thành

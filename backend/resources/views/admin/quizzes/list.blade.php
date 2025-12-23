@@ -327,11 +327,11 @@
             },
             questions_count: {
                 sticky: null,
-                width: 'w-[80px] 3xl:w-[110px]'
+                width: 'w-[100px] 3xl:w-[120px]'
             },
             passing_percent_score: {
                 sticky: null,
-                width: 'w-[80px] 3xl:w-[120px]'
+                width: 'w-[110px] 3xl:w-[130px]'
             },
             start_at_seconds: {
                 sticky: null,

@@ -13,7 +13,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
         <button type="button" onclick="openQuizModal()"
             class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium flex items-center gap-2 transition-all">
@@ -218,6 +217,9 @@
                                 <div class="font-medium text-gray-900 dark:text-gray-100 flex gap-2">
                                     <span class="text-blue-500 font-bold shrink-0">${qIdx + 1}.</span>
                                     <span>${escapeHtml_Local(q.question_text)}</span>
+                                    <span class="px-2 py-0.5 text-[10px] bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300 rounded-full font-bold uppercase tracking-wider">
+                                        ${q.points} điểm
+                                    </span>
                                 </div>
                                 <div class="mt-2 pl-6 space-y-1">
                                     ${(q.options || []).map(opt => `

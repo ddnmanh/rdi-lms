@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('question_id');
             $table->json('selected_option_ids')->nullable(); // JSON array của option_ids đã chọn
             $table->boolean('is_correct')->default(false); // Câu trả lời đúng hay sai
-            $table->unsignedInteger('points_earned')->default(0); // Điểm đạt được cho câu này
+            $table->unsignedInteger('score_earned')->default(0); // Điểm đạt được cho câu này
             $table->timestamps();
 
             $table->index('attempt_id');

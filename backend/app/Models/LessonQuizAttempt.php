@@ -14,18 +14,18 @@ class LessonQuizAttempt extends Model
     protected $fillable = [
         'quiz_id',
         'user_id',
-        'score',
-        'points_earned',
-        'max_points',
+        'percent_score_earned',
+        'score_earned',
+        'max_possible_score',
         'passed',
         'started_at',
         'completed_at',
     ];
 
     protected $casts = [
-        'score' => 'decimal:2',
-        'points_earned' => 'integer',
-        'max_points' => 'integer',
+        'percent_score_earned' => 'decimal:2',
+        'score_earned' => 'integer',
+        'max_possible_score' => 'integer',
         'passed' => 'boolean',
         'started_at' => 'datetime',
         'completed_at' => 'datetime',

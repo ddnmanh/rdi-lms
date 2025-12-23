@@ -25,7 +25,7 @@ class LessonFactory extends Factory
     {
         $prefixes = ['Bài', 'Chương', 'Phần'];
         $topics = ['Cài đặt môi trường', 'Cấu trúc thư mục', 'Routing và Controller', 'Database Migration', 'Authentication', 'Middleware', 'Deployment', 'Debug và Log'];
-        
+
         $title = $this->faker->randomElement($prefixes) . ' ' . $this->faker->numberBetween(1, 20) . ': ' . $this->faker->randomElement($topics);
 
         return [

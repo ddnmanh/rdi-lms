@@ -16,13 +16,13 @@ class LessonQuizAttemptAnswer extends Model
         'question_id',
         'selected_option_ids',
         'is_correct',
-        'points_earned',
+        'score_earned',
     ];
 
     protected $casts = [
         'selected_option_ids' => 'array',
         'is_correct' => 'boolean',
-        'points_earned' => 'integer',
+        'score_earned' => 'integer',
     ];
 
     /**

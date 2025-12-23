@@ -227,10 +227,11 @@
             params = JSON.parse(filters) || null;
         }
         // Set giá trị cho các input filter
-        document.getElementById('courseFilter').value = params?.course_id || '';
+        Select.setValue('courseFilter', params?.course_id);
         document.getElementById('searchFilter').value = decodeURIComponent(params?.search ?? '') || '';
         document.getElementById('durationMin').value = params?.duration_min || '';
         document.getElementById('durationMax').value = params?.duration_max || '';
+
         // Set giá trị sort
         sortBy = params.sort_by || sortBy;
         sortOrder = params.order_by || sortOrder;
@@ -421,8 +422,12 @@
                 sticky: null,
                 width: 'w-[400px] 3xl:w-[550px]'
             },
+            display_order: {
+                sticky: 'PIN right-[240px] 3xl:right-[300px] sticky-shadow-right border-l',
+                width: 'w-[90px] 3xl:w-[110px]'
+            },
             duration: {
-                sticky: 'PIN right-[120px] 3xl:right-[150px] sticky-shadow-right border-l',
+                sticky: 'PIN right-[120px] 3xl:right-[150px]',
                 width: 'w-[120px] 3xl:w-[150px]'
             },
             actions: {
@@ -439,6 +444,7 @@
                 <col class="${PIN_COLS_STYLES['title'].width}">
                 <col class="${PIN_COLS_STYLES['description'].width}">
                 <col class="${PIN_COLS_STYLES['course'].width}">
+                <col class="${PIN_COLS_STYLES['display_order'].width}">
                 <col class="${PIN_COLS_STYLES['duration'].width}">
                 <col class="${PIN_COLS_STYLES['actions'].width}">
             </colgroup>
@@ -468,6 +474,11 @@
                             Khóa học${getSortIcon('course_id')}
                         </span>
                     </th>
+                    <th onclick="handleSort('display_order')" class="HAS_SORT ${sortBy === 'display_order' ? 'ACTIVE' : ''} ${PIN_COLS_STYLES['display_order'].sticky}">
+                        <span>
+                            Thứ tự${getSortIcon('display_order')}
+                        </span>
+                    </th>
                     <th onclick="handleSort('duration')" class="HAS_SORT ${sortBy === 'duration' ? 'ACTIVE' : ''} ${PIN_COLS_STYLES['duration'].sticky}">
                         <span>
                             Thời lượng${getSortIcon('duration')}
@@ -484,7 +495,7 @@
                     ${headTable}
                     <tbody class="[&>tr:not(:first-child)>td]:border-t [&>tr:not(:first-child)>td]:border-gray-200 dark:[&>tr:not(:first-child)>td]:border-gray-700">
                         <tr>
-                            <td colspan="8" class="pt-40 text-center">
+                            <td colspan="9" class="pt-40 text-center">
                                 <div class="flex flex-col items-center justify-center">
                                     <div class="h-20 w-20 text-3xl text-gray-400 dark:text-gray-500 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center mb-4 shadow-lg">
                                         <svg class="w-7 h-7" viewBox="0 0 512 512" fill="currentColor">
@@ -534,6 +545,9 @@
                                     </td>
                                     <td class="${sortBy === 'course_id' ? 'ACTIVE' : ''}">
                                         <span>${lesson.course ? lesson.course.title : '-'}</span>
+                                    </td>
+                                    <td class="${sortBy === 'display_order' ? 'ACTIVE' : ''} ${PIN_COLS_STYLES['display_order'].sticky}">
+                                        <span>${lesson.display_order || '-'}</span>
                                     </td>
                                     <td class="${sortBy === 'duration' ? 'ACTIVE' : ''} ${PIN_COLS_STYLES['duration'].sticky}">
                                         <span>${formatSecondsToHHMMSS_Global(lesson.duration || 0, false)}</span>

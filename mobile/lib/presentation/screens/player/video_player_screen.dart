@@ -16,6 +16,11 @@ import '../../../data/models/lesson_note_model.dart';
 import 'package:LMS/presentation/widgets/header_navigation_bar.dart';
 import 'package:LMS/core/utils/scroll_tracking.dart';
 
+import 'widgets/video_player_view.dart';
+import 'widgets/video_player_controls.dart';
+import 'widgets/video_notes_section.dart';
+import 'widgets/player_overlays.dart';
+
 class VideoPlayerScreen extends StatefulWidget {
   final int lessonId;
   final String? initialTitle; // Optional: hiển thị title trong lúc loading
@@ -74,27 +79,15 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   late AnimationController _seekAnimController;
   late Animation<double> _seekAnimation;
 
-  // Playback speed options
-  static const List<double> _speedOptions = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
-
-  // Video fit options
-  static const Map<BoxFit, String> _fitOptions = {
-    BoxFit.contain: 'Vừa màn hình',
-    BoxFit.cover: 'Phủ kín',
-    BoxFit.fill: 'Kéo giãn',
-  };
+  // // Playback speed options and Video fit options removed as they handle in modals if needed,
+  // // currently functionality handles minimal controls.
+  // // If needed, can restore.
 
   // iOS 18 Design System Colors
   static const Color _accentBlue = Color(0xFF0A84FF);
   static const Color _accentOrange = Color(0xFFFF9F0A);
-  static const Color _systemBlack = Color(0xFF000000);
-  static const Color _systemGray5 = Color(0xFF2C2C2E);
   static const Color _systemGray6 = Color(0xFF1C1C1E);
-  static const Color _white = Color(0xFFFFFFFF);
-  static const Color _white60 = Color(0x99FFFFFF);
-  static const Color _white40 = Color(0x66FFFFFF);
-  static const Color _white20 = Color(0x33FFFFFF);
-  static const Color _white10 = Color(0x1AFFFFFF);
+  // static const Color _white = Color(0xFFFFFFFF);
 
   @override
   void initState() {
@@ -386,17 +379,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
           : _position.inSeconds;
       final lastPosition = _position.inSeconds;
 
-      debugPrint(_lesson?.toString() ?? 'Lesson is null');
-      debugPrint(
-        'Watched duration: $watchedDuration, Last position: $lastPosition',
-      );
-      debugPrint('Lesson ID: ${widget.lessonId}');
-      debugPrint('Auth token: $_authToken');
-      debugPrint(
-        'Progress saved: watched=$watchedDuration, position=$lastPosition',
-      );
-      debugPrint('API URL: ${ApiConstants.studentProgress}');
-
       await dio.post(
         ApiConstants.studentProgress,
         data: {'lesson_id': widget.lessonId, 'last_position': lastPosition},
@@ -438,7 +420,11 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         ? _duration
         : Duration(seconds: _lesson?.duration ?? 0);
     var newPosition = _position + Duration(seconds: seconds);
-    newPosition = newPosition.clamp(Duration.zero, duration);
+    if (newPosition < Duration.zero) {
+      newPosition = Duration.zero;
+    } else if (newPosition > duration) {
+      newPosition = duration;
+    }
     _player.seek(newPosition);
   }
 
@@ -493,19 +479,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     }
   }
 
-  void _setPlaybackSpeed(double speed) {
-    HapticFeedback.selectionClick();
-    setState(() => _playbackSpeed = speed);
-    _player.setRate(speed);
-    Navigator.pop(context);
-  }
-
-  void _setVideoFit(BoxFit fit) {
-    HapticFeedback.selectionClick();
-    setState(() => _videoFit = fit);
-    Navigator.pop(context);
-  }
-
   void _onVideoTap() {
     if (_isLocked) {
       _showControlsWithAnimation();
@@ -541,7 +514,25 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     }
   }
 
-  // ===== BOTTOM SHEETS =====
+  // ===== SEEK BAR ACTIONS =====
+  void _onSeekStart(bool seeking, Duration position) {
+    setState(() {
+      _isSeeking = seeking;
+      _seekPosition = position;
+    });
+  }
+
+  void _onSeekUpdate(Duration position) {
+    setState(() {
+      _seekPosition = position;
+    });
+  }
+
+  void _onSeekEnd(Duration position) {
+    _player.seek(position);
+    setState(() => _isSeeking = false);
+    _resetHideTimer();
+  }
 
   @override
   void dispose() {
@@ -591,7 +582,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
                           : Colors.white.withOpacity(0.8),
                       leading: HeaderNavigationBarBackButton(
                         color: _accentBlue,
-                        label: 'Chi tiết',
+                        label: 'Quay lại',
                         onPressed: () async {
                           await _saveProgress();
                           if (mounted) Navigator.pop(context);
@@ -626,23 +617,35 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   }
 
   Widget _buildBody() {
-    if (_error != null) return _buildErrorState();
-    if (_isLoading) return _buildLoadingState();
+    if (_error != null) {
+      return VideoErrorState(
+        onRetry: () {
+          HapticFeedback.mediumImpact();
+          _initializePlayer();
+        },
+        onBack: () => Navigator.pop(context),
+      );
+    }
+    if (_isLoading) {
+      return VideoLoadingState(
+        title: _lesson?.title ?? widget.initialTitle ?? '',
+      );
+    }
 
-    // Trong chế độ Fullscreen (Landscape), hiển thị video tràn màn hình
+    // Trong chế độ Fullscreen (Landscape)
     if (_isFullscreen) {
       return Stack(
         fit: StackFit.expand,
         children: [
-          _buildVideoLayer(),
+          _buildVideoView(),
           if (_doubleTapSeekDirection != null) _buildSeekIndicator(),
-          if (_showControls) _buildControlsLayer(),
-          if (_isBuffering && !_isLoading) _buildBufferingIndicator(),
+          if (_showControls) _buildControls(),
+          if (_isBuffering && !_isLoading) const BufferingIndicator(),
         ],
       );
     }
 
-    // Trong chế độ Portrait, chia màn hình: Video ở trên, Ghi chú ở dưới
+    // Trong chế độ Portrait
     final headerHeight = 44.0 + MediaQuery.of(context).padding.top;
 
     return Column(
@@ -650,559 +653,70 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         SizedBox(height: headerHeight),
         Stack(
           children: [
-            AspectRatio(aspectRatio: 16 / 9, child: _buildVideoLayer()),
+            AspectRatio(aspectRatio: 16 / 9, child: _buildVideoView()),
             if (_doubleTapSeekDirection != null) _buildSeekIndicator(),
-            if (_showControls) Positioned.fill(child: _buildControlsLayer()),
+            if (_showControls) Positioned.fill(child: _buildControls()),
             if (_isBuffering && !_isLoading)
-              Positioned.fill(child: _buildBufferingIndicator()),
+              const Positioned.fill(child: BufferingIndicator()),
           ],
         ),
-        Expanded(child: _buildNotesSection()),
+        Expanded(child: _buildNotes()),
       ],
     );
   }
 
-  Widget _buildVideoLayer() {
-    return GestureDetector(
+  Widget _buildVideoView() {
+    return VideoPlayerView(
+      controller: _videoController,
+      fit: _videoFit,
       onTap: _onVideoTap,
-      onDoubleTapDown: (details) =>
-          _handleDoubleTap(details, MediaQuery.of(context).size.width),
-      onDoubleTap: () {}, // Required for onDoubleTapDown to work
-      child: Container(
-        color: _systemBlack,
-        child: Center(
-          child: Video(
-            controller: _videoController,
-            controls: NoVideoControls,
-            fit: _videoFit,
-          ),
-        ),
-      ),
+      onDoubleTapDown: _handleDoubleTap,
     );
   }
 
   Widget _buildSeekIndicator() {
-    final isLeft = _doubleTapSeekDirection == -1;
-
-    return Positioned(
-      left: isLeft ? 40 : null,
-      right: isLeft ? null : 40,
-      top: 0,
-      bottom: 0,
-      child: FadeTransition(
-        opacity: _seekAnimation,
-        child: Center(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            decoration: BoxDecoration(
-              color: _systemGray6.withOpacity(0.9),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  isLeft
-                      ? CupertinoIcons.gobackward_10
-                      : CupertinoIcons.goforward_10,
-                  color: _white,
-                  size: 36,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  isLeft ? '-10s' : '+10s',
-                  style: const TextStyle(
-                    color: _white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+    return SeekIndicator(
+      animation: _seekAnimation,
+      isLeft: _doubleTapSeekDirection == -1,
     );
   }
 
-  Widget _buildControlsLayer() {
-    return FadeTransition(
-      opacity: _controlsFadeAnimation,
-      child: GestureDetector(
-        onTap: _onVideoTap,
-        onDoubleTapDown: (details) =>
-            _handleDoubleTap(details, MediaQuery.of(context).size.width),
-        onDoubleTap: () {}, // Required for onDoubleTapDown to work
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.15), // Subtle global dimming
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.black.withOpacity(0.5),
-                Colors.transparent,
-                Colors.transparent,
-                Colors.black.withOpacity(0.6),
-              ],
-              stops: const [0.0, 0.25, 0.75, 1.0],
-            ),
-          ),
-          child: _isLocked ? _buildLockedControls() : _buildFullControls(),
-        ),
-      ),
+  Widget _buildControls() {
+    return VideoPlayerControls(
+      controlsFadeAnimation: _controlsFadeAnimation,
+      isLocked: _isLocked,
+      isFullscreen: _isFullscreen,
+      isPlaying: _isPlaying,
+      isSeeking: _isSeeking,
+      position: _position,
+      seekPosition: _seekPosition,
+      duration: _duration,
+      lesson: _lesson,
+      onToggleLock: _toggleLock,
+      onToggleFullscreen: _toggleFullscreen,
+      onPlayPause: _togglePlayPause,
+      onSeekRelative: _seekRelative,
+      onSeekStart: _onSeekStart,
+      onSeekUpdate: _onSeekUpdate,
+      onSeekEnd: _onSeekEnd,
+      onTap: _onVideoTap,
+      onDoubleTapDown: _handleDoubleTap,
     );
   }
 
-  Widget _buildLockedControls() {
-    Widget content = Stack(
-      children: [
-        Positioned(
-          top: 12,
-          left: 16,
-          child: _buildGlassButton(
-            icon: CupertinoIcons.lock_fill,
-            label: 'Đã khóa',
-            onTap: _toggleLock,
-            isActive: true,
-          ),
-        ),
-      ],
-    );
-
-    if (_isFullscreen) {
-      return SafeArea(child: content);
-    }
-    return content;
-  }
-
-  Widget _buildFullControls() {
-    final safeArea = MediaQuery.of(context).padding;
-
-    Widget content = Column(
-      children: [
-        _buildTopBar(),
-        const Spacer(),
-        _buildCenterControls(),
-        const Spacer(),
-        _buildBottomControls(safeArea),
-      ],
-    );
-
-    if (_isFullscreen) {
-      return SafeArea(child: content);
-    }
-
-    return Padding(padding: const EdgeInsets.only(top: 8.0), child: content);
-  }
-
-  Widget _buildTopBar() {
-    if (!_isFullscreen) return const SizedBox(height: 48);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        children: [
-          CupertinoButton(
-            padding: EdgeInsets.zero,
-            onPressed: _toggleFullscreen,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.black26,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                CupertinoIcons.fullscreen_exit,
-                color: _white,
-                size: 22,
-                shadows: [
-                  Shadow(
-                    color: Colors.black54,
-                    blurRadius: 4,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const Spacer(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCenterControls() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _buildCircleButton(
-          icon: CupertinoIcons.gobackward_15,
-          size: 26,
-          buttonSize: 52,
-          onTap: () => _seekRelative(-15),
-        ),
-        const SizedBox(width: 40),
-        _buildPlayButton(),
-        const SizedBox(width: 40),
-        _buildCircleButton(
-          icon: CupertinoIcons.goforward_15,
-          size: 26,
-          buttonSize: 52,
-          onTap: () => _seekRelative(15),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPlayButton() {
-    return GestureDetector(
-      onTap: _togglePlayPause,
-      child: Container(
-        width: 64,
-        height: 64,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: _white.withOpacity(0.15),
-          border: Border.all(color: _white20, width: 1.5),
-        ),
-        child: Center(
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 150),
-            child: Icon(
-              _isPlaying ? CupertinoIcons.pause_fill : CupertinoIcons.play_fill,
-              key: ValueKey(_isPlaying),
-              color: _white,
-              size: 32,
-              shadows: const [
-                Shadow(
-                  color: Colors.black54,
-                  blurRadius: 4,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCircleButton({
-    required IconData icon,
-    required double size,
-    required double buttonSize,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: buttonSize,
-        height: buttonSize,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.black.withOpacity(0.3),
-        ),
-        child: Icon(
-          icon,
-          color: _white,
-          size: size,
-          shadows: const [
-            Shadow(color: Colors.black54, blurRadius: 4, offset: Offset(0, 2)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomControls(EdgeInsets safeArea) {
-    final position = _isSeeking ? _seekPosition : _position;
-    final duration = _duration.inMilliseconds > 0
-        ? _duration
-        : Duration(seconds: _lesson?.duration ?? 0);
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 8, 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Expanded(child: _buildProgressBar(position, duration)),
-          CupertinoButton(
-            padding: const EdgeInsets.all(8),
-            onPressed: _toggleFullscreen,
-            child: Icon(
-              _isFullscreen
-                  ? CupertinoIcons.fullscreen_exit
-                  : CupertinoIcons.fullscreen,
-              color: _white,
-              size: 22,
-              shadows: const [
-                Shadow(
-                  color: Colors.black54,
-                  blurRadius: 4,
-                  offset: Offset(0, 1),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProgressBar(Duration position, Duration duration) {
-    final maxMs = duration.inMilliseconds.toDouble();
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              _formatDuration(position),
-              style: const TextStyle(
-                color: _white,
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                fontFeatures: [FontFeature.tabularFigures()],
-                shadows: [
-                  Shadow(
-                    color: Colors.black87,
-                    blurRadius: 2,
-                    offset: Offset(0, 1),
-                  ),
-                ],
-              ),
-            ),
-            Text(
-              _formatDuration(duration),
-              style: const TextStyle(
-                color: _white,
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-                fontFeatures: [FontFeature.tabularFigures()],
-                shadows: [
-                  Shadow(
-                    color: Colors.black87,
-                    blurRadius: 2,
-                    offset: Offset(0, 1),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        SliderTheme(
-          data: SliderThemeData(
-            trackHeight: 3,
-            activeTrackColor: _accentBlue,
-            inactiveTrackColor: _white20,
-            thumbColor: _white,
-            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
-            overlayColor: _accentBlue.withOpacity(0.2),
-            overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
-          ),
-          child: Slider(
-            value: (_isSeeking ? _seekPosition : position).inMilliseconds
-                .toDouble()
-                .clamp(0, maxMs),
-            min: 0,
-            max: maxMs > 0 ? maxMs : 1,
-            onChangeStart: (v) => setState(() {
-              _isSeeking = true;
-              _seekPosition = Duration(milliseconds: v.toInt());
-            }),
-            onChanged: (v) => setState(() {
-              _seekPosition = Duration(milliseconds: v.toInt());
-            }),
-            onChangeEnd: (v) {
-              _player.seek(Duration(milliseconds: v.toInt()));
-              setState(() => _isSeeking = false);
-              _resetHideTimer();
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildGlassButton({
-    required IconData icon,
-    String? label,
-    required VoidCallback onTap,
-    bool isActive = false,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: label != null ? 14 : 12,
-              vertical: 10,
-            ),
-            decoration: BoxDecoration(
-              color: isActive
-                  ? _accentBlue.withOpacity(0.3)
-                  : _systemGray5.withOpacity(0.6),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isActive ? _accentBlue.withOpacity(0.5) : _white10,
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icon, color: isActive ? _accentBlue : _white, size: 18),
-                if (label != null) ...[
-                  const SizedBox(width: 6),
-                  Text(
-                    label,
-                    style: TextStyle(
-                      color: isActive ? _accentBlue : _white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ===== STATES =====
-
-  Widget _buildLoadingState() {
-    return Container(
-      color: _systemBlack,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: _systemGray6,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Center(
-                child: CupertinoActivityIndicator(color: _white, radius: 16),
-              ),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Đang tải video...',
-              style: TextStyle(
-                color: _white60,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 48),
-              child: Text(
-                _lesson?.title ?? widget.initialTitle ?? '',
-                style: const TextStyle(color: _white40, fontSize: 14),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBufferingIndicator() {
-    return Center(
-      child: Container(
-        width: 64,
-        height: 64,
-        decoration: BoxDecoration(
-          color: _systemGray6.withOpacity(0.9),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: const Center(
-          child: CupertinoActivityIndicator(color: _white, radius: 14),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildErrorState() {
-    return Container(
-      width: double.infinity,
-      color: _systemBlack,
-      padding: const EdgeInsets.all(40),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: _systemGray6,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Icon(
-              CupertinoIcons.exclamationmark_triangle_fill,
-              color: _accentOrange,
-              size: 36,
-            ),
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            'Không thể phát video',
-            style: TextStyle(
-              color: _white,
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Tải video thất bại, vui lòng thử lại sau.',
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: _white60, fontSize: 15, height: 1.4),
-          ),
-          const SizedBox(height: 32),
-          CupertinoButton(
-            color: _accentBlue,
-            borderRadius: BorderRadius.circular(14),
-            onPressed: () {
-              HapticFeedback.mediumImpact();
-              _initializePlayer();
-            },
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(CupertinoIcons.arrow_clockwise, size: 18, color: _white),
-                SizedBox(width: 8),
-                Text(
-                  'Thử lại',
-                  style: TextStyle(fontWeight: FontWeight.w600, color: _white),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          CupertinoButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Quay lại'),
-          ),
-        ],
-      ),
+  Widget _buildNotes() {
+    return VideoNotesSection(
+      notes: _notes,
+      isLoading: _isLoadingNotes,
+      onAddNote: () {
+        _player.pause();
+        _showAddNoteModal();
+      },
+      onSeekToNote: (seconds) {
+        _player.seek(Duration(seconds: seconds));
+        if (!_isPlaying) _player.play();
+      },
+      scrollController: scrollTrackingController,
     );
   }
 
@@ -1214,216 +728,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     return h > 0
         ? '$h:${twoDigits(m)}:${twoDigits(s)}'
         : '${twoDigits(m)}:${twoDigits(s)}';
-  }
-
-  // ===== NOTES UI =====
-
-  Widget _buildNotesSection() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      color: isDark ? _systemGray6 : const Color(0xFFF2F2F7),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildNotesHeader(),
-          Divider(height: 1, color: isDark ? _white10 : Colors.black12),
-          Expanded(
-            child: _isLoadingNotes
-                ? const Center(
-                    child: CupertinoActivityIndicator(color: _accentBlue),
-                  )
-                : _notes.isEmpty
-                ? _buildEmptyNotes()
-                : _buildNotesList(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNotesHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              const Icon(
-                CupertinoIcons.doc_text_fill,
-                color: _accentBlue,
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '${_notes.length} Ghi chú',
-                style: TextStyle(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? _white
-                      : Colors.black,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-          CupertinoButton(
-            padding: EdgeInsets.zero,
-            onPressed: () {
-              _player.pause();
-              _showAddNoteModal();
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: _accentBlue.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(100),
-              ),
-              child: const Row(
-                children: [
-                  Icon(CupertinoIcons.plus, color: _accentBlue, size: 14),
-                  SizedBox(width: 4),
-                  Text(
-                    'Thêm',
-                    style: TextStyle(
-                      color: _accentBlue,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyNotes() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            CupertinoIcons.doc_plaintext,
-            size: 48,
-            color: isDark ? _white.withOpacity(0.1) : Colors.black12,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Chưa có ghi chú nào',
-            style: TextStyle(
-              color: isDark ? _white.withOpacity(0.3) : Colors.black38,
-              fontSize: 15,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNotesList() {
-    return ListView.separated(
-      controller: scrollTrackingController,
-      padding: const EdgeInsets.all(16),
-      itemCount: _notes.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 16),
-      itemBuilder: (context, index) {
-        return _buildNoteItem(_notes[index]);
-      },
-    );
-  }
-
-  Widget _buildNoteItem(LessonNote note) {
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        _player.seek(Duration(seconds: note.durationAt));
-        if (!_isPlaying) _player.play();
-      },
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? _systemGray5
-              : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? _white10
-                : Colors.black.withOpacity(0.05),
-          ),
-          boxShadow: Theme.of(context).brightness == Brightness.light
-              ? [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: _accentBlue,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    _formatDuration(Duration(seconds: note.durationAt)),
-                    style: const TextStyle(
-                      color: _white,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  _formatDate(note.createdAt),
-                  style: TextStyle(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? _white.withOpacity(0.4)
-                        : Colors.black38,
-                    fontSize: 11,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              note.content,
-              style: TextStyle(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? _white
-                    : Colors.black87,
-                fontSize: 14,
-                height: 1.4,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _formatDate(String dateStr) {
-    try {
-      final date = DateTime.parse(dateStr);
-      return '${date.day}/${date.month}/${date.year}';
-    } catch (e) {
-      return dateStr;
-    }
   }
 
   void _showAddNoteModal() {
@@ -1456,7 +760,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
                   const Text(
                     'Thêm ghi chú',
                     style: TextStyle(
-                      color: _white,
+                      color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -1485,14 +789,16 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
               CupertinoTextField(
                 controller: textController,
                 placeholder: 'Nhập nội dung ghi chú...',
-                placeholderStyle: TextStyle(color: _white.withOpacity(0.3)),
+                placeholderStyle: TextStyle(
+                  color: Colors.white.withOpacity(0.3),
+                ),
                 maxLines: 4,
                 autofocus: true,
-                style: const TextStyle(color: _white, fontSize: 16),
+                style: const TextStyle(color: Colors.white, fontSize: 16),
                 decoration: BoxDecoration(
-                  color: _systemGray5,
+                  color: const Color(0xFF2C2C2E), // _systemGray5
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: _white10),
+                  border: Border.all(color: const Color(0x1AFFFFFF)),
                 ),
                 padding: const EdgeInsets.all(12),
               ),
@@ -1510,12 +816,12 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
                         height: 48,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: _white.withOpacity(0.05),
+                          color: Colors.white.withOpacity(0.05),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Text(
                           'Hủy',
-                          style: TextStyle(color: _white60),
+                          style: TextStyle(color: Color(0x99FFFFFF)),
                         ),
                       ),
                     ),
@@ -1547,7 +853,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
                         child: const Text(
                           'Lưu',
                           style: TextStyle(
-                            color: _white,
+                            color: Colors.white,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -1562,11 +868,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         ),
       ),
     ).then((_) {
-      // Logic for when the modal is dismissed by tapping outside
-      // But we already have _player.play() in Cancel and Save success.
-      // If they tap outside, should we resume?
-      // User said: "khi lưu ghi chú thành công thì phát video"
-      // Usually users expect play when they dismiss.
+      // Handle play resume? Already done in actions.
     });
   }
 
@@ -1596,13 +898,5 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     } catch (e) {
       debugPrint('Error saving note: $e');
     }
-  }
-}
-
-extension DurationClamp on Duration {
-  Duration clamp(Duration min, Duration max) {
-    if (this < min) return min;
-    if (this > max) return max;
-    return this;
   }
 }

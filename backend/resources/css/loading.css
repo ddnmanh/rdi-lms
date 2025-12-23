@@ -1,0 +1,137 @@
+
+/**
+* Css dành cho các spinner loading (icon loading)
+*/
+
+#SPINNER_LOADING {
+    width: -moz-fit-content;
+    width: fit-content;
+    position: relative;
+}
+
+#SPINNER_LOADING_CONTAINER {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/*******************\
+    Loading Roller
+\*******************/
+
+@keyframes SPINNER_LOADING_CONTAINER_LDS_ROLLER_keyframes {
+    0% {
+        transform: rotate(90deg);
+    }
+    100% {
+        transform: rotate(450deg);
+    }
+}
+
+#SPINNER_LOADING_CONTAINER_LDS_ROLLER {
+    position: relative;
+    height: 64px;
+    width: 64px;
+}
+
+/* Mọi div bên trong */
+#SPINNER_LOADING_CONTAINER_LDS_ROLLER div {
+    animation: SPINNER_LOADING_CONTAINER_LDS_ROLLER_keyframes 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    transform-origin: 32px 32px;
+}
+
+/* Pseudo-element */
+#SPINNER_LOADING_CONTAINER_LDS_ROLLER div::after {
+    content: " ";
+    display: block;
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #9ca3af80;
+    margin: -3px 0 0 -3px;
+}
+
+/* Child 1 */
+#SPINNER_LOADING_CONTAINER_LDS_ROLLER div:nth-child(1) {
+    animation-delay: -0.036s;
+}
+#SPINNER_LOADING_CONTAINER_LDS_ROLLER div:nth-child(1)::after {
+    top: 50px;
+    left: 50px;
+}
+
+/* Child 2 */
+#SPINNER_LOADING_CONTAINER_LDS_ROLLER div:nth-child(2) {
+    animation-delay: -0.072s;
+}
+#SPINNER_LOADING_CONTAINER_LDS_ROLLER div:nth-child(2)::after {
+    top: 54px;
+    left: 45px;
+}
+
+/* Child 3 */
+#SPINNER_LOADING_CONTAINER_LDS_ROLLER div:nth-child(3) {
+    animation-delay: -0.108s;
+}
+#SPINNER_LOADING_CONTAINER_LDS_ROLLER div:nth-child(3)::after {
+    top: 57px;
+    left: 39px;
+}
+
+/* Child 4 */
+#SPINNER_LOADING_CONTAINER_LDS_ROLLER div:nth-child(4) {
+    animation-delay: -0.144s;
+}
+#SPINNER_LOADING_CONTAINER_LDS_ROLLER div:nth-child(4)::after {
+    top: 58px;
+    left: 32px;
+}
+
+/* Child 5 */
+#SPINNER_LOADING_CONTAINER_LDS_ROLLER div:nth-child(5) {
+    animation-delay: -0.18s;
+}
+#SPINNER_LOADING_CONTAINER_LDS_ROLLER div:nth-child(5)::after {
+    top: 57px;
+    left: 25px;
+}
+
+/* Child 6 */
+#SPINNER_LOADING_CONTAINER_LDS_ROLLER div:nth-child(6) {
+    animation-delay: -0.216s;
+}
+#SPINNER_LOADING_CONTAINER_LDS_ROLLER div:nth-child(6)::after {
+    top: 54px;
+    left: 19px;
+}
+
+/* Child 7 */
+#SPINNER_LOADING_CONTAINER_LDS_ROLLER div:nth-child(7) {
+    animation-delay: -0.252s;
+}
+#SPINNER_LOADING_CONTAINER_LDS_ROLLER div:nth-child(7)::after {
+    top: 50px;
+    left: 14px;
+}
+
+/* Child 8 */
+#SPINNER_LOADING_CONTAINER_LDS_ROLLER div:nth-child(8) {
+    animation-delay: -0.288s;
+}
+#SPINNER_LOADING_CONTAINER_LDS_ROLLER div:nth-child(8)::after {
+    top: 45px;
+    left: 10px;
+}
+
+#SPINNER_LOADING_ICON {
+    position: absolute;
+    font-size: 20px;
+    color: #9ca3af80;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+

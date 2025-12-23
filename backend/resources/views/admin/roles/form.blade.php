@@ -5,16 +5,40 @@
 @section('description', $mode === 'CREATE' ? 'Thêm vai trò mới vào hệ thống' : 'Chỉnh sửa thông tin vai trò')
 
 @section('content')
-<div class="h-full flex flex-col items-stretch justify-start gap-4 3xl:gap-6">
+<div class="h-full flex flex-col items-stretch justify-start gap-2.5 3xl:gap-4 overflow-hidden">
+
+    {{-- Header Bar --}}
+    <div class="w-full max-w-[1800px] mx-auto p-3 3xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-row justify-between gap-4">
+
+        <div class="flex items-center justify-start gap-3">
+            <button onclick="handleGotoBackPage_Global()"
+                type="button"
+                class="group px-2.5 py-2.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 rounded-xl transition-all duration-300 font-medium flex items-center justify-center gap-2 cursor-pointer text-[18px]">
+                <svg class="h-6" viewBox="0 0 320 512" fill="currentColor">
+                    <path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"/>
+                </svg>
+            </button>
+            <div class="flex flex-col gap-0 min-w-0 flex-1">
+                <h2
+                    class="font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent truncate">
+                    @yield('title', 'Admin Panel')
+                </h2>
+                @hasSection('description')
+                    <p class="text-xs 3xl:text-sm text-gray-600 dark:text-gray-400 truncate">
+                        @yield('description')
+                    </p>
+                @endif
+            </div>
+        </div>
+    </div>
 
     {{-- Form Card --}}
-    <form id="roleForm" onsubmit="saveRole(event)"
-        class="w-full max-w-[1800px] h-full mx-auto p-6 flex flex-col justify-start gap-3 3xl:gap-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+    <form id="roleForm" onsubmit="saveRole(event)" class="w-full max-w-[1800px] flex-1 min-h-0 mx-auto p-6 flex flex-col justify-start gap-3 3xl:gap-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
 
         <input type="hidden" id="roleId" value="{{ $mode === 'EDIT' ? ($roleId ?? '') : '' }}">
 
         <!-- MAIN FORM WRAPPER -->
-        <div class="flex-1 flex flex-col items-stretch justify-start gap-3 3xl:gap-4 min-h-0">
+        <div class="flex-1 flex flex-col items-stretch justify-start gap-3 3xl:gap-4 min-h-0 overflow-y-auto">
 
             <div class="flex flex-row justify-between items-start gap-4 3xl:gap-6">
                 <!-- field: name -->
@@ -55,12 +79,16 @@
                         </div>
                         <div class="relative w-full max-w-[450px]">
                             <span class="absolute top-[50%] left-3 translate-y-[-50%] flex items-center text-gray-400">
-                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <svg class="w-4" viewBox="0 0 512 512" fill="currentColor">
+                                    <path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376C296.3 401.1 253.9 416 208 416 93.1 416 0 322.9 0 208S93.1 0 208 0 416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/>
+                                </svg>
                             </span>
                             <input type="text" id="permissionSearch" placeholder="Tìm theo tên, mô tả ..."
                                 class="w-full px-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none">
-                            <span id="permissionSearchClearBtn" class="w-[15px] 3xl:w-[20px] aspect-square rounded-full absolute top-[50%] right-3 translate-y-[-50%] flex items-center text-gray-400 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 cursor-pointer flex justify-center overflow-hidden">
-                                <i class="fa-solid fa-times text-sm text-white dark:text-gray-700"></i>
+                            <span id="permissionSearchClearBtn" class="w-[15px] 3xl:w-[20px] aspect-square  text-sm text-white dark:text-gray-700 rounded-full absolute top-[50%] right-3 translate-y-[-50%] flex items-center text-gray-400 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 cursor-pointer flex justify-center overflow-hidden">
+                                <svg class="w-2" viewBox="0 0 384 512" fill="currentColor">
+                                    <path d="M55.1 73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L147.2 256 9.9 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192.5 301.3 329.9 438.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.8 256 375.1 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192.5 210.7 55.1 73.4z"/>
+                                </svg>
                             </span>
                         </div>
                     </div>
@@ -83,7 +111,9 @@
                                     </div>
                                 </div>
                                 <div id="SPINNER_LOADING_ICON">
-                                    <i class="fas fa-graduation-cap"></i>
+                                    <svg class="w-6 h-6" viewBox="0 0 640 640" fill="currentColor">
+                                        <path d="M80 259.8L289.2 345.9C299 349.9 309.4 352 320 352C330.6 352 341 349.9 350.8 345.9L593.2 246.1C602.2 242.4 608 233.7 608 224C608 214.3 602.2 205.6 593.2 201.9L350.8 102.1C341 98.1 330.6 96 320 96C309.4 96 299 98.1 289.2 102.1L46.8 201.9C37.8 205.6 32 214.3 32 224L32 520C32 533.3 42.7 544 56 544C69.3 544 80 533.3 80 520L80 259.8zM128 331.5L128 448C128 501 214 544 320 544C426 544 512 501 512 448L512 331.4L369.1 390.3C353.5 396.7 336.9 400 320 400C303.1 400 286.5 396.7 270.9 390.3L128 331.4z"/>
+                                    </svg>
                                 </div>
                             </div>
                         </div>
@@ -95,13 +125,13 @@
 
         <!-- footer -->
         <div class="flex items-center justify-end gap-3">
-            <a href="{{ route('admin.roles.list') }}"
-                class="px-4 py-2.5  font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300">
+            <button
+                type="button"
+                onclick="handleGotoBackPage_Global()"
+                class="px-4 py-2.5 font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300">
                 Hủy
-            </a>
-            <button type="submit" id="submitBtn"
-                class="px-4 py-2.5  font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all duration-300 flex items-center gap-2">
-                <i class="fas fa-save"></i>
+            </button>
+            <button type="submit" id="submitBtn" class="px-4 py-2.5  font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all duration-300 flex items-center gap-2">
                 <span>Lưu</span>
             </button>
         </div>
@@ -149,7 +179,7 @@
         if (permissionsData && permissionsData.length > 0) {
             renderPermissionsCheckboxes([], permissionFilterText);
         } else {
-            showNotificationModel_Global(`Không thể tải danh sách permissions`, 'error', handleBackPrevPage);
+            NotificationModal.show(`Không thể tải danh sách permissions`, 'error', handleBackPrevPage);
         }
 
         // Nếu là chỉnh sửa vai trò thì tải thông tin vai trò
@@ -161,7 +191,7 @@
                 selectedPermissionIds = new Set(rolePermissionIds);
                 renderPermissionsCheckboxes(rolePermissionIds, permissionFilterText);
             } else {
-                showNotificationModel_Global(`Không thể tải thông tin vai trò cần chỉnh sửa`, 'error', handleBackPrevPage);
+                NotificationModal.show(`Không thể tải thông tin vai trò cần chỉnh sửa`, 'error', handleBackPrevPage);
             }
         }
 
@@ -368,7 +398,7 @@
                         <col class="w-[60px] 3xl:w-[80px]">
                         <col class="">
                         <col class="">
-                        <col class="w-[80px] 3xl:w-[100px]">
+                        <col class="w-[90px] 3xl:w-[100px]">
                         <col class="">
                     </colgroup>
                     <thead class="text-white dark:text-gray-200 [&>tr>th]:border-b [&>tr>th]:border-gray-200 dark:[&>tr>th]:border-gray-500 [&>tr>th:not(:first-child)]:border-l [&>tr>th:not(:first-child)]:border-gray-200 dark:[&>tr>th:not(:first-child)]:border-gray-500">
@@ -444,7 +474,7 @@
             const data = await response.json();
 
             if (response.ok) {
-                showNotificationModel_Global(
+                NotificationModal.show(
                     mode === 'EDIT' ? 'Cập nhật thông tin vai trò thành công' : 'Tạo vai trò thành công',
                     'success',
                     handleBackPrevPage
@@ -455,7 +485,7 @@
                 throw new Error(data.message || 'Có lỗi xảy ra');
             }
         } catch (error) {
-            showNotificationModel_Global(error.message || 'Thao tác thất bại', 'error');
+            NotificationModal.show(error.message || 'Thao tác thất bại', 'error');
         } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = mode === 'CREATE' ? 'Tạo' : 'Cập nhật';

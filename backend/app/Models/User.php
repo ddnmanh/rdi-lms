@@ -53,7 +53,6 @@ class User extends Authenticatable implements JWTSubject
     /** Relationships */
     public function roles()
     {
-        // chỉnh lại 'user_role' nếu pivot tên khác
         return $this->belongsToMany(Role::class, 'user_role', 'user_id', 'role_id');
     }
 
@@ -75,6 +74,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(RefreshToken::class);
     }
 
+    public function notes()
+    {
+        return $this->hasMany(Note::class);
+    }
+
     /** JWT */
     public function getJWTIdentifier()
     {
@@ -92,9 +96,9 @@ class User extends Authenticatable implements JWTSubject
         ])->toArray();
 
         return [
+            'id'          => $this->id,
             'email'       => $this->email,
             'fullname'    => $this->fullname,
-            'avatar_path' => $this->avatar_path,
             'roles'       => $roles,
         ];
     }

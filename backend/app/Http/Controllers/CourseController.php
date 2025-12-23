@@ -453,7 +453,7 @@ class CourseController extends Controller
             // - Thêm user mới (có trong $userIds nhưng chưa có trong DB)
             // - Xóa user cũ (có trong DB nhưng không có trong $userIds)
             // - Giữ nguyên user đã tồn tại (có trong cả DB và $userIds)
-            $syncData = [];
+            $syncData = $existingUserIds;
             foreach ($userIds as $userId) {
                 if (in_array($userId, $existingUserIds)) {
                     // User đã tồn tại, không set gì để giữ nguyên mọi thứ

@@ -1,0 +1,367 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    /* ===== THEAD ===== */
+    /* Base styles cho các thẻ th bên trong */
+    .custom-thead th {
+        @apply text-white text-left align-middle;
+        @apply sticky top-0 z-[100];
+        @apply px-3 py-[9px]; /* 12px 9px */
+        @apply shadow-sm;
+        @apply whitespace-normal break-words;
+
+        /* Border bottom logic */
+        @apply border-b border-gray-200 border-solid;
+
+        /* Background mặc định */
+        @apply bg-blue-600;
+
+        /* --- Dark Mode Base --- */
+        @apply dark:text-gray-200 dark:border-gray-500 dark:bg-gray-700;
+
+        @apply whitespace-nowrap;
+    }
+
+    .custom-thead th.HAS_SORT {
+        @apply cursor-pointer;
+    }
+
+    .custom-thead th.HAS_SORT span {
+        @apply flex items-center gap-1 w-full;
+    }
+
+    /* Style cho input type checkbox bên trong thẻ th */
+    .custom-thead th  input[type="checkbox"] {
+        @apply w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 bg-white dark:bg-gray-700 dark:border-gray-600;
+        /* @apply w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2;
+        @apply dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:border-gray-600; */
+    }
+
+    /* Style cho thẻ th có class PIN */
+    .custom-thead th.PIN {
+        @apply sticky z-[101];
+    }
+
+    .custom-thead th.ACTIVE {
+        @apply !bg-blue-700 dark:!bg-gray-600;
+    }
+
+    /* Style cho thẻ th nằm ngay TRƯỚC thẻ th có class PIN */
+    .custom-thead th:has(+ .PIN) {
+        @apply border-r-0;
+    }
+
+    /* Style cho thẻ th nằm ngay sau thẻ th có class PIN */
+    .custom-thead .PIN + th {
+        @apply border-l-0;
+    }
+
+    /* 1. Logic cho cột đầu tiên (Sticky Left) */
+    .custom-thead th:first-child {
+        @apply sticky left-0 z-[102]; /* Z-index cao hơn để đè lên khi scroll ngang */
+        @apply border-r border-gray-200 dark:border-gray-500;
+    }
+
+    /* 2. Logic cho các cột KHÔNG PHẢI đầu tiên (Border Right) */
+    .custom-thead th:not(:first-child) {
+        @apply border-r border-gray-200 dark:border-gray-500;
+    }
+
+    /* 3. Logic cho cột KẾ CUỐI (Xóa Border Right để tránh trùng với cột cuối) */
+    .custom-thead th:nth-last-child(2) {
+        @apply border-r-0;
+    }
+
+    /* 4. Logic cho cột cuối cùng (Sticky Right & Border Left) */
+    .custom-thead th:last-child {
+        @apply sticky right-0 z-[102];
+        @apply border-l border-gray-200 dark:border-gray-500;
+    }
+
+    /* ===== TBODY ===== */
+    .custom-tbody tr {
+        @apply border-b border-gray-200 dark:border-gray-700;
+        @apply transition-colors;
+        /* Lưu ý: class "group" cần thêm trực tiếp vào <tr> trong HTML */
+    }
+
+    /* Style cho thẻ th có class PIN */
+    .custom-tbody td.PIN {
+        @apply sticky z-[99];
+    }
+
+    /* Style cho thẻ th nằm ngay TRƯỚC thẻ th có class PIN */
+    .custom-tbody td:has(+ .PIN) {
+        @apply border-r-0;
+    }
+
+    /* Style cho thẻ th nằm ngay sau thẻ th có class PIN */
+    .custom-tbody .PIN + td {
+        @apply border-l-0;
+    }
+
+    .custom-tbody td > input[type="checkbox"] {
+        @apply w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 bg-white dark:bg-gray-700 dark:border-gray-600;
+        /* @apply w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded;
+        @apply focus:ring-2 focus:ring-blue-500;
+        @apply dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600; */
+    }
+
+    .custom-tbody td {
+        @apply px-4 py-3 bg-white;
+        @apply transition-colors;
+        @apply border-b border-gray-100 dark:border-gray-700;
+
+        @apply dark:bg-gray-800;
+    }
+
+    .custom-tbody td.ACTIVE {
+        @apply !bg-blue-50 dark:!bg-gray-700;
+    }
+
+    .custom-tbody td:first-child {
+        @apply sticky left-0 z-[100];
+    }
+
+    .custom-tbody td:last-child {
+        @apply sticky right-0 z-[100];
+    }
+
+    /* Hover effect - cần class "group" trên <tr> */
+    .custom-tbody tr:hover td {
+        @apply bg-gray-100 dark:bg-gray-700;
+    }
+
+    .custom-tbody td > span, a {
+        @apply text-gray-600 dark:text-gray-300;
+        @apply group-hover:bg-gray-100 dark:group-hover:bg-gray-700;
+    }
+
+    .custom-tbody td button {
+        @apply inline-flex shrink-0 size-7 3xl:size-8 items-center justify-center rounded-md border;
+        @apply transition-all duration-300;
+    }
+    .custom-tbody td button.DELETE {
+        @apply border-red-500 hover:border-red-600 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20;
+    }
+    .custom-tbody td button.EDIT {
+        @apply border-amber-500 hover:border-amber-600 text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20;
+    }
+    .custom-tbody td button.DETAIL {
+        @apply border-blue-500 hover:border-blue-600 text-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20;
+    }
+    .custom-tbody td button.BLOCK {
+        @apply border-green-500 hover:border-green-600 text-green-500 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20;
+    }
+    .custom-tbody td button.UNBLOCK {
+        @apply border-orange-500 hover:border-orange-600 text-orange-500 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20;
+    }
+}
+
+/* @font-face {
+    font-family: 'UTM Avo';
+    src: url('/fonts/utm-avo.ttf') format('truetype');
+    font-display: swap;
+    font-weight: normal;
+}
+@font-face {
+    font-family: 'UTM Avo';
+    src: url('/fonts/utm-avobold.ttf') format('truetype');
+    font-display: swap;
+    font-weight: bold;
+} */
+
+@font-face {
+    font-family: 'Be Vietnam Pro';
+    src: url('/fonts/BeVietnamPro-Thin.ttf') format('truetype');
+    font-display: swap;
+    font-weight: 100;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Be Vietnam Pro';
+    src: url('/fonts/BeVietnamPro-ThinItalic.ttf') format('truetype');
+    font-display: swap;
+    font-weight: 100;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Be Vietnam Pro';
+    src: url('/fonts/BeVietnamPro-ExtraLight.ttf') format('truetype');
+    font-display: swap;
+    font-weight: 200;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Be Vietnam Pro';
+    src: url('/fonts/BeVietnamPro-ExtraLightItalic.ttf') format('truetype');
+    font-display: swap;
+    font-weight: 200;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Be Vietnam Pro';
+    src: url('/fonts/BeVietnamPro-Light.ttf') format('truetype');
+    font-display: swap;
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Be Vietnam Pro';
+    src: url('/fonts/BeVietnamPro-LightItalic.ttf') format('truetype');
+    font-display: swap;
+    font-weight: 300;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Be Vietnam Pro';
+    src: url('/fonts/BeVietnamPro-Regular.ttf') format('truetype');
+    font-display: swap;
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Be Vietnam Pro';
+    src: url('/fonts/BeVietnamPro-Italic.ttf') format('truetype');
+    font-display: swap;
+    font-weight: 400;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Be Vietnam Pro';
+    src: url('/fonts/BeVietnamPro-Medium.ttf') format('truetype');
+    font-display: swap;
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Be Vietnam Pro';
+    src: url('/fonts/BeVietnamPro-MediumItalic.ttf') format('truetype');
+    font-display: swap;
+    font-weight: 500;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Be Vietnam Pro';
+    src: url('/fonts/BeVietnamPro-SemiBold.ttf') format('truetype');
+    font-display: swap;
+    font-weight: 600;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Be Vietnam Pro';
+    src: url('/fonts/BeVietnamPro-SemiBoldItalic.ttf') format('truetype');
+    font-display: swap;
+    font-weight: 600;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Be Vietnam Pro';
+    src: url('/fonts/BeVietnamPro-Bold.ttf') format('truetype');
+    font-display: swap;
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Be Vietnam Pro';
+    src: url('/fonts/BeVietnamPro-BoldItalic.ttf') format('truetype');
+    font-display: swap;
+    font-weight: 700;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Be Vietnam Pro';
+    src: url('/fonts/BeVietnamPro-ExtraBold.ttf') format('truetype');
+    font-display: swap;
+    font-weight: 800;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Be Vietnam Pro';
+    src: url('/fonts/BeVietnamPro-ExtraBoldItalic.ttf') format('truetype');
+    font-display: swap;
+    font-weight: 800;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Be Vietnam Pro';
+    src: url('/fonts/BeVietnamPro-Black.ttf') format('truetype');
+    font-display: swap;
+    font-weight: 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Be Vietnam Pro';
+    src: url('/fonts/BeVietnamPro-BlackItalic.ttf') format('truetype');
+    font-display: swap;
+    font-weight: 900;
+    font-style: italic;
+}
+
+
+
+html,
+body,
+input,
+main {
+    overflow-x: hidden;
+    max-width: 100%;
+    font-size: 12px;
+    color: #314158;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    line-height: 1.5;
+}
+
+@media (min-width: 1400px) {
+    html,
+    body,
+    input,
+    main {
+        font-size: 14px;
+    }
+}
+
+/* Màn hình PC cơ bản */
+@media (min-width: 1900px) {
+    html,
+    body,
+    input,
+    main {
+        font-size: 16px;
+    }
+}
+
+
+/* Sticky column shadows for horizontal scroll indication */
+.sticky-shadow-right {
+    box-shadow: -4px 0 8px -4px rgba(0, 0, 0, 0.15);
+}
+.sticky-shadow-left {
+    box-shadow: 4px 0 8px -4px rgba(0, 0, 0, 0.15);
+}
+.dark .sticky-shadow-right {
+    box-shadow: -4px 0 8px -4px rgba(0, 0, 0, 0.4);
+}
+.dark .sticky-shadow-left {
+    box-shadow: 4px 0 8px -4px rgba(0, 0, 0, 0.4);
+}

@@ -5,10 +5,35 @@
 @section('description', $mode === 'CREATE' ? 'Thêm người dùng mới vào hệ thống' : 'Chỉnh sửa thông tin người dùng')
 
 @section('content')
-<div class="h-full flex flex-col items-stretch justify-start gap-4 3xl:gap-6"> 
+<div class="h-full w-full max-w-[1600px] mx-auto flex flex-col items-stretch justify-start gap-4 3xl:gap-6">
+
+    {{-- Header Bar --}}
+    <div class="p-3 3xl:p-4 bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-row justify-between gap-4">
+        <div class="flex items-center justify-start gap-3">
+            <button onclick="handleGotoBackPage_Global()"
+                type="button"
+                class="group px-2.5 py-2.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 rounded-xl transition-all duration-300 font-medium flex items-center justify-center gap-2 cursor-pointer text-[18px]">
+                <svg class="h-6" viewBox="0 0 320 512" fill="currentColor">
+                    <path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"/>
+                </svg>
+            </button>
+
+            <div class="flex flex-col gap-0 min-w-0 flex-1">
+                <h2
+                    class="font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent truncate">
+                    @yield('title', 'Admin Panel')
+                </h2>
+                @hasSection('description')
+                    <p class="text-xs 3xl:text-sm text-gray-600 dark:text-gray-400 truncate">
+                        @yield('description')
+                    </p>
+                @endif
+            </div>
+        </div>
+    </div>
 
     {{-- Form Card --}}
-    <form id="userForm" onsubmit="saveUser(event)" class="w-full max-w-[1400px] mx-auto p-4 md:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+    <form id="userForm" onsubmit="saveUser(event)" class="w-full mx-auto p-4 md:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
         <input type="hidden" id="userId" value="{{ $mode === 'EDIT' ? ($userId ?? '') : '' }}">
         <input type="hidden" id="avatar_path" value="">
 
@@ -96,55 +121,25 @@
                 {{-- Birthday --}}
                 <div>
                     <label for="birthday" class="ml-4 block  font-semibold text-blue-700 dark:text-gray-300 mb-1">Ngày sinh</label>
-                    <input
-                        type="date"
-                        id="birthday"
-                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none"
-                    />
+                    @include('components.date-picker', [
+                        'id' => 'birthday',
+                        'placeholder' => 'Chọn ngày sinh...'
+                    ])
                 </div>
 
                 {{-- Roles --}}
                 <div class="md:col-span-2">
                     <label class="ml-4 block font-semibold text-blue-700 dark:text-gray-300 mb-1">Vai trò <span class="text-red-500">*</span></label>
-                    
+
                     {{-- Custom Multi-Select with Search --}}
-                    <div class="relative">
-                        {{-- Selected Items Display --}}
-                        <div id="selectedRolesContainer" class="min-h-[44px] w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 cursor-pointer flex flex-wrap gap-2 items-center">
-                            <div id="selectedRolesList" class="flex flex-wrap gap-2 flex-1">
-                                <span class="text-gray-400 dark:text-gray-500 text-sm">Đang tải vai trò...</span>
-                            </div>
-                            <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
-                        </div>
+                    @include('components.multi-select', [
+                        'id' => 'roles',
+                        'placeholder' => 'Chọn vai trò...',
+                        'loadingText' => 'Đang tải vai trò...',
+                        'searchPlaceholder' => 'Tìm kiếm vai trò...',
+                        'emptyText' => 'Không tìm thấy vai trò'
+                    ])
 
-                        {{-- Dropdown Menu --}}
-                        <div id="rolesDropdown" class="hidden absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-80 overflow-hidden flex flex-col">
-                            {{-- Search Input --}}
-                            <div class="p-3 border-b border-gray-200 dark:border-gray-700">
-                                <div class="relative">
-                                    <input 
-                                        type="text" 
-                                        id="roleSearchInput" 
-                                        placeholder="Tìm kiếm vai trò..."
-                                        class="w-full px-3 py-2 pl-9 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                                    />
-                                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                    </svg>
-                                </div>
-                            </div>
-
-                            {{-- Options List --}}
-                            <div id="rolesOptionsList" class="overflow-y-auto flex-1">
-                                <div class="flex items-center justify-center py-8">
-                                    <div class="h-8 w-8 rounded-full border-2 border-blue-500 border-t-transparent animate-spin"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
                     <p class="ml-4 text-sm text-gray-500 dark:text-gray-400 mt-1">Chọn ít nhất một vai trò cho người dùng</p>
                 </div>
             </div>
@@ -152,9 +147,8 @@
             <div class="flex items-center justify-end gap-3">
                 <button
                     type="button"
-                    onclick="handleBack()"
-                    class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
-                >
+                    onclick="handleGotoBackPage_Global()"
+                    class="px-4 py-2.5 font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300">
                     Hủy
                 </button>
                 <button
@@ -171,224 +165,93 @@
 </div>
 
 <script>
-    let rolesList = [];
-    let selectedRoles = [];
-    let isDropdownOpen = false;
     const mode = '{{ $mode }}'; // CREATE or EDIT
     const userId = @if($mode === 'EDIT' && isset($userId)) {{ $userId }} @else null @endif;
+    let userData = null;
     let existingThumbnail = null;
     let thumbnailPreview = null;
     let isDragActive = false;
 
+    const prevPageUrl = new URLSearchParams(window.location.search).get('prev_page_url');
+
     document.addEventListener('DOMContentLoaded', async function() {
-        // 1. Tạo một mảng chứa các promise bắt buộc phải chạy
-        const promises = [loadRoles()];
 
-        // 2. Nếu thỏa điều kiện, thêm promise thứ 2 vào mảng
+        // Load user data nếu là EDIT mode
         if (mode === 'EDIT' && userId) {
-            promises.push(loadUserData(userId));
+            userData = await loadUserData(userId);
+            if (userData == null) {
+                NotificationModal.show('Không thể tải thông tin người dùng', 'error', handleGotoBackPage_Global);
+                return;
+            } else {
+                fillUserDataToForm();
+            }
         }
 
-        // 3. Chạy tất cả cùng lúc
-        await Promise.all(promises);
+        // Khởi tạo MultiSelect cho roles
+        MultiSelect.init('roles', {
+            loadData: async () => {
+                try {
+                    const data = await RoleProvider.handleGetRoles({
+                        sort_by: 'level',
+                        order_by: 'asc',
+                        page: 1,
+                        per_page: 1000
+                    });
+                    return data?.success ? (data?.data?.data || []) : [];
+                } catch (error) {
+                    NotificationModal.show('Không thể tải danh sách vai trò: ' + error.message, 'error');
+                    return [];
+                }
+            },
+            displayField: 'name',
+            valueField: 'id',
+            placeholder: 'Chọn vai trò...',
+            emptyText: 'Không có vai trò phù hợp'
+        });
+        MultiSelect.setSelected('roles', userData?.roles || []);
 
-        if (rolesList.length > 0) {
-            renderRolesOptions();
-            updateSelectedRolesDisplay();
-        }
+        // Khởi tạo DatePicker cho birthday
+        DatePicker.init('birthday', {
+            minDate: DatePicker.addYears(DatePicker.today(), -120), // Không cho chọn trước năm 120 tuổi
+            maxDate: DatePicker.addYears(DatePicker.today(), -18), // Không cho chọn ngày dưới 18 tuổi
+            defaultValue: userData?.birthday || null
+        });
 
         initAvatarPreviewForm();
-        initRoleSelector();
     });
-
-    function handleBack() {
-        window.location.href = '{{ route('admin.users.list') }}';
-    }
-
-    async function loadRoles() {
-        try {
-            const data = await apiRequest('/roles?sort_by=level&order_by=asc&page=1&per_page=1000');
-            if (data.success) {
-                rolesList = data.data.data || [];
-            }
-        } catch (error) {
-            showNotificationModel_Global('Không thể tải danh sách vai trò: ' + error.message, 'error');
-        }
-    }
-
-    function initRoleSelector() {
-        const container = document.getElementById('selectedRolesContainer');
-        const dropdown = document.getElementById('rolesDropdown');
-        const searchInput = document.getElementById('roleSearchInput');
-
-        // Toggle dropdown
-        container.addEventListener('click', (e) => {
-            if (e.target.closest('.role-tag-remove')) return;
-            toggleDropdown();
-        });
-
-        // Search functionality
-        searchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase().trim();
-            filterRoles(searchTerm);
-        });
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('#selectedRolesContainer') && !e.target.closest('#rolesDropdown')) {
-                closeDropdown();
-            }
-        });
-
-        // Prevent dropdown close when clicking inside
-        dropdown.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
-    }
-
-    function toggleDropdown() {
-        const dropdown = document.getElementById('rolesDropdown');
-        isDropdownOpen = !isDropdownOpen;
-        
-        if (isDropdownOpen) {
-            dropdown.classList.remove('hidden');
-            document.getElementById('roleSearchInput').focus();
-        } else {
-            dropdown.classList.add('hidden');
-        }
-    }
-
-    function closeDropdown() {
-        const dropdown = document.getElementById('rolesDropdown');
-        isDropdownOpen = false;
-        dropdown.classList.add('hidden');
-        document.getElementById('roleSearchInput').value = '';
-        filterRoles('');
-    }
-
-    function filterRoles(searchTerm) {
-        const optionsList = document.getElementById('rolesOptionsList');
-        // Lọc roles: loại bỏ những role đã được chọn
-        const filteredRoles = rolesList.filter(role => {
-            const isNotSelected = !selectedRoles.some(r => r.id === role.id);
-            const matchesSearch = role.name.toLowerCase().includes(searchTerm);
-            return isNotSelected && matchesSearch;
-        });
-
-        if (filteredRoles.length === 0) {
-            optionsList.innerHTML = `
-                <div class="flex items-center justify-center py-8">
-                    <p class="text-gray-500 dark:text-gray-400">Không tìm thấy vai trò</p>
-                </div>
-            `;
-            return;
-        }
-
-        let html = '';
-        filteredRoles.forEach(role => {
-            html += `
-                <div onclick="toggleRole(${role.id})" 
-                    class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
-                    <div class="w-5 h-5 flex items-center justify-center">
-                        <div class="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 rounded"></div>
-                    </div>
-                    <span class="text-gray-700 dark:text-gray-300">${role.name}</span>
-                </div>
-            `;
-        });
-        optionsList.innerHTML = html;
-    }
-
-    function renderRolesOptions() {
-        filterRoles('');
-    }
-
-    function toggleRole(roleId) {
-        const role = rolesList.find(r => r.id === roleId);
-        if (!role) return;
-
-        const index = selectedRoles.findIndex(r => r.id === roleId);
-        if (index > -1) {
-            selectedRoles.splice(index, 1);
-        } else {
-            selectedRoles.push(role);
-        }
-
-        // Clear search input và reset danh sách
-        const searchInput = document.getElementById('roleSearchInput');
-        if (searchInput) {
-            searchInput.value = '';
-        }
-
-        updateSelectedRolesDisplay();
-        renderRolesOptions();
-    }
-
-    function removeRole(roleId) {
-        selectedRoles = selectedRoles.filter(r => r.id !== roleId);
-        updateSelectedRolesDisplay();
-        renderRolesOptions();
-    }
-
-    function updateSelectedRolesDisplay() {
-        const container = document.getElementById('selectedRolesList');
-        
-        if (selectedRoles.length === 0) {
-            container.innerHTML = '<span class="text-gray-400 dark:text-gray-500 text-sm">Chọn vai trò...</span>';
-            return;
-        }
-
-        let html = '';
-        selectedRoles.forEach(role => {
-            html += `
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium">
-                    ${role.name}
-                    <button type="button" onclick="event.stopPropagation(); removeRole(${role.id})" class="role-tag-remove hover:bg-blue-200 dark:hover:bg-blue-800 rounded-full p-0.5 transition-colors">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                </span>
-            `;
-        });
-        container.innerHTML = html;
-    }
 
     async function loadUserData(id) {
         try {
-            const data = await apiRequest(`/users/${id}`);
-            if (data.success) {
-                const user = data.data;
-                document.getElementById('email').value = user.email || '';
-                document.getElementById('fullname').value = user.fullname || '';
-                document.getElementById('birthday').value = user.birthday ? user.birthday.split('T')[0] : '';
-                document.getElementById('avatar_path').value = user.avatar_path || '';
-
-                // Set avatar preview
-                const avatarEl = document.getElementById('avatarPreview');
-                const placeholderEl = document.getElementById('avatarPlaceholder');
-                if (user.avatar_path) {
-                    avatarEl.src = user.avatar_path;
-                    avatarEl.classList.remove('hidden');
-                    placeholderEl.classList.add('hidden');
-                    existingThumbnail = user.avatar_path;
-                } else {
-                    const name = user.fullname || user.email || 'User';
-                    avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=3b82f6&color=fff&size=128`;
-                    avatarEl.classList.remove('hidden');
-                    placeholderEl.classList.add('hidden');
-                }
-
-                // Set selected roles
-                selectedRoles = user.roles || [];
-                updateSelectedRolesDisplay();
-                renderRolesOptions();
+            const data = await UserProvider.handleGetUserById(id);
+            if (data?.success) {
+                return data?.data;
+            } else {
+                return null;
             }
         } catch (error) {
-            showNotificationModel_Global('Không thể tải thông tin người dùng: ' + error.message, 'error');
-            setTimeout(() => {
-                window.location.href = '{{ route('admin.users.list') }}';
-            }, 2000);
+            return null;
+        }
+    }
+
+    function fillUserDataToForm() {
+        document.getElementById('email').value = userData?.email || '';
+        document.getElementById('fullname').value = userData?.fullname || '';
+        document.getElementById('avatar_path').value = userData?.avatar_path || '';
+        // Birthday sẽ được set trong DatePicker.init() với defaultValue
+
+        // Set avatar preview
+        const avatarEl = document.getElementById('avatarPreview');
+        const placeholderEl = document.getElementById('avatarPlaceholder');
+        if (userData.avatar_path) {
+            avatarEl.src = userData?.avatar_path;
+            avatarEl.classList.remove('hidden');
+            placeholderEl.classList.add('hidden');
+            existingThumbnail = userData?.avatar_path;
+        } else {
+            const name = userData?.fullname || userData?.email || 'User';
+            avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=3b82f6&color=fff&size=128`;
+            avatarEl.classList.remove('hidden');
+            placeholderEl.classList.add('hidden');
         }
     }
 
@@ -425,12 +288,12 @@
         }
 
         if (!ALLOWED_TYPES.includes(file.type)) {
-            showNotificationModel_Global('Định dạng không hỗ trợ. Hãy chọn ảnh PNG, JPG, WEBP hoặc GIF.', 'error');
+            NotificationModal.show('Định dạng không hỗ trợ. Hãy chọn ảnh PNG, JPG, WEBP hoặc GIF.', 'error');
             return;
         }
 
         if (file.size > MAX_SIZE) {
-            showNotificationModel_Global('Ảnh quá lớn. Kích thước tối đa 2MB.', 'error');
+            NotificationModal.show('Ảnh quá lớn. Kích thước tối đa 2MB.', 'error');
             return;
         }
 
@@ -522,14 +385,15 @@
 
         const email = document.getElementById('email').value;
         const fullname = document.getElementById('fullname').value;
-        const birthday = document.getElementById('birthday').value || null;
+        const birthday = DatePicker.getValue('birthday') || null;
         const avatarPath = document.getElementById('avatar_path').value || null;
         const password = document.getElementById('password').value;
         const fileInput = document.getElementById('avatar');
         const avatarFile = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
 
+        const selectedRoles = MultiSelect.getSelected('roles');
         if (selectedRoles.length === 0) {
-            showNotificationModel_Global('Vui lòng chọn ít nhất một vai trò', 'error');
+            NotificationModal.show('Vui lòng chọn ít nhất một vai trò', 'error');
             if (submitBtn) {
                 submitBtn.disabled = false;
                 submitBtn.textContent = mode === 'CREATE' ? 'Tạo' : 'Cập nhật';
@@ -541,7 +405,7 @@
         const url = mode === 'EDIT' ? `/users/${userIdValue}` : '/users';
         const method = mode === 'EDIT' ? 'PUT' : 'POST';
 
-        try { 
+        try {
             const fd = new FormData();
             if (mode === 'EDIT') {
                 fd.append('_method', 'PUT');
@@ -565,16 +429,16 @@
             });
             const data = await response.json();
             if (data.success) {
-                showNotificationModel_Global(mode === 'EDIT' ? 'Cập nhật thông tin người dùng thành công' : 'Tạo người dùng thành công', 'success', handleBack);
+                NotificationModal.show(mode === 'EDIT' ? 'Cập nhật thông tin người dùng thành công' : 'Tạo người dùng thành công', 'success', handleGotoBackPage_Global);
             } else if (response.status === 422) {
                 let errorsField = data.errors || null;
                 renderInputErrors_Global(errorsField);
             } else {
                 throw new Error(data.message || 'Có lỗi xảy ra');
-            } 
+            }
 
         } catch (error) {
-            showNotificationModel_Global(error.message || 'Thao tác thất bại', 'error');
+            NotificationModal.show(error.message || 'Thao tác thất bại', 'error');
         } finally {
             if (submitBtn) {
                 submitBtn.disabled = false;

@@ -17,8 +17,8 @@ class CourseUserSeeder extends Seeder
     {
         $this->command->info('Đang gán users vào các khóa học...');
 
-        $users = User::all();
-        $courses = Course::all();
+        $users = User::orderBy('id')->get();
+        $courses = Course::orderBy('id')->get();
 
         if ($users->isEmpty()) {
             $this->command->warn('⚠ Chưa có users nào. Vui lòng chạy UserSeederDev hoặc UserSeederProduction trước.');
@@ -31,13 +31,19 @@ class CourseUserSeeder extends Seeder
         }
 
         $assignedCount = 0;
+        $coursesCount = $courses->count();
 
-        // Gán tất cả users vào một số khóa học ngẫu nhiên
-        foreach ($users as $user) {
-            // Mỗi user sẽ được gán vào 2-4 khóa học ngẫu nhiên
-            $randomCourses = $courses->random(rand(2, min(4, $courses->count())));
+        // Gán users vào khóa học với logic cố định dựa trên index
+        foreach ($users as $userIndex => $user) {
+            // Mỗi user sẽ được gán vào 3 khóa học (cố định)
+            // Sử dụng modulo để đảm bảo phân bổ đều
+            $numCourses = 3;
             
-            foreach ($randomCourses as $course) {
+            for ($i = 0; $i < $numCourses; $i++) {
+                // Tính index của course dựa trên user index và offset
+                $courseIndex = ($userIndex * $numCourses + $i) % $coursesCount;
+                $course = $courses[$courseIndex];
+                
                 // Kiểm tra xem đã gán chưa
                 if (!$user->courses()->where('courses.id', $course->id)->exists()) {
                     $user->courses()->attach($course->id);

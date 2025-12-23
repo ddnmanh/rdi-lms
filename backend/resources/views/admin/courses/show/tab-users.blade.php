@@ -1,14 +1,7 @@
 {{-- Users Tab --}}
 <div class="tab-panel hidden h-full flex flex-col items-stretch justify-start" data-tab-content="tab-users">
-    <div class="px-6 py-4 flex items-center justify-between gap-3 rounded-t-none">
-        <div class="flex items-center gap-3"></div>
-        <a id="manageUsersButton" href="#"
-            class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5  font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
-            <i class="fa-solid fa-pen"></i>
-            <span>Quản lý sinh viên</span>
-        </a>
-    </div>
-    <div class="flex-1 min-h-0 p-6 pt-0">
+
+    <div class="flex-1 min-h-0 p-6">
         <div id="usersList" class="px-1 space-y-3 h-full overflow-auto">
 
         </div>
@@ -63,11 +56,17 @@
                                             ${escapeHtml_Global(lessonTitle)}
                                         </p>
                                         <div class="mt-1 flex flex-wrap items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
-                                            <span class="flex items-center gap-1" title="Lần đầu xem">
-                                                <i class="fa-regular fa-calendar text-gray-400"></i> ${firstWatched}
+                                            <span class="flex items-center gap-1 text-gray-400"" title="Lần đầu xem">
+                                                <svg class="w-3" viewBox="0 0 448 512" fill="currentColor">
+                                                    <path d="M128 0C110.3 0 96 14.3 96 32l0 32-32 0C28.7 64 0 92.7 0 128l0 48 448 0 0-48c0-35.3-28.7-64-64-64l-32 0 0-32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 32-128 0 0-32c0-17.7-14.3-32-32-32zM0 224L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-192-448 0z"/>
+                                                </svg>
+                                                ${firstWatched}
                                             </span>
-                                            <span class="flex items-center gap-1" title="Lần cuối xem">
-                                                <i class="fa-regular fa-clock text-gray-400"></i> ${lastWatched}
+                                            <span class="flex items-center gap-1 text-gray-400"" title="Lần cuối xem">
+                                                <svg class="w-3" viewBox="0 0 512 512" fill="currentColor">
+                                                    <path d="M256 0a256 256 0 1 1 0 512 256 256 0 1 1 0-512zM232 120l0 136c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2 280 120c0-13.3-10.7-24-24-24s-24 10.7-24 24z"/>
+                                                </svg>
+                                                ${lastWatched}
                                             </span>
                                         </div>
                                     </div>
@@ -110,8 +109,10 @@
                                             <img src="${user.avatar_path}" alt="" class="w-full h-full object-cover">
                                         </div>
                                         ${isPassed
-                                            ? `<div class="absolute -bottom-1 -right-1 bg-white dark:bg-gray-800 rounded-full p-0.5">
-                                                <i class="fa-solid fa-circle-check text-green-500 text-base"></i>
+                                            ? `<div class="absolute -bottom-1 -right-1 bg-white dark:bg-gray-800 rounded-full p-0.5 text-green-500 text-base">
+                                                <svg class="w-3 h-3" viewBox="0 0 512 512" fill="currentColor">
+                                                    <path d="M256 512a256 256 0 1 1 0-512 256 256 0 1 1 0 512zM374 145.7c-10.7-7.8-25.7-5.4-33.5 5.3L221.1 315.2 169 263.1c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l72 72c5 5 11.8 7.5 18.8 7s13.4-4.1 17.5-9.8L379.3 179.2c7.8-10.7 5.4-25.7-5.3-33.5z"/>
+                                                </svg>
                                             </div>`
                                             : ''
                                         }
@@ -157,7 +158,11 @@
                                         onclick="toggleUserDetail(${idx})"
                                         type="button" class="w-8 h-8 cursor-pointer rounded-full flex items-center justify-center transition-colors ${viewedLessonsCount === 0 ? 'cursor-not-allowed bg-gray-50 dark:bg-gray-800 text-gray-400' : 'hover:bg-gray-200 dark:hover:bg-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'}"
                                     >
-                                        <i id="toggleIconDesktop${idx}" class="fa-solid fa-chevron-down ${viewedLessonsCount === 0 ? 'text-gray-200 dark:text-gray-700' : 'text-gray-500 dark:text-gray-400'} text-xs transition-transform duration-300"></i>
+                                        <span id="toggleIconDesktop${idx}" class="${viewedLessonsCount === 0 ? 'text-gray-200 dark:text-gray-700' : 'text-gray-500 dark:text-gray-400'} text-xs transition-transform duration-300">
+                                            <svg class="w-3" viewBox="0 0 448 512" fill="currentColor">
+                                                <path d="M201.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 338.7 54.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/>
+                                            </svg>
+                                        </span>
                                     </button>
                                 </div>
 

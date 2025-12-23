@@ -1,15 +1,7 @@
 {{-- Course Information Tab --}}
 <div class="tab-panel h-full flex flex-col items-stretch justify-start" data-tab-content="tab-course-info">
-    <div class="px-6 py-4 flex items-center justify-between gap-3 rounded-t-none">
-        <div class="flex items-center gap-3"></div>
-        <a id="editButton" href="#"
-            class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5  font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
-            <i class="fa-solid fa-pen"></i>
-            <span>Chỉnh sửa</span>
-        </a>
-    </div>
 
-    <div class="flex-1 min-h-0 h-full p-6 pt-0">
+    <div class="flex-1 min-h-0 h-full p-6">
         <div class="w-full h-full overflow-y-auto">
             {{-- Personal Information Section --}}
             <div class="grid grid-cols-1 md:grid-cols-2 items-start gap-6 h-fit ">
@@ -69,17 +61,14 @@
                 </div>
             </div>
         </div>
-    </div> 
-    
+    </div>
+
 </div>
 
 <script>
     function renderCourse() {
         const pageTitleEl = document.getElementById('coursePageTitle');
         if (pageTitleEl) pageTitleEl.textContent = courseData_MainShow.title || 'Chi tiết khóa học';
-        document.getElementById('editButton').href = `/admin/courses/${courseData_MainShow.id}/edit`;
-        document.getElementById('manageLessonsButton').href = `/admin/courses/${courseData_MainShow.id}/edit`;
-        document.getElementById('manageUsersButton').href = `/admin/courses/${courseData_MainShow.id}/edit`;
         setText('courseId', courseData_MainShow.id);
         setText('courseTitle', courseData_MainShow.title || 'Chưa có tiêu đề');
         setText('courseDescription', courseData_MainShow.description || 'Chưa có mô tả');
@@ -116,5 +105,5 @@
              if (creatorNameEl) creatorNameEl.textContent = userCreator_MainShow.fullname || 'N/A';
              if (creatorEmailEl) creatorEmailEl.textContent = userCreator_MainShow.email || 'N/A';
         }
-    }    
+    }
 </script>

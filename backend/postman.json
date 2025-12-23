@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "5d1ede6b-4a0a-4289-af3d-717d968dbdaf",
+		"_postman_id": "a8eb59f0-5f0a-45d7-b7d4-6a32070e00bb",
 		"name": "LMS API Collection",
 		"description": "API collection cho hệ thống Quản lý Học trực tuyến (LMS)",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
@@ -29,9 +29,9 @@
 							"raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\",\n  \"fullname\": \"Nguyễn Văn A\",\n  \"birthday\": \"2000-01-01\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/auth/register",
+							"raw": "{{domain_server}}/api/auth/register",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -52,9 +52,9 @@
 								"exec": [
 									"if (pm.response.code === 200) {",
 									"    var jsonData = pm.response.json();",
-									"    if (jsonData.success && jsonData.data.access_token) {",
-									"        pm.environment.set(\"access_token\", jsonData.data.access_token);",
-									"        pm.environment.set(\"refresh_token\", jsonData.data.refresh_token);",
+									"    if (jsonData.data.access_token) {",
+									"        pm.collectionVariables.set(\"access_token\", jsonData.data.access_token);",
+									"        pm.collectionVariables.set(\"refresh_token\", jsonData.data.refresh_token);",
 									"    }",
 									"}"
 								],
@@ -78,12 +78,12 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "// {\n//   \"email\": \"root@lms.vn\",\n//   \"password\": \"123123123\"\n// }\n// {\n//   \"email\": \"admin2@lms.vn\",\n//   \"password\": \"123123123\"\n// }\n{\n  \"email\": \"student3@lms.vn\",\n  \"password\": \"123123123\"\n}"
+							"raw": "{\n  \"email\": \"root@lms.vn\",\n  \"password\": \"123123123\"\n}\n// {\n//   \"email\": \"admin2@lms.vn\",\n//   \"password\": \"123123123\"\n// }\n// {\n//   \"email\": \"student1@lms.vn\",\n//   \"password\": \"123123123\"\n// }"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/auth/login",
+							"raw": "{{domain_server}}/api/auth/login",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -114,9 +114,9 @@
 							"raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/auth/refresh",
+							"raw": "{{domain_server}}/api/auth/refresh",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -156,9 +156,9 @@
 							"raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/auth/logout",
+							"raw": "{{domain_server}}/api/auth/logout",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -173,6 +173,16 @@
 				{
 					"name": "Get Current User",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [
 							{
@@ -185,9 +195,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/auth/me",
+							"raw": "{{domain_server}}/api/auth/me",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -222,9 +232,9 @@
 							"raw": "{\n  \"fullname\": \"Nguyễn Văn A Updated\",\n  \"birthday\": \"2000-01-01\",\n  \"avatar_path\": \"/storage/avatars/avatar.jpg\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/auth/update-profile",
+							"raw": "{{domain_server}}/api/auth/update-profile",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -256,9 +266,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/users?search=&search_email=&search_fullname=&role_id=&role_name=&created_at_from=&created_at_to=&sort_by=id&order_by=desc&per_page=15&page=1",
+							"raw": "{{domain_server}}/api/users?search=&search_email=&search_fullname=&role_id=&role_name=&created_at_from=&created_at_to=&sort_by=id&order_by=desc&per_page=15&page=1",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -349,9 +359,9 @@
 							"raw": "{\n  \"email\": \"student@example.com\",\n  \"password\": \"password123\",\n  \"fullname\": \"Sinh Viên A\",\n  \"birthday\": \"2000-01-01\",\n  \"avatar_path\": \"/storage/avatars/avatar.jpg\",\n  \"role_ids\": [2]\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/users",
+							"raw": "{{domain_server}}/api/users",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -414,9 +424,9 @@
 							]
 						},
 						"url": {
-							"raw": "{{base_url}}/api/users",
+							"raw": "{{domain_server}}/api/users",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -442,9 +452,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/users/:id",
+							"raw": "{{domain_server}}/api/users/:id",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -485,9 +495,9 @@
 							"raw": "{\n  \"email\": \"student@example.com\",\n  \"password\": \"newpassword123\",\n  \"fullname\": \"Sinh Viên A Updated\",\n  \"birthday\": \"2000-01-01\",\n  \"avatar_path\": \"/storage/avatars/avatar.jpg\",\n  \"role_ids\": [2]\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/users/:id",
+							"raw": "{{domain_server}}/api/users/:id",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -558,9 +568,9 @@
 							]
 						},
 						"url": {
-							"raw": "{{base_url}}/api/users/:id",
+							"raw": "{{domain_server}}/api/users/:id",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -601,9 +611,9 @@
 							"raw": "{\n  \"user_ids\": [2, 3]\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/users",
+							"raw": "{{domain_server}}/api/users",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -634,9 +644,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/roles?search=&level_from=&level_to=&user_id=&permission_id=&sort_by=level&order_by=asc&per_page=15&page=1",
+							"raw": "{{domain_server}}/api/roles?search=&level_from=&level_to=&user_id=&permission_id=&sort_by=level&order_by=asc&per_page=15&page=1",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -717,9 +727,9 @@
 							"raw": "{\n  \"name\": \"MODERATOR\",\n  \"description\": \"Người điều hành\",\n  \"level\": 50,\n  \"permission_ids\": [1, 2, 3]\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/roles",
+							"raw": "{{domain_server}}/api/roles",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -745,9 +755,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/roles/:id",
+							"raw": "{{domain_server}}/api/roles/:id",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -788,9 +798,9 @@
 							"raw": "{\n  \"name\": \"MODERATOR\",\n  \"description\": \"Người điều hành (Updated)\",\n  \"level\": 50,\n  \"permission_ids\": [1, 2, 3, 4]\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/roles/:id",
+							"raw": "{{domain_server}}/api/roles/:id",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -831,9 +841,9 @@
 							"raw": "{\n  \"role_ids\": [1]\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/roles",
+							"raw": "{{domain_server}}/api/roles",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -867,9 +877,9 @@
 							"raw": "{\n  \"role_ids\": [2, 3],\n  \"is_block\": true\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/roles/block",
+							"raw": "{{domain_server}}/api/roles/block",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -904,9 +914,9 @@
 							"raw": "{\n  \"permission_ids\": [1, 2, 3, 4, 5]\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/roles/:id/permissions",
+							"raw": "{{domain_server}}/api/roles/:id/permissions",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -945,9 +955,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/permissions?search=&group=&method=&sort_by=group&order_by=asc&per_page=15&page=1",
+							"raw": "{{domain_server}}/api/permissions?search=&group=&method=&sort_by=group&order_by=asc&per_page=15&page=1",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -1015,9 +1025,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/courses?search=&user_id=&start_date_from=&start_date_to=&end_date_from=&end_date_to=&date_range=all&min_users=&max_users=&min_lessons=&max_lessons=&sort_by=id&order_by=desc&per_page=15&page=1",
+							"raw": "{{domain_server}}/api/courses?search=&user_id=&start_date_from=&start_date_to=&end_date_from=&end_date_to=&date_range=all&min_users=&max_users=&min_lessons=&max_lessons=&sort_by=id&order_by=desc&per_page=15&page=1",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -1128,9 +1138,9 @@
 							"raw": "{\n  \"title\": \"Lập trình Laravel\",\n  \"description\": \"Khóa học về Laravel framework\",\n  \"start_date\": \"2024-01-01 00:00:00\",\n  \"end_date\": \"2024-12-31 23:59:59\",\n  \"timezone\": \"Asia/Ho_Chi_Minh\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/courses",
+							"raw": "{{domain_server}}/api/courses",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -1192,9 +1202,9 @@
 							]
 						},
 						"url": {
-							"raw": "{{base_url}}/api/courses",
+							"raw": "{{domain_server}}/api/courses",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -1220,9 +1230,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/courses/:id",
+							"raw": "{{domain_server}}/api/courses/:id",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -1263,9 +1273,9 @@
 							"raw": "{\n  \"title\": \"Lập trình Laravel (Updated)\",\n  \"description\": \"Khóa học về Laravel framework - Updated\",\n  \"start_date\": \"2024-01-01 00:00:00\",\n  \"end_date\": \"2024-12-31 23:59:59\",\n  \"timezone\": \"Asia/Ho_Chi_Minh\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/courses/:id",
+							"raw": "{{domain_server}}/api/courses/:id",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -1333,9 +1343,9 @@
 							]
 						},
 						"url": {
-							"raw": "{{base_url}}/api/courses/:id",
+							"raw": "{{domain_server}}/api/courses/:id",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -1376,9 +1386,9 @@
 							"raw": "{\n  \"course_ids\": [1, 2]\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/courses",
+							"raw": "{{domain_server}}/api/courses",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -1412,9 +1422,9 @@
 							"raw": "{\n  \"user_ids\": [1, 2, 3]\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/courses/:id/users/add",
+							"raw": "{{domain_server}}/api/courses/:id/users/add",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -1457,9 +1467,9 @@
 							"raw": "{\n  \"user_ids\": [2, 3]\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/courses/:id/users/remove",
+							"raw": "{{domain_server}}/api/courses/:id/users/remove",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -1502,9 +1512,9 @@
 							"raw": "{\n  \"lessons\": [\n    {\n      \"id\": 5,\n      \"display_order\": 1\n    },\n    {\n      \"id\": 6,\n      \"display_order\": 2\n    }\n  ]\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/courses/:id/lessons/add",
+							"raw": "{{domain_server}}/api/courses/:id/lessons/add",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -1547,9 +1557,9 @@
 							"raw": "{\n  \"lesson_ids\": [5, 6]\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/courses/:id/lessons/remove",
+							"raw": "{{domain_server}}/api/courses/:id/lessons/remove",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -1600,9 +1610,9 @@
 									"raw": "{\n  \"lesson_id\": 1,\n  \"file_name\": \"video.mp4\",\n  \"file_size\": 104857600,\n  \"mime_type\": \"video/mp4\",\n  \"chunk_size\": 52428800\n}"
 								},
 								"url": {
-									"raw": "{{base_url}}/api/lessons/video-uploads/sessions",
+									"raw": "{{domain_server}}/api/lessons/video-uploads/sessions",
 									"host": [
-										"{{base_url}}"
+										"{{domain_server}}"
 									],
 									"path": [
 										"api",
@@ -1647,9 +1657,9 @@
 									]
 								},
 								"url": {
-									"raw": "{{base_url}}/api/lessons/video-uploads/:IdLessonVideoUpload/chunks",
+									"raw": "{{domain_server}}/api/lessons/video-uploads/:IdLessonVideoUpload/chunks",
 									"host": [
-										"{{base_url}}"
+										"{{domain_server}}"
 									],
 									"path": [
 										"api",
@@ -1692,9 +1702,9 @@
 									"raw": "{}"
 								},
 								"url": {
-									"raw": "{{base_url}}/api/lessons/video-uploads/:IdLessonVideoUpload/complete",
+									"raw": "{{domain_server}}/api/lessons/video-uploads/:IdLessonVideoUpload/complete",
 									"host": [
-										"{{base_url}}"
+										"{{domain_server}}"
 									],
 									"path": [
 										"api",
@@ -1729,9 +1739,9 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_url}}/api/lessons/video-uploads/:IdLessonVideoUpload",
+									"raw": "{{domain_server}}/api/lessons/video-uploads/:IdLessonVideoUpload",
 									"host": [
-										"{{base_url}}"
+										"{{domain_server}}"
 									],
 									"path": [
 										"api",
@@ -1765,9 +1775,9 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_url}}/api/lessons/video-uploads/:IdLessonVideoUpload",
+									"raw": "{{domain_server}}/api/lessons/video-uploads/:IdLessonVideoUpload",
 									"host": [
-										"{{base_url}}"
+										"{{domain_server}}"
 									],
 									"path": [
 										"api",
@@ -1803,9 +1813,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/lessons?course_id=&orphaned=&search=&duration_min=&duration_max=&sort_by=course_id&order_by=asc&per_page=15&page=1",
+							"raw": "{{domain_server}}/api/lessons?course_id=&orphaned=&search=&duration_min=&duration_max=&sort_by=course_id&order_by=asc&per_page=15&page=1",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -1886,9 +1896,9 @@
 							"raw": "{\n  \"course_id\": 1,\n  \"title\": \"Giới thiệu Laravel\",\n  \"description\": \"Bài học đầu tiên\",\n  \"duration\": 1800,\n  \"video_path\": \"https://example.com/video.mp4\",\n  \"display_order\": 1\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/lessons",
+							"raw": "{{domain_server}}/api/lessons",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -1963,9 +1973,9 @@
 							]
 						},
 						"url": {
-							"raw": "{{base_url}}/api/lessons",
+							"raw": "{{domain_server}}/api/lessons",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -1991,9 +2001,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/lessons/:id",
+							"raw": "{{domain_server}}/api/lessons/:id",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -2008,6 +2018,42 @@
 							]
 						},
 						"description": "Xem chi tiết bài học kèm thông tin khóa học."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Lesson Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{domain_server}}/api/lessons/:id/statistics",
+							"host": [
+								"{{domain_server}}"
+							],
+							"path": [
+								"api",
+								"lessons",
+								":id",
+								"statistics"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Xem thống kê chi tiết của một bài học (Quiz, câu hỏi, điểm số)."
 					},
 					"response": []
 				},
@@ -2034,9 +2080,9 @@
 							"raw": "{\n  \"title\": \"Giới thiệu Laravel (Updated)\",\n  \"description\": \"Bài học đầu tiên - Updated\",\n  \"duration\": 2000,\n  \"video_path\": \"https://example.com/video-updated.mp4\",\n  \"display_order\": 1\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/lessons/:id",
+							"raw": "{{domain_server}}/api/lessons/:id",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -2113,9 +2159,9 @@
 							]
 						},
 						"url": {
-							"raw": "{{base_url}}/api/lessons/:id",
+							"raw": "{{domain_server}}/api/lessons/:id",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -2156,9 +2202,9 @@
 							"raw": "{\n  \"lesson_ids\": [10, 11]\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/lessons",
+							"raw": "{{domain_server}}/api/lessons",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -2184,9 +2230,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/lessons/:lesson/auto-signature",
+							"raw": "{{domain_server}}/api/lessons/:lesson/auto-signature",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -2220,9 +2266,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/lessons/:lesson/hls-signature",
+							"raw": "{{domain_server}}/api/lessons/:lesson/hls-signature",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -2256,9 +2302,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/lessons/:lesson/mp4-signature",
+							"raw": "{{domain_server}}/api/lessons/:lesson/mp4-signature",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -2280,8 +2326,691 @@
 			]
 		},
 		{
+			"name": "Lesson Quiz Management",
+			"item": [
+				{
+					"name": "Get Quizzes by Lesson",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{domain_server}}/api/lesson-quizzes/lesson/:lessonId",
+							"host": [
+								"{{domain_server}}"
+							],
+							"path": [
+								"api",
+								"lesson-quizzes",
+								"lesson",
+								":lessonId"
+							],
+							"variable": [
+								{
+									"key": "lessonId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Xem danh sách tất cả quiz của một bài học."
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Quizzes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{domain_server}}/api/lesson-quizzes",
+							"host": [
+								"{{domain_server}}"
+							],
+							"path": [
+								"api",
+								"lesson-quizzes"
+							]
+						},
+						"description": "Xem danh sách tất cả quiz trong hệ thống."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Quiz",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"lesson_id\": 1,\n  \"title\": \"Bài kiểm tra trắc nghiệm\",\n  \"description\": \"Kiểm tra kiến thức bài 1\",\n  \"passing_percent_score\": 80,\n  \"questions\": [\n    {\n      \"content\": \"Laravel là gì?\",\n      \"type\": \"multiple_choice\",\n      \"answers\": [\n        {\n          \"content\": \"PHP Framework\",\n          \"is_correct\": true\n        },\n        {\n          \"content\": \"Javascript Library\",\n          \"is_correct\": false\n        }\n      ]\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{domain_server}}/api/lesson-quizzes",
+							"host": [
+								"{{domain_server}}"
+							],
+							"path": [
+								"api",
+								"lesson-quizzes"
+							]
+						},
+						"description": "Tạo mới quiz cho bài học (có thể kèm câu hỏi và đáp án)."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Quiz Detail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{domain_server}}/api/lesson-quizzes/:quizId",
+							"host": [
+								"{{domain_server}}"
+							],
+							"path": [
+								"api",
+								"lesson-quizzes",
+								":quizId"
+							],
+							"variable": [
+								{
+									"key": "quizId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Xem thông tin chi tiết của một quiz."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Quiz",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Bài kiểm tra trắc nghiệm (Updated)\",\n  \"description\": \"Kiểm tra kiến thức bài 1 update\",\n  \"passing_percent_score\": 90,\n  \"is_published\": true\n}"
+						},
+						"url": {
+							"raw": "{{domain_server}}/api/lesson-quizzes/:quizId",
+							"host": [
+								"{{domain_server}}"
+							],
+							"path": [
+								"api",
+								"lesson-quizzes",
+								":quizId"
+							],
+							"variable": [
+								{
+									"key": "quizId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Cập nhật thông tin quiz."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Quiz",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{domain_server}}/api/lesson-quizzes/:quizId",
+							"host": [
+								"{{domain_server}}"
+							],
+							"path": [
+								"api",
+								"lesson-quizzes",
+								":quizId"
+							],
+							"variable": [
+								{
+									"key": "quizId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Xóa quiz khỏi bài học."
+					},
+					"response": []
+				},
+				{
+					"name": "Add Question to Quiz",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"content\": \"Câu hỏi mới?\",\n  \"type\": \"multiple_choice\",\n  \"answers\": [\n    {\n      \"content\": \"Đáp án A\",\n      \"is_correct\": true\n    },\n    {\n      \"content\": \"Đáp án B\",\n      \"is_correct\": false\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{domain_server}}/api/lesson-quizzes/:quizId/questions",
+							"host": [
+								"{{domain_server}}"
+							],
+							"path": [
+								"api",
+								"lesson-quizzes",
+								":quizId",
+								"questions"
+							],
+							"variable": [
+								{
+									"key": "quizId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Thêm câu hỏi mới vào quiz."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Question",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"content\": \"Câu hỏi đã sửa?\",\n  \"type\": \"single_choice\",\n  \"answers\": [\n    {\n      \"content\": \"Đáp án X\",\n      \"is_correct\": true\n    },\n    {\n      \"content\": \"Đáp án Y\",\n      \"is_correct\": false\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{domain_server}}/api/lesson-quizzes/questions/:questionId",
+							"host": [
+								"{{domain_server}}"
+							],
+							"path": [
+								"api",
+								"lesson-quizzes",
+								"questions",
+								":questionId"
+							],
+							"variable": [
+								{
+									"key": "questionId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Cập nhật nội dung và đáp án của câu hỏi."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Question",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{domain_server}}/api/lesson-quizzes/questions/:questionId",
+							"host": [
+								"{{domain_server}}"
+							],
+							"path": [
+								"api",
+								"lesson-quizzes",
+								"questions",
+								":questionId"
+							],
+							"variable": [
+								{
+									"key": "questionId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Xóa câu hỏi khỏi quiz."
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Student",
 			"item": [
+				{
+					"name": "note",
+					"item": [
+						{
+							"name": "Create Note",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"lesson_id\": 1,\n  \"duration_at\": 120,\n  \"content\": \"Nội dung ghi chú tại thời điểm 2 phút trong video\"\n}"
+								},
+								"url": {
+									"raw": "{{domain_server}}/api/student/notes",
+									"host": [
+										"{{domain_server}}"
+									],
+									"path": [
+										"api",
+										"student",
+										"notes"
+									]
+								},
+								"description": "Tạo ghi chú mới cho bài học tại một thời điểm cụ thể trong video. duration_at tính bằng giây."
+							},
+							"response": []
+						},
+						{
+							"name": "Update Note",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"duration_at\": 150,\n  \"content\": \"Nội dung ghi chú đã cập nhật\"\n}"
+								},
+								"url": {
+									"raw": "{{domain_server}}/api/student/notes/:noteId",
+									"host": [
+										"{{domain_server}}"
+									],
+									"path": [
+										"api",
+										"student",
+										"notes",
+										":noteId"
+									],
+									"variable": [
+										{
+											"key": "noteId",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Cập nhật ghi chú của sinh viên. Có thể cập nhật thời điểm (duration_at) và/hoặc nội dung (content)."
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Note",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{domain_server}}/api/student/notes/:noteId",
+									"host": [
+										"{{domain_server}}"
+									],
+									"path": [
+										"api",
+										"student",
+										"notes",
+										":noteId"
+									],
+									"variable": [
+										{
+											"key": "noteId",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Xóa ghi chú của sinh viên."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Lesson Notes",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{domain_server}}/api/student/lessons/:lessonId/notes?sort_by=duration_at&order_by=asc",
+									"host": [
+										"{{domain_server}}"
+									],
+									"path": [
+										"api",
+										"student",
+										"lessons",
+										":lessonId",
+										"notes"
+									],
+									"query": [
+										{
+											"key": "sort_by",
+											"value": "duration_at",
+											"description": "Sắp xếp theo (duration_at, created_at)"
+										},
+										{
+											"key": "order_by",
+											"value": "asc",
+											"description": "Thứ tự sắp xếp (asc, desc)"
+										}
+									],
+									"variable": [
+										{
+											"key": "lessonId",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Lấy danh sách ghi chú của sinh viên cho một bài học, sắp xếp theo thời điểm trong video."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "quiz",
+					"item": [
+						{
+							"name": "Check Quiz Status",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{domain_server}}/api/student/lessons/:lessonId/quiz-status",
+									"host": [
+										"{{domain_server}}"
+									],
+									"path": [
+										"api",
+										"student",
+										"lessons",
+										":lessonId",
+										"quiz-status"
+									],
+									"variable": [
+										{
+											"key": "lessonId",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Kiểm tra sinh viên đã pass các quiz của bài học chưa (để cho phép xem tiếp video)."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Quiz Detail",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{domain_server}}/api/student/quizzes/:quizId",
+									"host": [
+										"{{domain_server}}"
+									],
+									"path": [
+										"api",
+										"student",
+										"quizzes",
+										":quizId"
+									],
+									"variable": [
+										{
+											"key": "quizId",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Lấy thông tin chi tiết quiz để làm bài."
+							},
+							"response": []
+						},
+						{
+							"name": "Submit Quiz",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"answers\": [\n    {\n      \"question_id\": 1,\n      \"answer_id\": 2\n    },\n    {\n      \"question_id\": 2,\n      \"answer_id\": 4\n    }\n  ]\n}"
+								},
+								"url": {
+									"raw": "{{domain_server}}/api/student/quizzes/:quizId/submit",
+									"host": [
+										"{{domain_server}}"
+									],
+									"path": [
+										"api",
+										"student",
+										"quizzes",
+										":quizId",
+										"submit"
+									],
+									"variable": [
+										{
+											"key": "quizId",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Nộp bài làm quiz và nhận kết quả/điểm số."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Quiz Attempts",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{domain_server}}/api/student/quizzes/:quizId/attempts",
+									"host": [
+										"{{domain_server}}"
+									],
+									"path": [
+										"api",
+										"student",
+										"quizzes",
+										":quizId",
+										"attempts"
+									],
+									"variable": [
+										{
+											"key": "quizId",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Xem lịch sử các lần làm quiz của sinh viên."
+							},
+							"response": []
+						}
+					]
+				},
 				{
 					"name": "Get Student Courses",
 					"request": {
@@ -2297,9 +3026,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/student/courses?search=&sort_by=id&order_by=desc",
+							"raw": "{{domain_server}}/api/student/courses?search=&sort_by=id&order_by=desc",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -2343,9 +3072,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/student/courses/:courseId",
+							"raw": "{{domain_server}}/api/student/courses/:courseId",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -2379,9 +3108,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/student/lessons/:lessonId",
+							"raw": "{{domain_server}}/api/student/lessons/:lessonId",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -2423,9 +3152,9 @@
 							"raw": "{\n  \"lesson_id\": 1,\n  \"watched_duration\": 900,\n  \"last_position\": 900\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/student/progress",
+							"raw": "{{domain_server}}/api/student/progress",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -2452,9 +3181,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/student/courses/:courseId/progress",
+							"raw": "{{domain_server}}/api/student/courses/:courseId/progress",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -2494,9 +3223,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/reports/overview",
+							"raw": "{{domain_server}}/api/reports/overview",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -2523,9 +3252,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/reports/courses/:courseId/statistics",
+							"raw": "{{domain_server}}/api/reports/courses/:courseId/statistics",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -2560,9 +3289,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/reports/courses/:courseId/students?search=&progress_min=&progress_max=&is_completed=&sort_by=user_id&order_by=asc&per_page=15&page=1",
+							"raw": "{{domain_server}}/api/reports/courses/:courseId/students?search=&progress_min=&progress_max=&is_completed=&sort_by=user_id&order_by=asc&per_page=15&page=1",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -2639,9 +3368,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/reports/courses/:courseId/students/:userId/progress",
+							"raw": "{{domain_server}}/api/reports/courses/:courseId/students/:userId/progress",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -2682,9 +3411,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/reports/students/:userId/login-history",
+							"raw": "{{domain_server}}/api/reports/students/:userId/login-history",
 							"host": [
-								"{{base_url}}"
+								"{{domain_server}}"
 							],
 							"path": [
 								"api",
@@ -2707,21 +3436,38 @@
 			]
 		}
 	],
-	"variable": [
+	"event": [
 		{
-			"key": "base_url",
-			"value": "http://localhost:8000",
-			"type": "string"
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
 		},
 		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
 			"key": "access_token",
-			"value": "",
-			"type": "string"
+			"value": ""
 		},
 		{
 			"key": "refresh_token",
-			"value": "",
-			"type": "string"
+			"value": ""
 		}
 	]
 }

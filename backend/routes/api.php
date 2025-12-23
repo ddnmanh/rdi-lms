@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
+use App\Http\Controllers\LessonQuizController;
 use App\Http\Controllers\LessonVideoStreamController;
 use App\Http\Controllers\LessonVideoUploadController;
 use App\Http\Controllers\PermissionController;
@@ -257,6 +258,12 @@ Route::middleware('auth:api')->group(function () {
             'description' => 'Cho phép xóa bài học, không thể xóa bài học đang thuộc về một khóa học'
         ]);
 
+        routeWithPermission('get', '/{id}/statistics', [LessonController::class, 'getStatistics'], [
+            'group' => 'Bài học',
+            'name' => 'Xem thống kê Bài học',
+            'description' => 'Cho phép xem thống kê chi tiết của một bài học (Quiz, câu hỏi, điểm số)'
+        ]);
+
         routeWithPermission('get', '/{lesson}/auto-signature', [LessonVideoStreamController::class, 'getUriWithSignatureForVideo'], [
             'group' => 'Bài học',
             'name' => 'Lấy chữ ký cho video (tự chọn HLS hoặc mp4)',
@@ -308,6 +315,58 @@ Route::middleware('auth:api')->group(function () {
 
     });
 
+    // Lesson Quiz Management (Admin) - yêu cầu permission
+    Route::middleware('check.permission')->prefix('lesson-quizzes')->group(function () {
+        // Quiz CRUD
+        routeWithPermission('get', '/lesson/{lessonId}', [LessonQuizController::class, 'index'], [
+            'group' => 'Quiz bài học',
+            'name' => 'Xem danh sách Quiz của bài học',
+            'description' => 'Cho phép xem danh sách tất cả quiz của một bài học'
+        ]);
+        routeWithPermission('get', '/', [LessonQuizController::class, 'indexAll'], [
+            'group' => 'Quiz bài học',
+            'name' => 'Xem tất cả Quiz',
+            'description' => 'Cho phép xem danh sách tất cả quiz trong hệ thống'
+        ]);
+        routeWithPermission('get', '/{quizId}', [LessonQuizController::class, 'show'], [
+            'group' => 'Quiz bài học',
+            'name' => 'Xem chi tiết Quiz',
+            'description' => 'Cho phép xem thông tin chi tiết của một quiz'
+        ]);
+        routeWithPermission('post', '/', [LessonQuizController::class, 'store'], [
+            'group' => 'Quiz bài học',
+            'name' => 'Tạo mới Quiz',
+            'description' => 'Cho phép tạo mới quiz cho bài học (có thể kèm câu hỏi và đáp án)'
+        ]);
+        routeWithPermission('put', '/{quizId}', [LessonQuizController::class, 'update'], [
+            'group' => 'Quiz bài học',
+            'name' => 'Cập nhật Quiz',
+            'description' => 'Cho phép cập nhật thông tin quiz'
+        ]);
+        routeWithPermission('delete', '/{quizId}', [LessonQuizController::class, 'destroy'], [
+            'group' => 'Quiz bài học',
+            'name' => 'Xóa Quiz',
+            'description' => 'Cho phép xóa quiz khỏi bài học'
+        ]);
+
+        // Question CRUD
+        routeWithPermission('post', '/{quizId}/questions', [LessonQuizController::class, 'storeQuestion'], [
+            'group' => 'Quiz bài học',
+            'name' => 'Thêm câu hỏi vào Quiz',
+            'description' => 'Cho phép thêm câu hỏi mới vào quiz'
+        ]);
+        routeWithPermission('put', '/questions/{questionId}', [LessonQuizController::class, 'updateQuestion'], [
+            'group' => 'Quiz bài học',
+            'name' => 'Cập nhật câu hỏi',
+            'description' => 'Cho phép cập nhật nội dung và đáp án của câu hỏi'
+        ]);
+        routeWithPermission('delete', '/questions/{questionId}', [LessonQuizController::class, 'destroyQuestion'], [
+            'group' => 'Quiz bài học',
+            'name' => 'Xóa câu hỏi',
+            'description' => 'Cho phép xóa câu hỏi khỏi quiz'
+        ]);
+    });
+
     // Student routes - yêu cầu permission
     Route::middleware('check.permission')->prefix('student')->group(function () {
         routeWithPermission('get', '/courses', [StudentController::class, 'courses'], [
@@ -334,6 +393,50 @@ Route::middleware('auth:api')->group(function () {
             'group' => 'Sinh viên',
             'name' => 'Xem tiến độ Khóa học',
             'description' => 'Cho phép học viên xem tiến độ học tập của một khóa học'
+        ]);
+
+        // Note routes
+        routeWithPermission('get', '/lessons/{lessonId}/notes', [StudentController::class, 'getNotes'], [
+            'group' => 'Ghi chú bài học',
+            'name' => 'Xem danh sách ghi chú',
+            'description' => 'Cho phép học viên xem danh sách ghi chú của một bài học'
+        ]);
+        routeWithPermission('post', '/notes', [StudentController::class, 'storeNote'], [
+            'group' => 'Ghi chú bài học',
+            'name' => 'Tạo ghi chú mới',
+            'description' => 'Cho phép học viên tạo ghi chú mới cho bài học tại một thời điểm trong video'
+        ]);
+        routeWithPermission('put', '/notes/{noteId}', [StudentController::class, 'updateNote'], [
+            'group' => 'Ghi chú bài học',
+            'name' => 'Cập nhật ghi chú',
+            'description' => 'Cho phép học viên cập nhật ghi chú của mình'
+        ]);
+        routeWithPermission('delete', '/notes/{noteId}', [StudentController::class, 'deleteNote'], [
+            'group' => 'Ghi chú bài học',
+            'name' => 'Xóa ghi chú',
+            'description' => 'Cho phép học viên xóa ghi chú của mình'
+        ]);
+
+        // Quiz routes (Sinh viên làm bài)
+        routeWithPermission('get', '/lessons/{lessonId}/quiz', [StudentController::class, 'getQuizzesByLesson'], [
+            'group' => 'Quiz bài học (Sinh viên)',
+            'name' => 'Lấy danh sách Quiz của bài học',
+            'description' => 'Cho phép học viên lấy danh sách quiz của một bài học'
+        ]);
+        routeWithPermission('get', '/lessons/{lessonId}/quiz-status', [StudentController::class, 'checkQuizStatus'], [
+            'group' => 'Quiz bài học (Sinh viên)',
+            'name' => 'Kiểm tra trạng thái Quiz',
+            'description' => 'Kiểm tra sinh viên đã pass các quiz của bài học chưa (để cho phép xem tiếp video)'
+        ]);
+        routeWithPermission('post', '/quizzes/{quizId}/submit', [StudentController::class, 'submitAttempt'], [
+            'group' => 'Quiz bài học (Sinh viên)',
+            'name' => 'Nộp bài Quiz',
+            'description' => 'Cho phép sinh viên nộp bài làm quiz và nhận điểm'
+        ]);
+        routeWithPermission('get', '/quizzes/{quizId}/attempts', [StudentController::class, 'getAttempts'], [
+            'group' => 'Quiz bài học (Sinh viên)',
+            'name' => 'Xem lịch sử làm bài Quiz',
+            'description' => 'Cho phép sinh viên xem lịch sử các lần làm quiz của mình'
         ]);
     });
 

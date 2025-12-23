@@ -198,20 +198,22 @@ class ProcessLessonVideoUpload implements ShouldQueue
 
         // Cập nhật video path mới
         $publicUrl = Storage::url($storagePath);
-        
+
         // Tính toán duration video
         $duration = $this->calculateVideoDuration($storagePath);
-        
+
         // Cập nhật lesson với video path, hls path và duration
         $updateData = [
             'video_path' => $publicUrl,
             'duration' => $duration,
         ];
-        
+
         if ($hlsPath) {
             $updateData['hls_path'] = Storage::url($hlsPath);
+        } else {
+            $updateData['hls_path'] = null;
         }
-        
+
         $lesson->update($updateData);
 
         // Xóa video cũ nếu là file local storage
@@ -231,7 +233,7 @@ class ProcessLessonVideoUpload implements ShouldQueue
                 ]);
             }
         }
-        
+
         // Xóa HLS playlist cũ nếu có
         if ($oldHlsPath && $this->isLocalStorageFile($oldHlsPath)) {
             try {

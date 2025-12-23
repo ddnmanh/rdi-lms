@@ -1,14 +1,6 @@
 {{-- Lessons Tab --}}
 <div class="tab-panel hidden h-full flex flex-col items-stretch justify-start" data-tab-content="tab-lessons">
-    <div class="px-6 py-4 flex items-center justify-between gap-3 rounded-t-none">
-        <div class="flex items-center gap-3"></div>
-        <a id="manageLessonsButton" href="#"
-            class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5  font-semibold text-white hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm transition-all duration-300">
-            <i class="fa-solid fa-pen"></i>
-            <span>Quản lý bài học</span>
-        </a>
-    </div>
-    <div class="flex-1 min-h-0 p-6 pt-0">
+    <div class="flex-1 min-h-0 p-6">
         <div id="lessonsList" class="space-y-4 h-full overflow-y-auto">
 
         </div>

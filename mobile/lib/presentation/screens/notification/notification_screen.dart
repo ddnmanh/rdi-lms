@@ -25,65 +25,49 @@ class _NotificationScreenState extends State<NotificationScreen> with AutomaticK
     super.build(context);
     final notifications = [
       _NotificationItem(
-        title: 'New Course Available!',
-        message: 'Advanced Flutter Development is now available',
-        time: '2h ago',
-        icon: Icons.school_rounded,
-        color: AppColors.primaryStart,
-        isUnread: true,
-      ),
-      _NotificationItem(
-        title: 'Course Completed',
-        message: 'Congratulations! You completed Introduction to Flutter',
-        time: '5h ago',
+        title: 'Hoàn thành khóa học',
+        message: 'Chúc mừng! Bạn đã hoàn thành Giới thiệu về Flutter',
+        time: '2 giờ trước',
         icon: Icons.check_circle_rounded,
         color: Colors.green,
         isUnread: true,
       ),
       _NotificationItem(
-        title: 'New Achievement',
-        message: 'You earned the "Week Streak Master" badge',
-        time: '1d ago',
-        icon: Icons.emoji_events_rounded,
-        color: Colors.orange,
-        isUnread: false,
-      ),
-      _NotificationItem(
-        title: 'Reminder',
-        message: 'Continue your learning streak today',
-        time: '1d ago',
-        icon: Icons.notifications_rounded,
-        color: Colors.blue,
-        isUnread: false,
-      ),
-      _NotificationItem(
-        title: 'Course Update',
-        message: 'New lessons added to Dart Programming',
-        time: '2d ago',
-        icon: Icons.update_rounded,
-        color: AppColors.primaryEnd,
-        isUnread: false,
-      ),
-      _NotificationItem(
-        title: 'New Achievement',
-        message: 'You earned the "Week Streak Master" badge',
-        time: '1d ago',
-        icon: Icons.emoji_events_rounded,
-        color: Colors.orange,
-        isUnread: false,
-      ),
-      _NotificationItem(
-        title: 'New Course Available!',
-        message: 'Advanced Flutter Development is now available',
-        time: '2h ago',
+        title: 'Khóa học mới có sẵn!',
+        message: 'Khóa học Phát triển Flutter Nâng cao hiện đã có sẵn',
+        time: '6 giờ trước',
         icon: Icons.school_rounded,
         color: AppColors.primaryStart,
         isUnread: true,
       ),
       _NotificationItem(
-        title: 'Course Update',
-        message: 'New lessons added to Dart Programming',
-        time: '2d ago',
+        title: 'Nhắc nhở',
+        message: 'Tiếp tục chuỗi học tập của bạn hôm nay',
+        time: '1 ngày trước',
+        icon: Icons.notifications_rounded,
+        color: Colors.blue,
+        isUnread: false,
+      ),
+      _NotificationItem(
+        title: 'Cập nhật khóa học',
+        message: 'Bài học mới đã được thêm vào Lập trình Dart',
+        time: '2 ngày trước',
+        icon: Icons.update_rounded,
+        color: AppColors.primaryEnd,
+        isUnread: false,
+      ),
+      _NotificationItem(
+        title: 'Khóa học mới có sẵn!',
+        message: 'Khóa học Phát triển JavaScript và React.js từ Zero đến Hero',
+        time: '4 ngày trước',
+        icon: Icons.school_rounded,
+        color: AppColors.primaryStart,
+        isUnread: true,
+      ),
+      _NotificationItem(
+        title: 'Cập nhật khóa học',
+        message: 'Bài học mới đã được thêm vào Lập trình Dart',
+        time: '4 ngày trước',
         icon: Icons.update_rounded,
         color: AppColors.primaryEnd,
         isUnread: false,
@@ -134,33 +118,6 @@ class _NotificationScreenState extends State<NotificationScreen> with AutomaticK
                     )
                   ),
                 ),
-
-
-
-                // SliverToBoxAdapter(
-                //   child: Padding(
-                //     padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-                //     child: Row(
-                //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //       children: [
-                //         Text(
-                //           'Thông báo',
-                //           style: Theme.of(context).textTheme.displayLarge,
-                //         ),
-                //         TextButton(
-                //           onPressed: () {},
-                //           child: Text(
-                //             'Đánh dấu đã đọc',
-                //             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                //               color: AppColors.primary,
-                //               fontWeight: FontWeight.w600,
-                //             ),
-                //           ),
-                //         ),
-                //       ],
-                //     ),
-                //   ),
-                // ),
 
 
 

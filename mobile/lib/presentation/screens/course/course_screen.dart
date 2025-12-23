@@ -5,6 +5,7 @@ import 'package:LMS/data/models/course_model.dart';
 import 'package:LMS/presentation/widgets/spinner_loading.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/course_provider.dart';
+import '../../../providers/navigation_provider.dart';
 import '../../../theme/ios_widgets.dart';
 import '../../../theme/app_colors.dart';
 import '../../../core/utils/scroll_tracking.dart';
@@ -12,16 +13,7 @@ import '../../widgets/header_bar.dart';
 import 'course_detail_screen.dart';
 
 class CourseScreen extends StatefulWidget {
-  final int? autoNavigateToCourseId; // Tự động navigate đến course này
-  final int? autoPlayLessonId; // Tự động play lesson này (truyền cho CourseDetailScreen)
-  final String? autoPlayLessonTitle; // Title của lesson (hiển thị khi loading)
-
-  const CourseScreen({
-    super.key,
-    this.autoNavigateToCourseId,
-    this.autoPlayLessonId,
-    this.autoPlayLessonTitle,
-  });
+  const CourseScreen({super.key});
 
   @override
   State<CourseScreen> createState() => _CourseScreenState();
@@ -30,7 +22,7 @@ class CourseScreen extends StatefulWidget {
 class _CourseScreenState extends State<CourseScreen> with ScrollTracking {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
-  bool _hasAutoNavigated = false; // Đảm bảo chỉ auto-navigate 1 lần
+  int? _lastNavigatedCourseId; // Theo dõi course đã navigate để tránh navigate lặp
 
   @override
   void initState() {
@@ -75,18 +67,24 @@ class _CourseScreenState extends State<CourseScreen> with ScrollTracking {
     );
   }
 
-  /// Xử lý auto-navigation đến CourseDetailScreen
-  void _handleAutoNavigation(CourseProvider courseProvider) {
+  /// Xử lý auto-navigation đến CourseDetailScreen từ NavigationProvider
+  void _handleAutoNavigation(CourseProvider courseProvider, NavigationProvider navProvider) {
+    final pending = navProvider.pendingCourseNavigation;
+
     // Chỉ auto-navigate khi:
-    // - Có autoNavigateToCourseId
+    // - Có pendingCourseNavigation
     // - Courses đã load xong (không loading)
     // - Có courses data
-    // - Chưa auto-navigate lần nào
-    if (widget.autoNavigateToCourseId != null &&
+    // - Chưa navigate đến course này (tránh navigate lặp)
+    if (pending != null &&
         !courseProvider.isLoadingAllCourses &&
         courseProvider.courses.isNotEmpty &&
-        !_hasAutoNavigated) {
-      _hasAutoNavigated = true;
+        _lastNavigatedCourseId != pending.courseId) {
+
+      _lastNavigatedCourseId = pending.courseId;
+
+      // Clear pending trước khi navigate
+      navProvider.clearPendingNavigation();
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
@@ -94,12 +92,15 @@ class _CourseScreenState extends State<CourseScreen> with ScrollTracking {
             context,
             CupertinoPageRoute(
               builder: (context) => CourseDetailScreen(
-                courseId: widget.autoNavigateToCourseId!,
-                autoPlayLessonId: widget.autoPlayLessonId,
-                autoPlayLessonTitle: widget.autoPlayLessonTitle,
+                courseId: pending.courseId,
+                autoPlayLessonId: pending.lessonId,
+                autoPlayLessonTitle: pending.lessonTitle,
               ),
             ),
           ).then((_) {
+            // Reset để có thể navigate lại nếu cần
+            _lastNavigatedCourseId = null;
+
             // Refresh courses khi quay lại
             if (mounted) {
               context.read<CourseProvider>().fetchCourses(
@@ -122,9 +123,10 @@ class _CourseScreenState extends State<CourseScreen> with ScrollTracking {
   @override
   Widget build(BuildContext context) {
     final courseProvider = context.watch<CourseProvider>();
+    final navProvider = context.watch<NavigationProvider>();
 
-    // Auto-navigate đến CourseDetailScreen nếu có autoNavigateToCourseId
-    _handleAutoNavigation(courseProvider);
+    // Auto-navigate đến CourseDetailScreen nếu có pendingCourseNavigation
+    _handleAutoNavigation(courseProvider, navProvider);
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),

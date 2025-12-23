@@ -4,10 +4,10 @@ import 'package:provider/provider.dart';
 import '../../../core/constants/api_constants.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/course_provider.dart';
+import '../../../providers/navigation_provider.dart';
 import '../../../theme/ios_widgets.dart';
 import '../../../theme/app_colors.dart';
 import '../../widgets/header_bar.dart';
-import '../course/course_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -284,25 +284,11 @@ class _HomeScreenState extends State<HomeScreen> {
     final progress = recentCourse.progress?.completionPercentage ?? 0;
 
     return IOSCard(
-      onTap: () async {
-        // Navigate đến CourseScreen → CourseDetailScreen
-        await Navigator.push(
-          context,
-          CupertinoPageRoute(
-            builder: (context) => CourseScreen(
-              autoNavigateToCourseId: recentCourse.id,
-            ),
-          ),
+      onTap: () {
+        // Chuyển sang tab Course và auto-navigate đến CourseDetailScreen
+        context.read<NavigationProvider>().navigateToCourse(
+          courseId: recentCourse.id,
         );
-        // Refresh courses sau khi quay lại
-        if (mounted) {
-          // ignore: use_build_context_synchronously
-          context.read<CourseProvider>().fetchCourses(
-            sortBy: 'joined_at',
-            sortOrder: 'desc',
-            forceRefresh: true,
-          );
-        }
       },
       child: Row(
         children: [
@@ -384,28 +370,14 @@ class _HomeScreenState extends State<HomeScreen> {
     final progress = lesson.progress.completionPercentage;
 
     return IOSCard(
-      onTap: () async {
-        // Navigate đến CourseScreen → CourseDetailScreen → VideoPlayerScreen
-        // Flow đầy đủ: HomeScreen → CourseScreen → CourseDetailScreen → VideoPlayerScreen
-        await Navigator.push(
-          context,
-          CupertinoPageRoute(
-            builder: (context) => CourseScreen(
-              autoNavigateToCourseId: course.id,
-              autoPlayLessonId: lesson.id,
-              autoPlayLessonTitle: lesson.title,
-            ),
-          ),
+      onTap: () {
+        // Chuyển sang tab Course và auto-navigate đến CourseDetailScreen → VideoPlayerScreen
+        // Flow: Tab Home → Tab Course → CourseDetailScreen → VideoPlayerScreen
+        context.read<NavigationProvider>().navigateToCourse(
+          courseId: course.id,
+          lessonId: lesson.id,
+          lessonTitle: lesson.title,
         );
-        // Refresh courses sau khi quay lại
-        if (mounted) {
-          // ignore: use_build_context_synchronously
-          context.read<CourseProvider>().fetchCourses(
-            sortBy: 'joined_at',
-            sortOrder: 'desc',
-            forceRefresh: true,
-          );
-        }
       },
       child: Row(
         children: [

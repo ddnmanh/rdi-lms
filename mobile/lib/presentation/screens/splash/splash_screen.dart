@@ -6,16 +6,14 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("SplashScreen: Building...");
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
       body: Container(
         width: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color(0xFFF5F5F7),
-              Color(0xFFFFFFFF),
-            ],
+            colors: [Color(0xFFF5F5F7), Color(0xFFFFFFFF)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -26,7 +24,10 @@ class SplashScreen extends StatelessWidget {
               const Spacer(flex: 3),
               // Logo + tên app trong card phong cách iOS 18
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 24,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.96),
                   borderRadius: BorderRadius.circular(26),
@@ -69,7 +70,8 @@ class SplashScreen extends StatelessWidget {
                     const SizedBox(height: 18),
                     Text(
                       'LMS',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      style:
+                          Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontSize: 26,
                             fontWeight: FontWeight.w800,
                             letterSpacing: -0.4,
@@ -86,7 +88,8 @@ class SplashScreen extends StatelessWidget {
                     Text(
                       'Học tập online mọi lúc, mọi nơi',
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      style:
+                          Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontSize: 14,
                             color: Colors.black54,
                             fontWeight: FontWeight.w500,
@@ -110,20 +113,20 @@ class SplashScreen extends StatelessWidget {
                     height: 28,
                     child: CircularProgressIndicator(
                       strokeWidth: 2.6,
-                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppColors.primary,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     'Đang chuẩn bị môi trường học tập…',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    style:
+                        Theme.of(context).textTheme.bodySmall?.copyWith(
                           fontSize: 12,
                           color: Colors.black45,
                         ) ??
-                        const TextStyle(
-                          fontSize: 12,
-                          color: Colors.black45,
-                        ),
+                        const TextStyle(fontSize: 12, color: Colors.black45),
                   ),
                   const SizedBox(height: 20),
                 ],

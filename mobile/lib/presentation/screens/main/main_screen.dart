@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:ui';
+import 'package:provider/provider.dart';
 import '../home/home_screen.dart';
 import '../course/course_screen.dart';
 import '../statistical/statistical_screen.dart';
@@ -7,6 +7,7 @@ import '../notification/notification_screen.dart';
 import '../profile/profile_screen.dart';
 import '../../widgets/modern_bottom_nav_bar.dart';
 import '../../../theme/app_colors.dart';
+import '../../../providers/navigation_provider.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -16,8 +17,6 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;
-
   final List<Widget> _screens = [
     const HomeScreen(),
     const CourseScreen(),
@@ -60,18 +59,18 @@ class _MainScreenState extends State<MainScreen> {
   ];
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    context.read<NavigationProvider>().setSelectedTab(index);
   }
 
   @override
   Widget build(BuildContext context) {
+    final navProvider = context.watch<NavigationProvider>();
+
     return Scaffold(
       extendBody: true,
-      body: IndexedStack(index: _selectedIndex, children: _screens),
+      body: IndexedStack(index: navProvider.selectedTabIndex, children: _screens),
       bottomNavigationBar: ModernBottomNavBar(
-        currentIndex: _selectedIndex,
+        currentIndex: navProvider.selectedTabIndex,
         onTap: _onItemTapped,
         items: _navItems,
       ),

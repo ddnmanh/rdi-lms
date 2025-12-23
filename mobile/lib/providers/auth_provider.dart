@@ -24,16 +24,25 @@ class AuthProvider extends ChangeNotifier {
   AuthProvider(this._authRepository, this._userRepository, this._storage);
 
   Future<void> loadUser() async {
+    print("AuthProvider: Bắt đầu loadUser");
     _isInitializing = true;
     notifyListeners();
     try {
+      print("AuthProvider: Đang đọc token từ storage...");
       final token = await _storage.read(key: 'access_token');
+      print(
+        "AuthProvider: Token: ${token != null ? 'Tìm thấy' : 'Không tìm thấy'}",
+      );
       if (token != null) {
+        print("AuthProvider: Đang lấy thông tin user...");
         _user = await _authRepository.getCurrentUser();
+        print("AuthProvider: User: ${_user?.fullname ?? 'Unknown'}");
       }
     } catch (e) {
+      print("AuthProvider: Lỗi khi load user: $e");
       _error = e.toString();
     } finally {
+      print("AuthProvider: Kết thúc loadUser");
       _isInitializing = false;
       notifyListeners();
     }

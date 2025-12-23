@@ -20,18 +20,26 @@ class ApiConstants {
 
   // Lessons
   static const String streamLesson = '/api/lessons/'; // + id + /stream
-  static const String hlsSignature = '/api/lessons/'; // + id + /hls-signature (deprecated)
+  static const String hlsSignature =
+      '/api/lessons/'; // + id + /hls-signature (deprecated)
   static const String autoSignature = '/api/lessons/'; // + id + /auto-signature
 
   /// Lấy chi tiết lesson
-  static String getLessonDetail(int lessonId) => '/api/student/lessons/$lessonId';
+  static String getLessonDetail(int lessonId) =>
+      '/api/student/lessons/$lessonId';
 
   // Progress
   static const String studentProgress = '/api/student/progress';
 
   /// Lấy endpoint HLS signature cho lesson (deprecated)
-  static String getHlsSignatureUrl(int lessonId) => '/api/lessons/$lessonId/hls-signature';
+  static String getHlsSignatureUrl(int lessonId) =>
+      '/api/lessons/$lessonId/hls-signature';
 
   /// Lấy endpoint auto signature cho lesson (hỗ trợ cả HLS và MP4)
-  static String getAutoSignatureUrl(int lessonId) => '/api/lessons/$lessonId/auto-signature';
+  static String getAutoSignatureUrl(int lessonId) =>
+      '/api/lessons/$lessonId/auto-signature';
+
+  /// Lấy danh sách ghi chú của lesson
+  static String getLessonNotes(int lessonId) =>
+      '/api/student/lessons/$lessonId/notes?sort_by=duration_at&order_by=asc';
 }

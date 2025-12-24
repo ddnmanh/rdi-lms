@@ -27,6 +27,8 @@ class LessonProgress {
         'lastPosition: ${lastPosition}s, lastWatchedAt: $lastWatchedAt, '
         'completionPercentage: ${completionPercentage.toStringAsFixed(2)}%)';
   }
+
+  bool get isCompleted => completionPercentage >= 100;
 }
 
 class Lesson {

@@ -183,6 +183,7 @@
                 maxDate: DatePicker.today(),
                 onChange: (value) => {
                     DatePicker.setMinDate('startDateToFilter', value || null);
+                    DatePicker.setMinDate('endDateFromFilter', value || null);
                 }
             });
             DatePicker.init('startDateToFilter', {
@@ -190,14 +191,12 @@
             });
 
             DatePicker.init('endDateFromFilter', {
-                maxDate: DatePicker.today(),
                 onChange: (value) => {
                     DatePicker.setMinDate('endDateToFilter', value || null);
                 }
             });
-            DatePicker.init('endDateToFilter', {
-                maxDate: DatePicker.today()
-            });
+            DatePicker.init('endDateToFilter', {});
+
 
             // Khởi tạo filters từ URL hoặc storage
             initFiltersFromStorageOrUrl();

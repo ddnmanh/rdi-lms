@@ -309,32 +309,32 @@
             </a>
 
             @php $reportsOpen = request()->routeIs('admin.reports.*'); @endphp
-            <details class="group" {{ $reportsOpen ? 'open' : '' }}>
+            <details class="sidebar-details" {{ $reportsOpen ? 'open' : '' }}>
                 <summary
-                    class="sidebar-item list-none group flex items-center gap-3 px-2 py-2 rounded-xl cursor-pointer transition-all duration-300 {{ $reportsOpen ? 'active bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20' }}">
+                    class="sidebar-item list-none flex items-center gap-3 px-2 py-2 rounded-xl cursor-pointer transition-all duration-300 {{ $reportsOpen ? 'active bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-900/20 dark:hover:to-purple-900/20' }}">
                     <div class="h-7 w-7 rounded-lg {{ $reportsOpen ? 'text-white bg-white/20' : 'text-gray-600 dark:text-gray-400 bg-slate-100 dark:bg-slate-900/30' }} flex items-center justify-center transition-all duration-300">
                         <svg class="w-4 h-4" viewBox="0 0 512 512" fill="currentColor">
                             <path d="M64 64c0-17.7-14.3-32-32-32S0 46.3 0 64L0 400c0 44.2 35.8 80 80 80l400 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 416c-8.8 0-16-7.2-16-16L64 64zm406.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L320 210.7 262.6 153.4c-12.5-12.5-32.8-12.5-45.3 0l-96 96c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l73.4-73.4 57.4 57.4c12.5 12.5 32.8 12.5 45.3 0l128-128z"/>
                         </svg>
                     </div>
                     <span class="sidebar-text">Báo cáo</span>
-                    <label class="ml-auto text-xs {{ $reportsOpen ? 'text-white' : 'text-gray-500 dark:text-gray-400' }} group-open:rotate-180 transition-transform">
+                    <label class="sidebar-arrow ml-auto text-xs {{ $reportsOpen ? 'text-white' : 'text-gray-500 dark:text-gray-400' }} transition-transform">
                         <svg class="w-3 h-3" viewBox="0 0 448 512" fill="currentColor">
                             <path d="M201.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 338.7 54.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/>
                         </svg>
                     </label>
                 </summary>
                 <div class="mt-2 p-2 rounded-xl space-y-2">
-                    <a href="{{ route('admin.reports.index') }}" class="group/item pl-10 flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all duration-200 {{ request()->routeIs('admin.reports.index') ? 'bg-white text-indigo-700 ring-1 ring-indigo-200 dark:bg-gray-800/70 dark:text-indigo-300 dark:ring-indigo-800' : 'text-gray-700 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-800/60' }}">
+                    <a href="{{ route('admin.reports.index') }}" class="sidebar-submenu-item pl-10 flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all duration-200 {{ request()->routeIs('admin.reports.index') ? 'bg-white text-indigo-700 ring-1 ring-indigo-200 dark:bg-gray-800/70 dark:text-indigo-300 dark:ring-indigo-800' : 'text-gray-700 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-800/60' }}">
                         <span class="font-medium">Tổng quan</span>
                     </a>
-                    <a href="{{ route('admin.reports.students') }}" class="group/item pl-10 flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all duration-200 {{ request()->routeIs('admin.reports.students') ? 'bg-white text-indigo-700 ring-1 ring-indigo-200 dark:bg-gray-800/70 dark:text-indigo-300 dark:ring-indigo-800' : 'text-gray-700 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-800/60' }}">
+                    <a href="{{ route('admin.reports.students') }}" class="sidebar-submenu-item pl-10 flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all duration-200 {{ request()->routeIs('admin.reports.students') ? 'bg-white text-indigo-700 ring-1 ring-indigo-200 dark:bg-gray-800/70 dark:text-indigo-300 dark:ring-indigo-800' : 'text-gray-700 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-800/60' }}">
                         <span class="font-medium">Học viên</span>
                     </a>
-                    <a href="{{ route('admin.reports.courses') }}" class="group/item pl-10 flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all duration-200 {{ request()->routeIs('admin.reports.courses') ? 'bg-white text-indigo-700 ring-1 ring-indigo-200 dark:bg-gray-800/70 dark:text-indigo-300 dark:ring-indigo-800' : 'text-gray-700 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-800/60' }}">
+                    <a href="{{ route('admin.reports.courses') }}" class="sidebar-submenu-item pl-10 flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all duration-200 {{ request()->routeIs('admin.reports.courses') ? 'bg-white text-indigo-700 ring-1 ring-indigo-200 dark:bg-gray-800/70 dark:text-indigo-300 dark:ring-indigo-800' : 'text-gray-700 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-800/60' }}">
                         <span class="font-medium">Khóa học</span>
                     </a>
-                    <a href="{{ route('admin.reports.activities') }}" class="group/item pl-10 flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all duration-200 {{ request()->routeIs('admin.reports.activities') ? 'bg-white text-indigo-700 ring-1 ring-indigo-200 dark:bg-gray-800/70 dark:text-indigo-300 dark:ring-indigo-800' : 'text-gray-700 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-800/60' }}">
+                    <a href="{{ route('admin.reports.activities') }}" class="sidebar-submenu-item pl-10 flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all duration-200 {{ request()->routeIs('admin.reports.activities') ? 'bg-white text-indigo-700 ring-1 ring-indigo-200 dark:bg-gray-800/70 dark:text-indigo-300 dark:ring-indigo-800' : 'text-gray-700 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-800/60' }}">
                         <span class="font-medium">Hoạt động</span>
                     </a>
                 </div>
@@ -369,7 +369,7 @@
         </div>
     </aside>
 
-    <div class="w-full h-full relative">
+    <div class="w-full h-full relative min-w-0 overflow-hidden">
         <!-- Top Nav -->
         <nav class="hidden absolute top-0 left-0 right-0 py-3 bg-white dark:bg-gray-900 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700/60 transition-all duration-300 z-[110]">
             <div class="h-full w-full flex items-center justify-between px-4 sm:px-6">
@@ -389,7 +389,7 @@
         </nav>
 
         <!-- Main -->
-        <main class="z-[100] h-[100dvh] p-3 md:p-4 transition-all duration-300 bg-gray-100 dark:bg-gray-900 overflow-y-auto">
+        <main class="z-[100] h-[100dvh] w-full overflow-x-hidden p-3 md:p-4 transition-all duration-300 bg-gray-100 dark:bg-gray-900 overflow-y-auto">
             @yield('content')
         </main>
 

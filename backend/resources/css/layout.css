@@ -65,6 +65,17 @@
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
 }
 
+/* Sidebar submenu - isolate hover states */
+.sidebar-details[open] .sidebar-arrow {
+    transform: rotate(180deg);
+}
+
+.sidebar-submenu-item {
+    position: relative;
+    /* Explicitly isolate hover from parent */
+    pointer-events: auto;
+}
+
 .sidebar-text {
     transition: opacity .3s ease;
     white-space: nowrap;

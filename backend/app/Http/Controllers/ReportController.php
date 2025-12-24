@@ -45,7 +45,7 @@ class ReportController extends Controller
 
     /**
      * Danh sách sinh viên trong khóa học với tiến độ học
-     * 
+     *
      * Query params:
      * - search: Tìm kiếm theo email hoặc fullname
      * - progress_min: Lọc tiến độ tối thiểu (%)
@@ -95,7 +95,7 @@ class ReportController extends Controller
                 }
             }
 
-            $overallPercentage = $totalDuration > 0 
+            $overallPercentage = $totalDuration > 0
                 ? round($totalWatchedDuration / $totalDuration * 100, 2)
                 : 0;
 
@@ -136,19 +136,19 @@ class ReportController extends Controller
         // Sắp xếp
         $sortBy = $request->get('sort_by', 'user_id');
         $orderBy = $request->get('order_by', 'asc');
-        
+
         // Validate sort_by
         $allowedSortBy = ['user_id', 'email', 'fullname', 'overall_percentage', 'total_watched_duration'];
         if (!in_array($sortBy, $allowedSortBy)) {
             $sortBy = 'user_id';
         }
-        
+
         // Validate order_by
         $orderBy = strtolower($orderBy);
         if (!in_array($orderBy, ['asc', 'desc'])) {
             $orderBy = 'asc';
         }
-        
+
         // Sắp xếp collection
         $studentsWithProgress = $studentsWithProgress->sortBy(function ($student) use ($sortBy) {
             return $student[$sortBy];
@@ -216,7 +216,7 @@ class ReportController extends Controller
             $watchedDuration = $lessonView ? $lessonView->watched_duration : 0;
             $totalWatchedDuration += $watchedDuration;
 
-            $completionPercentage = $lesson->duration > 0 
+            $completionPercentage = $lesson->duration > 0
                 ? round($watchedDuration / $lesson->duration * 100, 2)
                 : 0;
 
@@ -231,7 +231,7 @@ class ReportController extends Controller
             ];
         }
 
-        $overallPercentage = $totalDuration > 0 
+        $overallPercentage = $totalDuration > 0
             ? round($totalWatchedDuration / $totalDuration * 100, 2)
             : 0;
 
@@ -309,8 +309,57 @@ class ReportController extends Controller
             $query->where('name', 'student');
         })->count();
         $totalLessons = Lesson::count();
+        $totalQuizzes = \App\Models\LessonQuiz::count();
 
-        $courses = Course::withCount('users')->get();
+        // Tính tổng thời lượng tất cả bài học (giây)
+        $totalDuration = Lesson::sum('duration');
+
+        // Thống kê lượt xem bài học
+        $totalLessonViews = LessonView::count();
+        $lessonsWatched = LessonView::distinct('lesson_id')->count('lesson_id');
+        $totalWatchedDuration = LessonView::sum('watched_duration'); // Tổng thời gian đã xem (giây)
+
+        // Thống kê quiz attempts
+        $totalQuizAttempts = \App\Models\LessonQuizAttempt::whereNotNull('completed_at')->count();
+        $avgQuizScore = \App\Models\LessonQuizAttempt::whereNotNull('completed_at')
+            ->avg('percent_score_earned') ?? 0;
+        $avgQuizScore = round($avgQuizScore, 2);
+
+        // Thống kê hoàn thành khóa học (tối ưu hóa)
+        $totalCompletedStudents = 0;
+        $coursesWithProgress = Course::with(['users', 'lessons'])->get();
+
+        // Lấy tất cả lesson views một lần
+        $allLessonViews = LessonView::select('user_id', 'lesson_id', 'watched_duration')
+            ->get()
+            ->groupBy('user_id')
+            ->map(function ($views) {
+                return $views->keyBy('lesson_id');
+            });
+
+        foreach ($coursesWithProgress as $course) {
+            $courseTotalDuration = $course->lessons->sum('duration');
+            if ($courseTotalDuration > 0) {
+                foreach ($course->users as $user) {
+                    $userViews = $allLessonViews->get($user->id, collect());
+                    $totalWatched = 0;
+
+                    foreach ($course->lessons as $lesson) {
+                        $lessonView = $userViews->get($lesson->id);
+                        if ($lessonView) {
+                            $totalWatched += $lessonView->watched_duration;
+                        }
+                    }
+
+                    $completionPercentage = ($totalWatched / $courseTotalDuration) * 100;
+                    if ($completionPercentage > 80) {
+                        $totalCompletedStudents++;
+                    }
+                }
+            }
+        }
+
+        $courses = Course::withCount(['users', 'lessons'])->get();
 
         return response()->json([
             'success' => true,
@@ -318,11 +367,22 @@ class ReportController extends Controller
                 'total_courses' => $totalCourses,
                 'total_students' => $totalStudents,
                 'total_lessons' => $totalLessons,
+                'total_quizzes' => $totalQuizzes,
+                'total_duration' => $totalDuration, // Tổng thời lượng (giây)
+                'total_lesson_views' => $totalLessonViews,
+                'lessons_watched' => $lessonsWatched,
+                'total_watched_duration' => $totalWatchedDuration, // Tổng thời gian đã xem (giây)
+                'total_quiz_attempts' => $totalQuizAttempts,
+                'avg_quiz_score' => $avgQuizScore,
+                'total_completed_students' => $totalCompletedStudents,
                 'courses' => $courses->map(function ($course) {
                     return [
                         'id' => $course->id,
                         'title' => $course->title,
                         'student_count' => $course->users_count,
+                        'lesson_count' => $course->lessons_count,
+                        'start_date' => $course->start_date ? $course->start_date->toIso8601String() : null,
+                        'end_date' => $course->end_date ? $course->end_date->toIso8601String() : null,
                     ];
                 }),
             ]

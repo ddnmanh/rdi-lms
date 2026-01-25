@@ -93,7 +93,7 @@ cp .env.example .env
 | `APP_KEY` | *Auto-generate* | Sẽ được tự động generate bằng `php artisan key:generate` |
 | `APP_ENV` | `production` | Môi trường sản phẩm |
 | `APP_DEBUG` | `false` | Tắt chế độ debug |
-| `APP_URL` | `http://lms.domain.vn` | URL của ứng dụng |
+| `APP_URL` | `https://lms.domain.vn` | URL của ứng dụng |
 | `DB_HOST` | `host.docker.internal` | Giữ nguyên để Docker container kết nối với MySQL trên host |
 | `DB_DATABASE` | `lms_database` | Tên database đã tạo trên MySQL server |
 | `DB_USERNAME` | `lms_user` | User MySQL |

@@ -176,7 +176,24 @@ sudo docker compose exec app php -r "new PDO('mysql:host=host.docker.internal;db
 sudo docker compose exec app composer install --optimize-autoloader --no-dev
 ```
 
-#### Bước 8: Generate key
+#### Bước 8: Cấp quyền cho Laravel trước khi chạy Artisan
+
+PHP-FPM chạy bằng `www-data` theo `docker/php-fpm/www.conf`. Compose bind mount `.:/COURCE`, nên quyền đặt trong Dockerfile bị thay bằng quyền của source trên host. Phải cấp lại quyền sau khi cài Composer và trong mỗi lần deploy, trước khi tạo cache.
+
+```bash
+# Chạy bằng root để sửa cả các file cache cũ do root tạo.
+sudo docker compose exec -T --user root app \
+  chown -R www-data:www-data /COURCE/storage /COURCE/bootstrap/cache
+sudo docker compose exec -T --user root app \
+  chmod -R u+rwX,g+rwX /COURCE/storage /COURCE/bootstrap/cache
+```
+
+Chỉ cấp quyền ghi cho `storage` và `bootstrap/cache`. Dùng `--user www-data` khi chạy các lệnh cache, migration và seeder bên dưới để file mới có cùng chủ sở hữu với PHP-FPM. Không dùng `chmod 777`.
+
+#### Bước 9: Generate key
+
+Chỉ tạo key/secret khi cài mới và giá trị còn trống; giữ nguyên khi deploy lại.
+
 ```bash
 # Tự động tạo APP_KEY trong file .env
 sudo docker compose exec app php artisan key:generate
@@ -185,40 +202,31 @@ sudo docker compose exec app php artisan key:generate
 sudo docker compose exec app php artisan jwt:secret
 ```
 
-### Bước 9: Tạo symplink
+#### Bước 10: Tạo symlink
 Tạo symlink để ánh xạ thư mục `public/storage` -> `storage/app/public`
 ```bash
 sudo docker compose exec app php artisan storage:link
 ```
 
-#### Bước 10: Chạy database migrations
+#### Bước 11: Chạy database migrations
 ```bash
 # Tạo tables trong database
-sudo docker compose exec app php artisan migrate --force
+sudo docker compose exec -T --user www-data app php artisan migrate --force
 
 # Nếu cần chạy seeders
-sudo docker compose exec app php artisan db:seed --force
+sudo docker compose exec -T --user www-data app php artisan db:seed --force
 ```
 
-#### Bước 11: Cache configurations
+#### Bước 12: Cache configurations bằng user PHP-FPM
 ```bash
 # Cache config để tăng performance
-sudo docker compose exec app php artisan config:cache
+sudo docker compose exec -T --user www-data app php artisan config:cache
 
 # Cache routes
-sudo docker compose exec app php artisan route:cache
+sudo docker compose exec -T --user www-data app php artisan route:cache
 
 # Cache views
-sudo docker compose exec app php artisan view:cache
-```
-
-#### Bước 12: Set permissions
-```bash
-# Cấp quyền cho thư mục storage và cache
-sudo docker compose exec app chown -R www-data:www-data /COURCE/storage
-sudo docker compose exec app chown -R www-data:www-data /COURCE/bootstrap/cache
-sudo docker compose exec app chmod -R 775 /COURCE/storage
-sudo docker compose exec app chmod -R 775 /COURCE/bootstrap/cache
+sudo docker compose exec -T --user www-data app php artisan view:cache
 ```
 
 #### Bước 13: Restart để áp dụng changes
@@ -340,6 +348,18 @@ sudo systemctl restart nginx
 
 ## 7️⃣ Kiểm tra sau deploy
 
+Kiểm tra quyền bằng đúng user PHP-FPM. Kiểm tra bằng root có thể thành công dù ứng dụng không ghi được cache:
+
+```bash
+sudo docker compose exec -T --user www-data app test -w storage/framework/views
+sudo docker compose exec -T --user www-data app test -w storage/framework/sessions
+sudo docker compose exec -T --user www-data app test -w bootstrap/cache
+
+# Không được có file cache thiếu quyền ghi được in ra.
+sudo docker compose exec -T --user www-data app \
+  find storage/framework/views bootstrap/cache -type f ! -writable -print
+```
+
 ```bash
 # Cấp quyền thực thi cho script
 chmod +x verify-deployment-with-docker.sh
@@ -368,8 +388,8 @@ sudo docker compose start
 
 # Vào container để chạy commands
 sudo docker compose exec app bash
-sudo docker compose exec app php artisan migrate
-sudo docker compose exec app php artisan cache:clear
+sudo docker compose exec --user www-data app php artisan migrate
+sudo docker compose exec --user www-data app php artisan cache:clear
 
 # Rebuild sau khi thay đổi code
 sudo docker compose down
@@ -392,18 +412,26 @@ sudo docker compose build --no-cache
 sudo docker compose down
 sudo docker compose up -d
 
-# 4. Clear và cache lại
-sudo docker compose exec app php artisan config:clear
-sudo docker compose exec app php artisan cache:clear
+# 4. Cài dependencies rồi cấp lại quyền, kể cả file cache do Composer/root tạo.
 sudo docker compose exec app composer install --optimize-autoloader --no-dev
-sudo docker compose exec app php artisan config:cache
-sudo docker compose exec app php artisan route:cache
-sudo docker compose exec app php artisan view:cache
+sudo docker compose exec -T --user root app \
+  chown -R www-data:www-data storage bootstrap/cache
+sudo docker compose exec -T --user root app \
+  chmod -R u+rwX,g+rwX storage bootstrap/cache
 
-# 5. Chạy migrations mới (nếu có)
-sudo docker compose exec app php artisan migrate --force
+# 5. Clear cache bằng đúng user PHP-FPM.
+sudo docker compose exec -T --user www-data app php artisan config:clear
+sudo docker compose exec -T --user www-data app php artisan route:clear
+sudo docker compose exec -T --user www-data app php artisan view:clear
+sudo docker compose exec -T --user www-data app php artisan cache:clear
 
-# 6. Restart lại
+# 6. Chạy migrations mới (nếu có), sau đó tạo lại cache.
+sudo docker compose exec -T --user www-data app php artisan migrate --force
+sudo docker compose exec -T --user www-data app php artisan config:cache
+sudo docker compose exec -T --user www-data app php artisan route:cache
+sudo docker compose exec -T --user www-data app php artisan view:cache
+
+# 7. Restart lại và kiểm tra quyền/HTTP theo mục 7.
 sudo docker compose restart
 ```
 
@@ -484,9 +512,9 @@ sudo docker compose exec nginx ls -la /etc/nginx/conf.d/
 **Giải pháp:**
 ```bash
 # Xóa tất cả cache
-sudo docker compose exec app php artisan config:clear
-sudo docker compose exec app php artisan route:clear
-sudo docker compose exec app php artisan cache:clear
+sudo docker compose exec -T --user www-data app php artisan config:clear
+sudo docker compose exec -T --user www-data app php artisan route:clear
+sudo docker compose exec -T --user www-data app php artisan cache:clear
 sudo docker compose exec app rm -rf bootstrap/cache/*.php
 
 # Generate APP_KEY mới
@@ -499,18 +527,29 @@ sudo docker compose restart
 sudo docker compose exec app grep "^APP_KEY=" .env
 ```
 
-### ⚠️ Lỗi permission storage
+### ⚠️ Lỗi 500 do thiếu quyền ghi storage hoặc cache
+
+Log thường có `file_put_contents(...storage/framework/views/...php): Failed to open stream: Permission denied`. Khi file Blade thay đổi hoặc cache bị xóa, Laravel phải biên dịch lại view. Cache cũ có thể vẫn đọc được nên trang chạy bình thường trước đó, nhưng trả về 500 khi cần ghi lại.
+
+Nguyên nhân thường gặp là chạy `php artisan view:cache` bằng root, tạo file `644` mà `www-data` không ghi đè được, hoặc source mount chưa được cấp quyền đúng. Sửa cả chủ sở hữu và quyền của thư mục lẫn file hiện có:
+
 ```bash
-sudo docker compose exec app chmod -R 775 storage bootstrap/cache
-sudo docker compose exec app chown -R www-data:www-data storage bootstrap/cache
+sudo docker compose exec -T --user root app \
+  chown -R www-data:www-data storage bootstrap/cache
+sudo docker compose exec -T --user root app \
+  chmod -R u+rwX,g+rwX storage bootstrap/cache
+sudo docker compose exec -T --user www-data app php artisan view:clear
+sudo docker compose exec -T --user www-data app php artisan view:cache
 ```
+
+Kiểm tra lại quyền theo mục 7 và truy cập trang gây lỗi. Không cần build lại image hay tạo lại `APP_KEY` để xử lý lỗi quyền. Các lần tạo cache sau tiếp tục dùng `--user www-data`.
 
 ### 🧹 Clear cache
 ```bash
-sudo docker compose exec app php artisan cache:clear
-sudo docker compose exec app php artisan config:clear
-sudo docker compose exec app php artisan route:clear
-sudo docker compose exec app php artisan view:clear
+sudo docker compose exec -T --user www-data app php artisan cache:clear
+sudo docker compose exec -T --user www-data app php artisan config:clear
+sudo docker compose exec -T --user www-data app php artisan route:clear
+sudo docker compose exec -T --user www-data app php artisan view:clear
 ```
 
 ### ⚠️ Database connection failed
@@ -556,6 +595,8 @@ sudo docker compose exec app rm -rf vendor
 sudo docker compose exec app composer clear-cache
 sudo docker compose exec app composer install --optimize-autoloader --no-dev
 ```
+
+Sau khi cài lại Composer thành công, chạy lại bước cấp quyền (Bước 8) trước khi tạo cache bằng `www-data`, vì Composer có thể tạo file mới trong `bootstrap/cache` bằng root.
 
 ### ⚠️ Migration failed
 ```bash

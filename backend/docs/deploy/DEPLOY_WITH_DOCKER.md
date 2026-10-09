@@ -128,22 +128,22 @@ Bước này là bắt buộc vì các lệnh deploy được viết ở trạng
 
 #### Bước 2: Stop containers cũ (nếu có)
 ```bash
-docker compose down
+sudo docker compose down
 ```
 
 #### Bước 3: Build Docker images
 ```bash
 # Build lại images từ Dockerfile
-docker compose build --no-cache
+sudo docker compose build --no-cache
 ```
 
 #### Bước 4: Khởi động các containers
 ```bash
 # Khởi động tất cả services (nginx, app)
-docker compose up -d
+sudo docker compose up -d
 
 # Kiểm tra trạng thái
-docker compose ps
+sudo docker compose ps
 ```
 
 #### Bước 5: Kiểm tra FFmpeg trong container
@@ -151,10 +151,10 @@ docker compose ps
 
 ```bash
 # Kiểm tra phiên bản
-docker compose exec app ffmpeg -version
+sudo docker compose exec app ffmpeg -version
 
 # Kiểm tra đường dẫn đầy đủ
-docker compose exec app which ffmpeg
+sudo docker compose exec app which ffmpeg
 ```
 
 
@@ -165,7 +165,7 @@ docker compose exec app which ffmpeg
 Nếu chắc chắn các thông tin kết nối là đúng thì có thể bỏ qua, hoặc chỉ cần chạy migration thì có thể thấy lỗi nếu không kết nối được.
 ```bash
 # Test kết nối từ container đến MySQL host
-docker compose exec app php -r "new PDO('mysql:host=host.docker.internal;dbname=lms_database', 'lms_user', 'your_password');"
+sudo docker compose exec app php -r "new PDO('mysql:host=host.docker.internal;dbname=lms_database', 'lms_user', 'your_password');"
 
 # Nếu thành công sẽ không có lỗi
 ```
@@ -173,57 +173,57 @@ docker compose exec app php -r "new PDO('mysql:host=host.docker.internal;dbname=
 #### Bước 7: Cài đặt dependencies cho Laravel
 ```bash
 # Vào container và cài đặt Composer packages
-docker compose exec app composer install --optimize-autoloader --no-dev
+sudo docker compose exec app composer install --optimize-autoloader --no-dev
 ```
 
 #### Bước 8: Generate key
 ```bash
 # Tự động tạo APP_KEY trong file .env
-docker compose exec app php artisan key:generate
+sudo docker compose exec app php artisan key:generate
 
 # Tự động tạo JWT_SECRET trong file .env
-docker compose exec app php artisan jwt:secret
+sudo docker compose exec app php artisan jwt:secret
 ```
 
 ### Bước 9: Tạo symplink
 Tạo symlink để ánh xạ thư mục `public/storage` -> `storage/app/public`
 ```bash
-docker compose exec app php artisan storage:link
+sudo docker compose exec app php artisan storage:link
 ```
 
 #### Bước 10: Chạy database migrations
 ```bash
 # Tạo tables trong database
-docker compose exec app php artisan migrate --force
+sudo docker compose exec app php artisan migrate --force
 
 # Nếu cần chạy seeders
-docker compose exec app php artisan db:seed --force
+sudo docker compose exec app php artisan db:seed --force
 ```
 
 #### Bước 11: Cache configurations
 ```bash
 # Cache config để tăng performance
-docker compose exec app php artisan config:cache
+sudo docker compose exec app php artisan config:cache
 
 # Cache routes
-docker compose exec app php artisan route:cache
+sudo docker compose exec app php artisan route:cache
 
 # Cache views
-docker compose exec app php artisan view:cache
+sudo docker compose exec app php artisan view:cache
 ```
 
 #### Bước 12: Set permissions
 ```bash
 # Cấp quyền cho thư mục storage và cache
-docker compose exec app chown -R www-data:www-data /COURCE/storage
-docker compose exec app chown -R www-data:www-data /COURCE/bootstrap/cache
-docker compose exec app chmod -R 775 /COURCE/storage
-docker compose exec app chmod -R 775 /COURCE/bootstrap/cache
+sudo docker compose exec app chown -R www-data:www-data /COURCE/storage
+sudo docker compose exec app chown -R www-data:www-data /COURCE/bootstrap/cache
+sudo docker compose exec app chmod -R 775 /COURCE/storage
+sudo docker compose exec app chmod -R 775 /COURCE/bootstrap/cache
 ```
 
 #### Bước 13: Restart để áp dụng changes
 ```bash
-docker compose restart
+sudo docker compose restart
 ```
 
 ## 6️⃣ Cấu hình Nginx ngoài server
@@ -236,14 +236,14 @@ Hành động này là bắt buộc, xem tài liệu bên ngoài
 ### 2. Tạo file cấu hình
 Copy cấu hình nginx từ source vào thư mục cấu hình Nginx ở Host (Ubuntu server)
 ```bash
-vim /etc/nginx/sites-available/rdi.sotech.io.vn
+vim /etc/nginx/sites-available/lms.sotech.io.vn
 ```
 Ghi nội dung sau vào file vừa tạo hoặc có thể lấy nội dung từ `nginx-host.conf`:
 ```nginx
 # HTTP Server - Redirect to HTTPS
 server {
     listen 80;
-    server_name rdi.sotech.io.vn;
+    server_name lms.sotech.io.vn;
     
     # Redirect all HTTP requests to HTTPS
     return 308 https://$server_name$request_uri;
@@ -252,11 +252,14 @@ server {
 # HTTPS Server
 server {
     listen 443 ssl;
-    server_name rdi.sotech.io.vn;
+    server_name lms.sotech.io.vn;
 
     # SSL Certificate paths (update these paths after generating certificates)
-    ssl_certificate /etc/letsencrypt/live/rdi.sotech.io.vn/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/rdi.sotech.io.vn/privkey.pem;
+    #ssl_certificate /etc/letsencrypt/live/lms.sotech.io.vn/fullchain.pem;
+    #ssl_certificate_key /etc/letsencrypt/live/lms.sotech.io.vn/privkey.pem;
+
+    ssl_certificate /etc/nginx/ssl/cloudflare.crt;
+    ssl_certificate_key /etc/nginx/ssl/cloudflare.key;
     
     # SSL Configuration - Modern and secure
     ssl_protocols TLSv1.2 TLSv1.3;
@@ -278,7 +281,7 @@ server {
 
     location / {
         # Proxy đến Docker Nginx container (port 8080)
-        proxy_pass http://localhost:8080;
+        proxy_pass http://127.0.0.1:8080;
         
         # Headers để giữ thông tin client
         proxy_set_header Host $host;
@@ -308,10 +311,10 @@ Tìm các giá trị `lms.domain.vn` và thay thế bằng domain mà bạn cầ
 #### 3.2 Sửa lại điều hướng domain internet vào port docker
 ```bash
 # Kiểm tra port docker
-docker compose ps
+sudo docker compose ps
 ```
 
-Kết quả tương tự như sau là app trên docker đang chạy ở port `8080`:
+Kết quả tương tự như sau là app trên sudo docker đang chạy ở port `8080`:
 ```bash
 NAME        IMAGE          COMMAND                  SERVICE   CREATED      STATUS      PORTS
 lms_app     rdi_app        "docker-php-entrypoi…"   app       4 days ago   Up 4 days   9000/tcp
@@ -351,27 +354,27 @@ Mở trình duyệt và truy cập: `http://lms.domain.vn` hoặc `https://lms.d
 
 ```bash
 # Xem logs
-docker compose logs -f app      # Logs PHP
-docker compose logs -f nginx    # Logs Nginx
+sudo docker compose logs -f app      # Logs PHP
+sudo docker compose logs -f nginx    # Logs Nginx
 
 # Restart services
-docker compose restart
+sudo docker compose restart
 
 # Stop services
-docker compose stop
+sudo docker compose stop
 
 # Start services
-docker compose start
+sudo docker compose start
 
 # Vào container để chạy commands
-docker compose exec app bash
-docker compose exec app php artisan migrate
-docker compose exec app php artisan cache:clear
+sudo docker compose exec app bash
+sudo docker compose exec app php artisan migrate
+sudo docker compose exec app php artisan cache:clear
 
 # Rebuild sau khi thay đổi code
-docker compose down
-docker compose build --no-cache
-docker compose up -d
+sudo docker compose down
+sudo docker compose build --no-cache
+sudo docker compose up -d
 ```
 
 ## 🔄 Deploy lại khi có sự thay đổi về code
@@ -383,25 +386,25 @@ Khi bạn cần update code mới lên server:
 git pull origin main
 
 # 2. Rebuild nếu có thay đổi Dockerfile, nginx.conf, hoặc dependencies
-docker compose build --no-cache
+sudo docker compose build --no-cache
 
 # 3. Restart containers
-docker compose down
-docker compose up -d
+sudo docker compose down
+sudo docker compose up -d
 
 # 4. Clear và cache lại
-docker compose exec app php artisan config:clear
-docker compose exec app php artisan cache:clear
-docker compose exec app composer install --optimize-autoloader --no-dev
-docker compose exec app php artisan config:cache
-docker compose exec app php artisan route:cache
-docker compose exec app php artisan view:cache
+sudo docker compose exec app php artisan config:clear
+sudo docker compose exec app php artisan cache:clear
+sudo docker compose exec app composer install --optimize-autoloader --no-dev
+sudo docker compose exec app php artisan config:cache
+sudo docker compose exec app php artisan route:cache
+sudo docker compose exec app php artisan view:cache
 
 # 5. Chạy migrations mới (nếu có)
-docker compose exec app php artisan migrate --force
+sudo docker compose exec app php artisan migrate --force
 
 # 6. Restart lại
-docker compose restart
+sudo docker compose restart
 ```
 
 ## 🔄 Deploy lại khi có sự thay đổi cấu hình Nginx trong Docker
@@ -416,13 +419,13 @@ git pull origin main
 # Hoặc: nano docker/nginx/nginx.conf
 
 # 2. Restart nginx container để áp dụng config mới
-docker compose restart nginx
+sudo docker compose restart nginx
 
 # 3. Verify config đã được load
-docker compose exec nginx nginx -t
+sudo docker compose exec nginx nginx -t
 
 # 4. Xem config hiện tại
-docker compose exec nginx cat /etc/nginx/conf.d/default.conf | grep client_max_body_size
+sudo docker compose exec nginx cat /etc/nginx/conf.d/default.conf | grep client_max_body_size
 ```
 
 ## 🔍 Troubleshooting
@@ -446,20 +449,20 @@ Thực hiện bước cấu hình theo hướng dẫn [Cấu hình Nginx ngoài 
 ```bash
 # 1. Kiểm tra config hiện tại
 cd /COURCE
-docker compose exec nginx cat /etc/nginx/conf.d/default.conf | grep client_max_body_size
+sudo docker compose exec nginx cat /etc/nginx/conf.d/default.conf | grep client_max_body_size
 
 # 2. Nếu không thấy hoặc giá trị nhỏ, cần pull code mới
 git pull origin main
 
 # 3. Restart nginx để áp dụng config
-docker compose restart nginx
+sudo docker compose restart nginx
 
 # 4. Verify lại
-docker compose exec nginx nginx -t
-docker compose exec nginx cat /etc/nginx/conf.d/default.conf | grep -A 2 client_max_body_size
+sudo docker compose exec nginx nginx -t
+sudo docker compose exec nginx cat /etc/nginx/conf.d/default.conf | grep -A 2 client_max_body_size
 
 # Nếu vẫn không thấy, kiểm tra volume mapping
-docker compose exec nginx ls -la /etc/nginx/conf.d/
+sudo docker compose exec nginx ls -la /etc/nginx/conf.d/
 ```
 
 **Lưu ý**: File `docker/nginx/nginx.conf` đã được cấu hình:
@@ -481,40 +484,40 @@ docker compose exec nginx ls -la /etc/nginx/conf.d/
 **Giải pháp:**
 ```bash
 # Xóa tất cả cache
-docker compose exec app php artisan config:clear
-docker compose exec app php artisan route:clear
-docker compose exec app php artisan cache:clear
-docker compose exec app rm -rf bootstrap/cache/*.php
+sudo docker compose exec app php artisan config:clear
+sudo docker compose exec app php artisan route:clear
+sudo docker compose exec app php artisan cache:clear
+sudo docker compose exec app rm -rf bootstrap/cache/*.php
 
 # Generate APP_KEY mới
-docker compose exec app php artisan key:generate --force
+sudo docker compose exec app php artisan key:generate --force
 
 # Restart để áp dụng
-docker compose restart
+sudo docker compose restart
 
 # Verify APP_KEY đã được tạo
-docker compose exec app grep "^APP_KEY=" .env
+sudo docker compose exec app grep "^APP_KEY=" .env
 ```
 
 ### ⚠️ Lỗi permission storage
 ```bash
-docker compose exec app chmod -R 775 storage bootstrap/cache
-docker compose exec app chown -R www-data:www-data storage bootstrap/cache
+sudo docker compose exec app chmod -R 775 storage bootstrap/cache
+sudo docker compose exec app chown -R www-data:www-data storage bootstrap/cache
 ```
 
 ### 🧹 Clear cache
 ```bash
-docker compose exec app php artisan cache:clear
-docker compose exec app php artisan config:clear
-docker compose exec app php artisan route:clear
-docker compose exec app php artisan view:clear
+sudo docker compose exec app php artisan cache:clear
+sudo docker compose exec app php artisan config:clear
+sudo docker compose exec app php artisan route:clear
+sudo docker compose exec app php artisan view:clear
 ```
 
 ### ⚠️ Database connection failed
 - Kiểm tra MySQL đang chạy trên host: `sudo systemctl status mysql`
 - Kiểm tra credentials trong `.env`
 - Kiểm tra MySQL bind-address: `sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf`
-- Test kết nối: `docker compose exec app php artisan tinker` -> `DB::connection()->getPdo();`
+- Test kết nối: `sudo docker compose exec app php artisan tinker` -> `DB::connection()->getPdo();`
 - Kiểm tra firewall: `sudo ufw status`
 
 ### ⚠️ Không kết nối được MySQL từ Docker
@@ -529,15 +532,15 @@ sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
 sudo systemctl restart mysql
 
 # Test từ container
-docker compose exec app ping host.docker.internal
-docker compose exec app nc -zv host.docker.internal 3306
+sudo docker compose exec app ping host.docker.internal
+sudo docker compose exec app nc -zv host.docker.internal 3306
 ```
 
 ### ⚠️ Container không start được
 ```bash
 # Xem logs để tìm lỗi
-docker compose logs app
-docker compose logs nginx
+sudo docker compose logs app
+sudo docker compose logs nginx
 
 # Kiểm tra port đã được sử dụng chưa
 sudo netstat -tulpn | grep :80
@@ -549,17 +552,17 @@ sudo systemctl stop nginx
 ### ⚠️ Composer install failed
 ```bash
 # Xóa vendor và thử lại
-docker compose exec app rm -rf vendor
-docker compose exec app composer clear-cache
-docker compose exec app composer install --optimize-autoloader --no-dev
+sudo docker compose exec app rm -rf vendor
+sudo docker compose exec app composer clear-cache
+sudo docker compose exec app composer install --optimize-autoloader --no-dev
 ```
 
 ### ⚠️ Migration failed
 ```bash
 # Rollback và migrate lại
-docker compose exec app php artisan migrate:rollback
-docker compose exec app php artisan migrate --force
+sudo docker compose exec app php artisan migrate:rollback
+sudo docker compose exec app php artisan migrate --force
 
 # Hoặc fresh (XÓA HẾT DATA - cẩn thận!)
-docker compose exec app php artisan migrate:fresh --force
+sudo docker compose exec app php artisan migrate:fresh --force
 ```

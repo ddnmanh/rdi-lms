@@ -1,5 +1,10 @@
 FROM php:8.0-fpm
 
+# Chuyển hướng repository sang archive.debian.org
+RUN sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list \
+    && sed -i 's|security.debian.org|archive.debian.org/|g' /etc/apt/sources.list \
+    && sed -i '/buster-updates/d' /etc/apt/sources.list
+
 # Install system dependencies including FFmpeg
 RUN apt-get update && apt-get install -y \
     git \

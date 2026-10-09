@@ -86,7 +86,7 @@
 
             <div class="mt-6 text-center text-[12px] text-gray-400 dark:text-gray-500">
                 © <span id="currentYear"></span> LMS. Hỗ trợ:
-                <a class="underline" href="mailto:support@lms.vn">support@lms.vn</a>
+                <a class="underline" href="mailto:dnmanh@sotech.io.vn">dnmanh@sotech.io.vn</a>
             </div>
         </div>
 
